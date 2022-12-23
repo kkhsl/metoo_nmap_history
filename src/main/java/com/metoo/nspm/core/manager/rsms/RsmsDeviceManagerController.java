@@ -5,14 +5,14 @@ import com.metoo.nspm.core.config.annotation.OperationLogAnno;
 import com.metoo.nspm.core.config.annotation.OperationType;
 import com.metoo.nspm.core.manager.admin.tools.GroupTools;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.core.service.zabbix.ZabbixHostInterfaceService;
+import com.metoo.nspm.core.service.api.zabbix.ZabbixHostInterfaceService;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.PlantRoomDTO;
 import com.metoo.nspm.dto.RsmsDeviceDTO;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.entity.*;
+import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +76,6 @@ public class RsmsDeviceManagerController {
             }
         }
         Page<RsmsDevice> page = this.rsmsDeviceService.selectConditionQuery(dto);
-        if(page.size() > 0){
             Map map = new HashMap();
             // 设备类型
             List<DeviceType> deviceTypeList = this.deviceTypeService.selectConditionQuery();
@@ -98,8 +97,6 @@ public class RsmsDeviceManagerController {
             List<Project> projectList = this.projectService.selectObjByMap(params);
             map.put("project", projectList);
             return ResponseUtil.ok(new PageInfo<Rack>(page, map));
-        }
-        return ResponseUtil.ok();
     }
 
     @RequestMapping("/type/list")

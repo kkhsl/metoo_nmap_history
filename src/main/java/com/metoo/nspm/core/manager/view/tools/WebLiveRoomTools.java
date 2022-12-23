@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.manager.view.tools;
 
-import com.metoo.nspm.core.service.IRoomProgramService;
-import com.metoo.nspm.entity.RoomProgram;
+import com.metoo.nspm.core.service.nspm.IRoomProgramService;
+import com.metoo.nspm.entity.nspm.RoomProgram;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

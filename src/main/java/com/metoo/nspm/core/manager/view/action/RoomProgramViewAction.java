@@ -1,11 +1,11 @@
 package com.metoo.nspm.core.manager.view.action;
 
-import com.metoo.nspm.core.service.ILiveRoomService;
-import com.metoo.nspm.core.service.IRoomProgramService;
-import com.metoo.nspm.core.service.ISysConfigService;
-import com.metoo.nspm.entity.LiveRoom;
-import com.metoo.nspm.entity.RoomProgram;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.core.service.nspm.ILiveRoomService;
+import com.metoo.nspm.core.service.nspm.IRoomProgramService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
+import com.metoo.nspm.entity.nspm.LiveRoom;
+import com.metoo.nspm.entity.nspm.RoomProgram;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import com.metoo.nspm.vo.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -65,7 +65,7 @@ public class RoomProgramViewAction {
                 map.put("rtmp", rtmp + "/index.m3u8");
             }
         }
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         map.put("title", sysConfig.getTitle());
         return new Result(200, "Successfully", map);
     }

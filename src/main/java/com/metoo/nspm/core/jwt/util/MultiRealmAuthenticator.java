@@ -45,7 +45,7 @@ public class MultiRealmAuthenticator extends ModularRealmAuthenticator {
                     authenticationException = e;
                     if (log.isDebugEnabled()) {
                         String msg = "Realm [" + realm
-                                + "] threw an exception during a multi-realm authentication attempt:";
+                                + "] threw an exception during zabbix multi-realm authentication attempt:";
                         log.debug(msg, e);
                     }
                 }

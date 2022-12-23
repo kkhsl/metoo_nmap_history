@@ -1,10 +1,10 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.IAccessoryService;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IAccessoryService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.entity.Accessory;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.Accessory;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +85,7 @@ public class FileUploadManagerController {
 
     public Map upload(@RequestParam(required = false) MultipartFile file, int type){
         Map map = new HashMap();
-        SysConfig configs = this.configService.findSysConfigList();
+        SysConfig configs = this.configService.select();
         String uploaFilePath = configs.getUploadFilePath();
         String path = configs.getVideoFilePath();
         String originalName = file.getOriginalFilename();

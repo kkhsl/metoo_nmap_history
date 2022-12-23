@@ -1,7 +1,7 @@
 package com.metoo.nspm.dto;
 
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

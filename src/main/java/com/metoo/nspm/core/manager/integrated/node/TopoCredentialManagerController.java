@@ -3,15 +3,15 @@ package com.metoo.nspm.core.manager.integrated.node;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.IGroupService;
-import com.metoo.nspm.core.service.ISysConfigService;
-import com.metoo.nspm.core.service.IUserService;
+import com.metoo.nspm.core.service.nspm.IGroupService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.TopoCredentialDto;
-import com.metoo.nspm.entity.Group;
-import com.metoo.nspm.entity.SysConfig;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.Group;
+import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("列表")
     @RequestMapping({"/push/credential/getall"})
     public Object getall(@RequestBody(required = false) TopoCredentialDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             if (dto.getBranchLevel() == null || dto.getBranchLevel().equals("")) {
@@ -97,7 +97,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("新增")
     @RequestMapping({"/push/credential/create"})
     public Object create(@RequestBody(required = false) TopoCredentialDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -144,7 +144,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("编辑")
     @RequestMapping({"/push/credential/get"})
     public Object get(@RequestBody(required = false) TopoCredentialDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -159,7 +159,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("编辑保存")
     @RequestMapping({"/push/credential/modify"})
     public Object modify(@RequestBody(required = false) TopoCredentialDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -174,7 +174,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("删除")
     @RequestMapping({"/push/credential/delete"})
     public Object delete(@RequestBody(required = false) TopoCredentialDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -189,7 +189,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("分配组")
     @RequestMapping({"/push/credential/batch-credential-update"})
     public Object batch_credential_update(@RequestBody(required = false) TopoCredentialDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -204,7 +204,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("导出")
     @GetMapping({"/push/credential/export-credential"})
     public Object export_credential(HttpServletResponse response, TopoCredentialDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -227,7 +227,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("下载模板")
     @RequestMapping({"/push/credential/download-credential-template"})
     public Object download_credential_template() {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -242,7 +242,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("导出")
     @GetMapping({"/push/downloadFile/template"})
     public Object template(HttpServletResponse response, TopoCredentialDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -256,7 +256,7 @@ public class TopoCredentialManagerController {
     @ApiOperation("导入文件")
     @RequestMapping({"/push/credential/import-credential"})
     public Object upload(@RequestParam(value = "multipartFile",required = false) MultipartFile file, String encrypt) throws IOException {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

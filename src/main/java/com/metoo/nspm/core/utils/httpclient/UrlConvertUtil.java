@@ -1,6 +1,6 @@
 package com.metoo.nspm.core.utils.httpclient;
 
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ public class UrlConvertUtil {
     private ISysConfigService sysConfigService;
 
     public String convert(String url){
-        String nspmUrl = sysConfigService.findSysConfigList().getNspmUrl();
+        String nspmUrl = sysConfigService.select().getNspmUrl();
         String convert = "";
         String abtUrl = "";
         int indexOf = url.indexOf("/");

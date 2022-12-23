@@ -1,11 +1,11 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.IRoleGroupService;
-import com.metoo.nspm.core.service.IRoleService;
+import com.metoo.nspm.core.service.nspm.IRoleGroupService;
+import com.metoo.nspm.core.service.nspm.IRoleService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.RoleGroupDto;
-import com.metoo.nspm.entity.Role;
-import com.metoo.nspm.entity.RoleGroup;
+import com.metoo.nspm.entity.nspm.Role;
+import com.metoo.nspm.entity.nspm.RoleGroup;
 import com.metoo.nspm.req.RoleGroupReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

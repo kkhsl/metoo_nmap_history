@@ -2,13 +2,13 @@ package com.metoo.nspm.core.manager.integrated.policy;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.TopoPolicyDto;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.Order;
-import com.metoo.nspm.entity.Policy;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.Order;
+import com.metoo.nspm.entity.nspm.Policy;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("列表")
     @RequestMapping("/push/task/pushtasklist")
     public Object pushtasklist(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/push/task/pushtasklist";
@@ -56,7 +56,7 @@ public class TopoIssuedManagerController {
 //    @ApiOperation("列表")
 //    @RequestMapping("/push/task/pushtasklist")
 //    public Object pushtasklist(@RequestBody(required = false) TopoPolicyDto dto){
-//        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+//        SysConfig sysConfig = this.sysConfigService.select();
 //
 //        String token = sysConfig.getNspmToken();
 //        if(token != null){
@@ -127,7 +127,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("下发详情")
     @RequestMapping("/push/recommend/task/getcommand")
     public Object getcommand(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -153,7 +153,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("列表")
     @RequestMapping("/push/task/pushtaskstatuslist")
     public Object pushtaskstatuslist(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -167,7 +167,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("获取下发信息")
     @RequestMapping("/push/task/getdevicenum")
     public Object getdevicenum(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -181,7 +181,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("下发")
     @RequestMapping("/push/task/startpushtasks")
     public Object startpushtasks(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -196,7 +196,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("停止下发")
     @RequestMapping("/push/task/stoppushtasks")
     public Object stoppushtasks(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -211,7 +211,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("下发")
     @RequestMapping("/push/task/checkNatOrder")
     public Object checkNatOrder(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -225,7 +225,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("命令下发")
     @RequestMapping("/push/task/startdevicepushtasks")
     public Object startdevicepushtasks(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -243,7 +243,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("命令保存")
     @RequestMapping("/push/recommend/task/editcommand.action")
     public Object editcommand(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -257,7 +257,7 @@ public class TopoIssuedManagerController {
     @ApiOperation("下发计划")
     @RequestMapping("/push/task/setschedule")
     public Object setschedule(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

@@ -2,17 +2,13 @@ package com.metoo.nspm.core.manager.rsms;
 
 import com.github.pagehelper.Page;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.IProjectService;
+import com.metoo.nspm.core.service.nspm.IProjectService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.ProjectDTO;
-import com.metoo.nspm.entity.NetworkElement;
-import com.metoo.nspm.entity.Project;
-import com.metoo.nspm.entity.User;
-import io.swagger.annotations.ApiModel;
+import com.metoo.nspm.entity.nspm.Project;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Param;
-import org.nutz.lang.random.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

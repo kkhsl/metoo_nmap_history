@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.IRoleResService;
-import com.metoo.nspm.entity.RoleRes;
+import com.metoo.nspm.core.service.nspm.IRoleResService;
+import com.metoo.nspm.entity.nspm.RoleRes;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

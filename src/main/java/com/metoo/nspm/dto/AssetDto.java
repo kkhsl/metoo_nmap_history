@@ -20,7 +20,7 @@ public class AssetDto {
     private Integer page;
     private Object val;
     /*{
-            "name": "a",
+            "name": "zabbix",
             "manufacturerId": 2,
             "ipAddress": "1.1.1.1",
             "assetGroup": 54,

@@ -3,13 +3,13 @@ package com.metoo.nspm.core.manager.admin.action;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.POJO.QueryFilter;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.LiveRoomDto;
+import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.vo.Result;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -107,7 +107,7 @@ public class LiveRoomManagerController {
     @ApiOperation("直播间列表")
     @RequestMapping(value = "/list")
     public Object list(@RequestBody LiveRoomDto dto) {
-        SysConfig sysConfig = this.configService.findSysConfigList();
+        SysConfig sysConfig = this.configService.select();
         Map map = new HashMap();
         User user = ShiroUserHolder.currentUser();
         // 分页查询
@@ -195,7 +195,7 @@ public class LiveRoomManagerController {
         params.put("id", room.getId());
         List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
         if(liveRoomList.size() > 0){
-            SysConfig sysConfig = this.configService.findSysConfigList();
+            SysConfig sysConfig = this.configService.select();
             LiveRoom liveRoom = liveRoomList.get(0);
             User currentUser = ShiroUserHolder.currentUser();
             if(currentUser.getId().equals(liveRoom.getUserId())){
@@ -327,7 +327,7 @@ public class LiveRoomManagerController {
                 if (liveRoom.getIsEnable() == 0) {
                     liveRoom.setIsEnable(1);
                     // 合并ts文件、转mp4
-                    SysConfig sysconfig = this.sysConfigService.findSysConfigList();
+                    SysConfig sysconfig = this.sysConfigService.select();
                     String path = sysconfig.getPath() + File.separator +liveRoom.getBindCode();
                     String currentDate = CommUtils.formatTime("yyyyMMddhhmmss", new Date());
                     String playBack = path + File.separator + currentDate;

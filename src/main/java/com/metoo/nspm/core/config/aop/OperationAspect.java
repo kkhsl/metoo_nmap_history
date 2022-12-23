@@ -2,8 +2,8 @@ package com.metoo.nspm.core.config.aop;
 
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.config.annotation.OperationLogAnno;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.*;
+import com.metoo.nspm.core.service.nspm.*;
+import com.metoo.nspm.entity.nspm.*;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
@@ -58,11 +58,9 @@ public class OperationAspect {
         MethodSignature methodSignature = (MethodSignature) signature;
         Method method = methodSignature.getMethod();
 
-
         //4. 获取方法的参数 一一对应
         Object[] args = joinPoint.getArgs();
         if(args.length > 0){
-
             if(operationLogAnno.name().equals("device")){
                 this.parse(args[0]);
             }

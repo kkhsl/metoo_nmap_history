@@ -1,14 +1,14 @@
 package com.metoo.nspm.core.manager.admin.action;
 
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.VideoDto;
+import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.req.VideoReq;
 import com.metoo.nspm.vo.Result;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.Logical;
@@ -324,7 +324,7 @@ public class VideoManagerController {
                        @RequestParam(value = "file", required = false) MultipartFile file,
                        @RequestParam(value = "img", required = false) MultipartFile img){
 
-        SysConfig configs = this.configService.findSysConfigList();
+        SysConfig configs = this.configService.select();
         if (file == null || file.getSize() <= 0 || img ==null && img.getSize() <= 0) {
             return new Result(500, "File does not exist");
         }
@@ -341,7 +341,7 @@ public class VideoManagerController {
 */
 
     public Accessory upload(@RequestParam(required = false) MultipartFile file, int type){
-        SysConfig configs = this.configService.findSysConfigList();
+        SysConfig configs = this.configService.select();
         String uploaFilePath = configs.getUploadFilePath();
         String path = configs.getVideoFilePath();
         if(type == 0){

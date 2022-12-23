@@ -1,9 +1,9 @@
 package com.metoo.nspm.core.utils.abt;
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.httpclient.UrlConvertUtil;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class AbtHttpClient {
         }
         params.remove("class");
         // 获取第三方token
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         return this.sendPost(params, url, token, contentType);
     }

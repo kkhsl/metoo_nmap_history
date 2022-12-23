@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.ILiveRoomService;
-import com.metoo.nspm.entity.LiveRoom;
+import com.metoo.nspm.core.service.nspm.ILiveRoomService;
+import com.metoo.nspm.entity.nspm.LiveRoom;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

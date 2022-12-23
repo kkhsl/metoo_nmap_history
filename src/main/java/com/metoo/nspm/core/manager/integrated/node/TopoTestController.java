@@ -13,7 +13,7 @@ public class TopoTestController {
 
     @RequestMapping("/topoNode")
     public void topoNode(){
-        this.topoNodeService.queryMetoo().forEach(item -> System.out.println(item));
+        this.topoNodeService.queryNetworkElement().forEach(item -> System.out.println(item));
     }
 
 

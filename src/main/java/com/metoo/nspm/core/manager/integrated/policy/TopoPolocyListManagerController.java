@@ -1,11 +1,11 @@
 package com.metoo.nspm.core.manager.integrated.policy;
 
 import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.TopoPolicyDto;
-import com.metoo.nspm.entity.SysConfig;
-import com.metoo.nspm.core.service.*;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.beanutils.BeanMap;
@@ -39,7 +39,7 @@ public class TopoPolocyListManagerController {
     @ApiOperation("策略列表统计")
     @PostMapping(value = "/policy-list-pie")
     public Object policyListPie(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
 
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -53,7 +53,7 @@ public class TopoPolocyListManagerController {
     @ApiOperation("根据策略集uuid查询策略规则")
     @PostMapping(value = "/rule-list-search")
     public Object ruleListSearch(@RequestBody TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology-policy/policy/rule-list-search";
@@ -66,7 +66,7 @@ public class TopoPolocyListManagerController {
     @ApiOperation("下载策略列表Excel文件")
     @RequestMapping("/report/policyList/download")
     public Object policyListDownLoad(HttpServletRequest request, String deviceUuid, String isReload){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology-policy/report/policyList/download";

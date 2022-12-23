@@ -1,6 +1,6 @@
 package com.metoo.nspm.core.shiro.main;
 
-import com.metoo.nspm.config.shiro.MyRealm;
+import com.metoo.nspm.core.config.shiro.MyRealm;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;

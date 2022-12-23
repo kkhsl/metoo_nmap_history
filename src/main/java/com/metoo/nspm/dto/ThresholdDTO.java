@@ -18,4 +18,5 @@ public class ThresholdDTO extends PageDto<ThresholdDTO> {
     private Double cpu;
     private Double memory;
     private Double flow;
+
 }

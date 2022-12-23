@@ -1,10 +1,10 @@
 package com.metoo.nspm.core.manager.integrated.node;
 
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.BranchDto;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +24,7 @@ public class TopoNspmBranchManagerAction {
     @ApiOperation("列表")
     @PostMapping(value = "/findBranchTree")
     public Object findBranchTree(@RequestBody(required = false) BranchDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if (token != null) {
@@ -38,7 +38,7 @@ public class TopoNspmBranchManagerAction {
     @ApiOperation("获取分组")
     @PostMapping(value = "/getBranch")
     public Object getBranch(@RequestBody(required = false) BranchDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if (token != null) {
@@ -52,7 +52,7 @@ public class TopoNspmBranchManagerAction {
     @ApiOperation("更新")
     @PostMapping(value = "/update")
     public Object update(@RequestBody(required = false) BranchDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if (token != null) {
@@ -66,7 +66,7 @@ public class TopoNspmBranchManagerAction {
     @ApiOperation("添加")
     @PostMapping(value = "/add")
     public Object add(@RequestBody(required = false) BranchDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -80,7 +80,7 @@ public class TopoNspmBranchManagerAction {
     @ApiOperation("删除")
     @PostMapping(value = "/delete")
     public Object delete(@RequestBody(required = false) BranchDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if (token != null) {

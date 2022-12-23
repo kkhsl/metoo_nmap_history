@@ -1,9 +1,11 @@
 package com.metoo.nspm.core.manager.view.action;
 
-import com.metoo.nspm.core.service.ISysConfigService;
-import com.metoo.nspm.core.service.IUserService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IUserService;
+import com.metoo.nspm.core.service.zabbix.IGatherService;
 import com.metoo.nspm.core.utils.CaptchaUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
+import com.metoo.nspm.entity.nspm.User;
 import com.metoo.nspm.vo.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -75,11 +79,12 @@ public class LoginController{
                             }
                             subject.login(token);
                             session.removeAttribute("captcha");
-                            Cookie cookie = new Cookie("access_token", this.sysConfigService.findSysConfigList().getNspmToken().trim());
+                            Cookie cookie = new Cookie("access_token", this.sysConfigService.select().getNspmToken().trim());
                             cookie.setMaxAge(43200);
                             cookie.setPath("/");
                             response.addCookie(cookie);
-                            return ResponseUtil.ok();
+                            User user = this.userService.findByUserName(username);
+                            return ResponseUtil.ok(user.getId());
                             //  return "redirect:/index.jsp";
                         } catch (UnknownAccountException e) {
                             e.printStackTrace();
@@ -103,8 +108,24 @@ public class LoginController{
         }
     }
 
+    @Autowired
+    private IGatherService gatherService;
+
     @GetMapping("/captcha")
     public void captcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+//        System.out.println("Arp开始采集: " + System.currentTimeMillis());
+//        // 采集时间
+//        Calendar cal = Calendar.getInstance();
+//        cal.clear(Calendar.SECOND);
+//        cal.clear(Calendar.MILLISECOND);
+//        Date date = cal.getTime();
+//        // 此处开启两个线程
+//        // 存在先后顺序，先录取arp，在根据arp解析数据
+//        this.gatherService.gatherMacItem(date);
+//        this.gatherService.gatherArpItem(date);
+//        this.gatherService.gatherRouteItem(date);
+
         //设置响应头信息，通知浏览器不要缓存
         response.setHeader("Expires", "-1");
         response.setHeader("Cache-Control", "no-cache");

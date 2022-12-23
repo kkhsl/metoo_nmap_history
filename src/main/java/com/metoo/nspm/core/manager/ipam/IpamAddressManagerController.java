@@ -1,12 +1,12 @@
 package com.metoo.nspm.core.manager.ipam;
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.http.IpamHttpBase;
+import com.metoo.nspm.core.http.IpamApiUtil;
 import com.metoo.nspm.core.service.phpipam.IpamAddressService;
-import com.metoo.nspm.core.service.zabbix.IpDetailService;
+import com.metoo.nspm.core.service.nspm.IpDetailService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.entity.Ipam.IpamAddress;
-import com.metoo.nspm.entity.zabbix.IpDetail;
+import com.metoo.nspm.entity.nspm.IpDetail;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -77,7 +77,7 @@ public class IpamAddressManagerController {
         if(subnetId != null){
             url += "/" + subnetId;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         JSONObject result = base.get();
         if(result != null && result.getBoolean("success")) {
             Object data = result.get("data");

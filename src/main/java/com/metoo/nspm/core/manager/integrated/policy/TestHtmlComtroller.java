@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.manager.integrated.policy;
 
 import com.metoo.nspm.core.utils.freemarker.FreemarkerUtil;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.User;
 import com.metoo.nspm.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

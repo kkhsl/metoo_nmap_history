@@ -59,4 +59,25 @@ public class DownLoadFileUtil {
             ;
         }
     }
+
+    public static boolean downloadZip(InputStream in, String fileName, HttpServletResponse response) {
+        try {
+            byte[] buffer = new byte[in.available()];
+            in.read(buffer);
+            in.close();
+            response.reset();
+            OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+            toClient.write(buffer);
+            toClient.flush();
+            toClient.close();
+            boolean var5 = true;
+            return var5;
+        } catch (IOException var9) {
+            logger.error("downloadZip异常", var9);
+            boolean var3 = false;
+            return var3;
+        }
+    }
 }

@@ -2,7 +2,7 @@ package com.metoo.nspm.dto;
 
 
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.entity.Monitor;
+import com.metoo.nspm.entity.nspm.Monitor;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;

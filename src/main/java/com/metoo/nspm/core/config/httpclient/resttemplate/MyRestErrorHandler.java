@@ -25,7 +25,5 @@ public class MyRestErrorHandler implements ResponseErrorHandler {
     public void handleError(ClientHttpResponse response) throws IOException {
         // 里面可以实现你自己遇到了Error进行合理的处理
         //TODO 将接口请求的异常信息持久化
-
-
     }
 }

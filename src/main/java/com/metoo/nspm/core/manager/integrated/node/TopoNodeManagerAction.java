@@ -4,23 +4,23 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.IGroupService;
-import com.metoo.nspm.core.service.INodeService;
-import com.metoo.nspm.core.service.ISysConfigService;
-import com.metoo.nspm.core.service.IUserService;
+import com.metoo.nspm.core.service.nspm.IGroupService;
+import com.metoo.nspm.core.service.nspm.INodeService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.service.topo.ITopoNodeService;
-import com.metoo.nspm.core.service.zabbix.ZabbixHostInterfaceService;
-import com.metoo.nspm.core.service.zabbix.ZabbixService;
+import com.metoo.nspm.core.service.api.zabbix.ZabbixHostInterfaceService;
+import com.metoo.nspm.core.service.api.zabbix.ZabbixService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.abt.AbtHttpClient;
 import com.metoo.nspm.core.utils.httpclient.UrlConvertUtil;
 import com.metoo.nspm.dto.TopoNodeDto;
 import com.metoo.nspm.dto.TopoPolicyDto;
-import com.metoo.nspm.entity.Group;
-import com.metoo.nspm.entity.SysConfig;
-import com.metoo.nspm.entity.TopoNode;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.Group;
+import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.entity.nspm.TopoNode;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.beanutils.BeanMap;
@@ -77,7 +77,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("设备列表")
     @GetMapping(value = "/topology-layer/whale/GET/node/navigation")
     public Object nodeNavigation(TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
            if(dto.getBranchLevel() == null || dto.getBranchLevel().equals("")){
@@ -110,7 +110,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("节点列表")
     @RequestMapping("/nodeQuery")
     public Object nodeQuery(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "topology/node/queryNode.action";
@@ -172,7 +172,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("厂商")
     @RequestMapping("/vendor")
     public Object vendor(@RequestBody(required = false) TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -204,7 +204,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("编辑")
     @RequestMapping(value="/device/devices")
     public Object deviceDevices(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -218,7 +218,7 @@ public class TopoNodeManagerAction {
 //    @ApiOperation("保存")
 //    @RequestMapping(value="/simulation/addGateway")
 //    public Object addGateway(@RequestBody TopoNodeDto dto){
-//        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+//        SysConfig sysConfig = this.sysConfigService.select();
 //        String token = sysConfig.getNspmToken();
 //        if(token != null){
 //            String url = "/topology/node/simulation/addGateway.action/";
@@ -242,7 +242,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("编辑保存（防火墙）")
     @RequestMapping("/updateNode")
     public Object updateNode(TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -256,7 +256,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("在线采集")
     @RequestMapping("/addGatherNode")
     public Object addGatherNode(TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -290,7 +290,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("节点保存(local)")
     @RequestMapping("/addGatherNode1")
     public Object addGatherNodeLocal(TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -332,7 +332,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("验证Ip是否存在")
     @RequestMapping("/booleanExistIPs")
     public Object booleanExistIPs(TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -346,7 +346,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("节点删除")
     @RequestMapping("/nodeDelete")
     public Object nodeDelete(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -362,7 +362,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("设备接口")
     @RequestMapping(value="/view/configuration")
     public Object viewConfiguration(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         String uuid = dto.getUuid();
@@ -377,7 +377,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("业务子网自动学习")
    @PutMapping(value="/deviceBusinessSubnet")
     public Object deviceBusinessSubnet(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -391,7 +391,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("设备接口编辑")
     @PutMapping(value="/businessSubnet")
     public Object businessSubnet(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -405,7 +405,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("设备配置")
     @PutMapping(value="device/rawConfig")
     public Object rawConfig(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -419,7 +419,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("采集历史")
     @PostMapping(value="/queryNodeHistory")
     public Object queryNodeHistory(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -433,7 +433,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("文件对比")
     @GetMapping(value="/showConfig")
     public Object showConfig(TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -447,7 +447,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("路由表采集历史")
     @PostMapping(value="/queryRouteTableHistory")
     public Object queryRouteTableHistory(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/node/queryRouteTableHistory.action/";
@@ -460,7 +460,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("采集历史-配置文件")
     @GetMapping(value="/downloadHistory.action")
     public Object downloadHistory(@RequestParam("id") String id){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url =  "/topology/node/downloadHistory.action";
@@ -474,7 +474,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("路由表-配置下载")
     @GetMapping(value="/downloadRouteTableHistory.action")
     public Object downloadRouteTableHistory(@RequestParam("id") String id){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url =  "/topology/node/downloadRouteTableHistory.action";
@@ -489,7 +489,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("参与路径计算")
     @RequestMapping(value="/updateNodeSkipAnalysis")
     public Object updateNodeSkipAnalysis(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -503,7 +503,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("同进同出")
     @RequestMapping(value="/updateNodeToSameInbound")
     public Object updateNodeToSameInbound(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -517,7 +517,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("二层设备")
     @RequestMapping(value="/updateNodeLayerTwoDevice")
     public Object updateNodeLayerTwoDevice(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -531,7 +531,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("变更总览")
     @RequestMapping(value="/device/reversion")
     public Object deviceReversion(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -545,7 +545,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("变更总览")
     @RequestMapping(value="/device/change")
     public Object deviceChange(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -559,7 +559,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("对比")
     @GetMapping(value="/showRouteTableConfig")
     public Object showRouteTableConfig(TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -574,7 +574,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("设备类型")
     @GetMapping(value="/engineJson")
     public Object engineJson(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -588,7 +588,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("采集凭据/下发凭据")
     @RequestMapping(value="/push/credential/getall")
     public Object push(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -607,7 +607,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("采集周期")
     @GetMapping(value="/cycle/getCyclePage")
     public Object cycleGetCyclePage(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -622,7 +622,7 @@ public class TopoNodeManagerAction {
     @PostMapping(value="/doGather")
     public Object doGather(@RequestBody TopoNodeDto dto) {
 
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if (token != null) {
@@ -644,8 +644,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("批量导入")
     @GetMapping(value="/batch-import-excel")
     public Object batchImportNode(@RequestParam(value = "multipartFile", required = false) MultipartFile file, String encrypt) throws IOException {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
-        
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/node/batch-import-excel/";
@@ -679,7 +678,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("手工采集")
     @PostMapping(value = "/upload")
     public Object upload(@RequestParam(value = "file", required = false) MultipartFile file, TopoNodeDto dto) throws IOException {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/node/upload.action/";
@@ -719,7 +718,7 @@ public class TopoNodeManagerAction {
     @ApiOperation("离线导入路由表")
     @PostMapping(value = "/uploadRouteTable")
     public Object uploadRouteTable(@RequestParam(value = "file", required = false) MultipartFile file, TopoNodeDto dto) throws IOException {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/node/uploadRouteTable.action/";
@@ -763,7 +762,7 @@ public class TopoNodeManagerAction {
     @ApiModelProperty("通过Zabbix获取设备路由表信息-上传到abt")
     @GetMapping("/auto/upload/rout/table")
     public Object autoUploadRoutTable(){
-        List<Map> maps = this.topoNodeService.queryMetoo();
+        List<Map> maps = this.topoNodeService.queryNetworkElement();
         for (Map map : maps){
             FileInputStream fileInputStream = null;
             MultipartFile multipartFile = null;
@@ -778,7 +777,7 @@ public class TopoNodeManagerAction {
                 fileInputStream = new FileInputStream(file);
                 multipartFile = new MockMultipartFile(file.getName(),file.getName(),
                         ContentType.APPLICATION_OCTET_STREAM.toString(),fileInputStream);
-                SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+                SysConfig sysConfig = this.sysConfigService.select();
                 String token = sysConfig.getNspmToken();
                 if(token != null) {
                     String url = "/topology/node/uploadRouteTable.action/";

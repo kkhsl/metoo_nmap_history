@@ -21,6 +21,11 @@ public class MyAccessControlFilter extends AccessControlFilter {
 //        if(env.equalsIgnoreCase("dev")){
 //            return true;
 //        }
+
+//        if(protocol.equals("wss") || protocol.equals("ws")){
+//        if(env.equals("dev")){
+//            return true;
+//        }
         Subject subject = SecurityUtils.getSubject();
         if(subject.getPrincipal() != null){
             // 如果未认证并且未IsreMenmberMe(Session失效问题)

@@ -1,13 +1,13 @@
 package com.metoo.nspm.core.manager.view.action;
 
 import com.metoo.nspm.core.manager.view.tools.WebLiveRoomTools;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.CommUtils;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.VideoDto;
+import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.req.VideoReq;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +84,7 @@ public class VideoViewController {
     public Object list(@RequestBody(required = false) VideoDto dto){
 
         Map data = new HashMap();
-        SysConfig config = this.configService.findSysConfigList();
+        SysConfig config = this.configService.select();
         if(dto.getCurrentPage() == null){
             dto.setCurrentPage(1);
         }
@@ -136,7 +136,7 @@ public class VideoViewController {
     @RequestMapping("/detail")
     public Object videoList(@RequestBody(required = true) VideoReq req){
         Map map = new HashMap();
-        SysConfig config = this.configService.findSysConfigList();
+        SysConfig config = this.configService.select();
         Video video = this.videoService.selectPrimaryById(req.getId());
         LiveRoom liveRoom = null;
         // 查询当前直播间是否有直播未结束

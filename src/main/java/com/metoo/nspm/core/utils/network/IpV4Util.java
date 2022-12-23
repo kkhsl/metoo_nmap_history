@@ -1,6 +1,6 @@
 package com.metoo.nspm.core.utils.network;
 
-import com.metoo.nspm.entity.zabbix.Arp;
+import com.metoo.nspm.entity.nspm.Arp;
 import com.github.pagehelper.util.StringUtil;
 import org.springframework.stereotype.Component;
 

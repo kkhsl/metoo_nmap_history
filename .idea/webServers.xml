@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="28892797-010a-4b15-aa40-7680d47c8b2e" name="192.168.5.112" url="http://192.168.5.112">
+        <fileTransfer host="192.168.5.112" port="22" rootFolder="/home/nspm/topologyBackupDir" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions controlEncoding="utf-8" dataProtectionLevel="Private" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="23622132-fe72-42aa-8716-f1058ca1651d" name="192.168.5.101" url="http://192.168.5.101">
+        <fileTransfer host="192.168.5.101" port="22" rootFolder="/home/install/project" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

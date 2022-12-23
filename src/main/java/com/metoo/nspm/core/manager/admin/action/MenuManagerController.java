@@ -1,6 +1,6 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.IResService;
+import com.metoo.nspm.core.service.nspm.IResService;
 import org.apache.http.HttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

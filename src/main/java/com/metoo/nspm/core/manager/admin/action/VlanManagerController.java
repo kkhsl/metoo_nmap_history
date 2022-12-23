@@ -2,18 +2,17 @@ package com.metoo.nspm.core.manager.admin.action;
 
 import com.metoo.nspm.core.manager.admin.tools.GroupTools;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.IDomainService;
-import com.metoo.nspm.core.service.IGroupService;
-import com.metoo.nspm.core.service.IVlanService;
+import com.metoo.nspm.core.service.nspm.IDomainService;
+import com.metoo.nspm.core.service.nspm.IGroupService;
+import com.metoo.nspm.core.service.nspm.IVlanService;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.entity.Domain;
-import com.metoo.nspm.entity.Group;
-import com.metoo.nspm.entity.User;
-import com.metoo.nspm.entity.Vlan;
+import com.metoo.nspm.entity.nspm.Domain;
+import com.metoo.nspm.entity.nspm.Group;
+import com.metoo.nspm.entity.nspm.User;
+import com.metoo.nspm.entity.nspm.Vlan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.ws.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

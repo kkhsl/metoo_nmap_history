@@ -3,16 +3,16 @@ package com.metoo.nspm.core.manager.admin.action;
 import com.metoo.nspm.core.manager.admin.tools.MonitorTools;
 import com.metoo.nspm.core.manager.admin.tools.PlayBackTools;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.CommUtils;
 import com.metoo.nspm.core.utils.file.FileUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.MonitorDto;
 import com.metoo.nspm.dto.RoomProgramDto;
+import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.vo.Result;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.*;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -267,7 +267,7 @@ public class RoomProgramManagerController {
                 return ResponseUtil.error();
             }
             String path = null;
-            SysConfig sysconfig = this.sysConfigService.findSysConfigList();
+            SysConfig sysconfig = this.sysConfigService.select();
             LiveRoom liveRoom = this.liveRoomService.getObjById(obj.getRoomId());
             if(liveRoom.getIsEnable() != 1 ){
                 return ResponseUtil.badArgument("请先开启直播间");

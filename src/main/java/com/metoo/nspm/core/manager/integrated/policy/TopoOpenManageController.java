@@ -3,14 +3,14 @@ package com.metoo.nspm.core.manager.integrated.policy;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.ISysConfigService;
-import com.metoo.nspm.core.service.IUserService;
-import com.metoo.nspm.core.service.IssuedService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IUserService;
+import com.metoo.nspm.core.service.nspm.IssuedService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.TopoPolicyDto;
-import com.metoo.nspm.entity.SysConfig;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class TopoOpenManageController {
     @ApiOperation("列表")
     @RequestMapping("/push/recommend/task/searchtasklist.action")
     public Object searchtasklist(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/push/recommend/task/searchtasklist";
@@ -87,7 +87,7 @@ public class TopoOpenManageController {
 //    @ApiOperation("列表")
 //    @RequestMapping("/push/recommend/task/searchtasklist.action")
 //    public Object searchtasklist(@RequestBody(required = false) TopoPolicyDto dto){
-//        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+//        SysConfig sysConfig = this.sysConfigService.select();
 //
 //        String token = sysConfig.getNspmToken();
 //        if(token != null){
@@ -145,7 +145,7 @@ public class TopoOpenManageController {
 //    @ApiOperation("列表")
 //    @RequestMapping("/push/recommend/task/searchtasklist.action")
 //    public Object searchtasklist(@RequestBody(required = false) TopoPolicyDto dto){
-//        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+//        SysConfig sysConfig = this.sysConfigService.select();
 //
 //        String token = sysConfig.getNspmToken();
 //        if(token != null){
@@ -204,7 +204,7 @@ public class TopoOpenManageController {
     @ApiOperation("业务开通")
     @RequestMapping("/push/recommend/task/addGlobalRecommendTask")
     public Object addGlobalRecommendTask(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/push/recommend/task/addGlobalRecommendTask";
@@ -229,7 +229,7 @@ public class TopoOpenManageController {
     @ApiOperation("互联网开通")
     @RequestMapping("/push/recommend/task/addGlobalinternat")
     public Object addGlobalinternat(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -246,7 +246,7 @@ public class TopoOpenManageController {
     @ApiOperation("起点标签")
     @RequestMapping("/push/recommend/label/list")
     public Object labelList(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -260,7 +260,7 @@ public class TopoOpenManageController {
     @ApiOperation("编辑")
     @RequestMapping("/push/recommend/task/gettaskbyid")
     public Object gettaskbyid(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -283,7 +283,7 @@ public class TopoOpenManageController {
     @ApiOperation("编辑保存")
     @RequestMapping("/push/recommend/task/edit")
     public Object edit(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -307,7 +307,7 @@ public class TopoOpenManageController {
     @ApiOperation("删除")
     @RequestMapping("/push/recommend/task/deletetask")
     public Object deletetask(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -323,7 +323,7 @@ public class TopoOpenManageController {
     @ApiOperation("仿真")
     @RequestMapping("/push/recommend/recommend/startGlobalRecommendTaskList")
     public Object startGlobalRecommendTaskList(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -337,7 +337,7 @@ public class TopoOpenManageController {
     @ApiOperation("重复仿真")
     @RequestMapping("/push/recommend/recommend/restart")
     public Object restart(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -351,7 +351,7 @@ public class TopoOpenManageController {
     @ApiOperation("命令行下载")
     @GetMapping("/push/recommend/download")
     public Object download(@RequestParam(required = false) String ids){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -366,7 +366,7 @@ public class TopoOpenManageController {
     @ApiOperation("导出")
     @GetMapping("/push/recommend/task/export")
     public Object export(TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -386,7 +386,7 @@ public class TopoOpenManageController {
     @ApiOperation("任务执行情况")
     @RequestMapping("/push/recommend/task/gettaskstatus")
     public Object gettaskstatus(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -400,7 +400,7 @@ public class TopoOpenManageController {
     @ApiOperation("模拟仿真")
     @RequestMapping("/push/recommend/task/getpathstatic")
     public Object etpathstatic(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -414,7 +414,7 @@ public class TopoOpenManageController {
     @ApiOperation("路径列表")
     @RequestMapping("/push/recommend/task/analyzepathinfolist")
     public Object analyzepathinfolist(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -428,7 +428,7 @@ public class TopoOpenManageController {
     @ApiOperation("路径状态")
     @RequestMapping("/push/recommend/task/enablepath")
     public Object enablepath(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -442,7 +442,7 @@ public class TopoOpenManageController {
     @ApiOperation("路径详情")
     @RequestMapping("/push/recommend/task/pathdetail")
     public Object pathdetail(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -456,7 +456,7 @@ public class TopoOpenManageController {
     @ApiOperation("相关策略")
     @RequestMapping("/push/recommend/task/getrisk")
     public Object getrisk(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -470,7 +470,7 @@ public class TopoOpenManageController {
     @ApiOperation("相关策略")
     @RequestMapping("/push/recommend/task/devicedetail")
     public Object devicedetail(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -485,7 +485,7 @@ public class TopoOpenManageController {
     @ApiOperation("策略建议详情")
     @RequestMapping("/push/recommend/task/getmergedpolicy")
     public Object getmergedpolicy(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -499,7 +499,7 @@ public class TopoOpenManageController {
     @ApiOperation("下发结果")
     @RequestMapping("/push/recommend/task/getcheckresult")
     public Object getcheckresult(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -513,7 +513,7 @@ public class TopoOpenManageController {
     @ApiOperation("策略开通建议")
     @RequestMapping("/push/recommend/task/getpolicy")
     public Object getpolicy(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -527,7 +527,7 @@ public class TopoOpenManageController {
     @ApiOperation("批量任务管理")
     @RequestMapping("/push/recommend/task/searchbatchlist")
     public Object searchbatchlist(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -541,7 +541,7 @@ public class TopoOpenManageController {
     @ApiOperation("批量下发")
     @RequestMapping("/push/recommend/getbatchdevicenum")
     public Object getbatchdevicenum(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -556,7 +556,7 @@ public class TopoOpenManageController {
     @ApiOperation("验证")
     @RequestMapping("/push/recommend/verify/startverify")
     public Object startverify(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -570,7 +570,7 @@ public class TopoOpenManageController {
     @ApiOperation("验证列表")
     @RequestMapping("/push/recommend/task/verifypathinfolist")
     public Object verifypathinfolist(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

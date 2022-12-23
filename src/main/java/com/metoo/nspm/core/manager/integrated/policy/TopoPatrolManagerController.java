@@ -1,9 +1,9 @@
 package com.metoo.nspm.core.manager.integrated.policy;
 
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import com.github.pagehelper.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ public class TopoPatrolManagerController {
     public Object downloadFile(String url){
         if(!StringUtil.isEmpty(url)){
             url = "patrol/" + url;
-            SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+            SysConfig sysConfig = this.sysConfigService.select();
             String token = sysConfig.getNspmToken();
             return this.nodeUtil.downloadPatrol(null, url, token);
         }

@@ -1,6 +1,7 @@
 package com.metoo.nspm.core.manager.admin.action;
 
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.shiro.tools.SaltUtils;
 import com.metoo.nspm.core.utils.CommUtils;
 import com.metoo.nspm.core.utils.ResponseUtil;
@@ -9,11 +10,10 @@ import com.metoo.nspm.dto.UserDto;
 import com.metoo.nspm.vo.UserVo;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.util.StringUtil;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.Group;
-import com.metoo.nspm.entity.Role;
-import com.metoo.nspm.entity.User;
-import com.metoo.nspm.entity.Video;
+import com.metoo.nspm.entity.nspm.Group;
+import com.metoo.nspm.entity.nspm.Role;
+import com.metoo.nspm.entity.nspm.User;
+import com.metoo.nspm.entity.nspm.Video;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;

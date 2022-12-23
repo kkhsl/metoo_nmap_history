@@ -3,14 +3,14 @@ package com.metoo.nspm.core.manager.integrated.policy;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.ISysConfigService;
-import com.metoo.nspm.core.service.IUserService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.OperationDto;
 import com.metoo.nspm.dto.TopoPolicyDto;
-import com.metoo.nspm.entity.SysConfig;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class TopoGenerateManageController {
     @ApiOperation("仿真开通-命令行")
     @PostMapping(value = "/task/command")
     public Object taskCommand(@RequestBody TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -83,7 +83,7 @@ public class TopoGenerateManageController {
     @ApiOperation("策略生成列表")
     @RequestMapping("push/recommend/task/searchsecuritypolicytasklist")
     public Object searchsecuritypolicytasklist(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/push/recommend/task/searchsecuritypolicytasklist";
@@ -127,7 +127,7 @@ public class TopoGenerateManageController {
 //    @ApiOperation("策略生成列表")
 //    @RequestMapping("push/recommend/task/searchsecuritypolicytasklist")
 //    public Object searchsecuritypolicytasklist(@RequestBody(required = false) OperationDto dto){
-//        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+//        SysConfig sysConfig = this.sysConfigService.select();
 //        String token = sysConfig.getNspmToken();
 //        if(token != null){
 //            String url = "/push/recommend/task/searchsecuritypolicytasklist";
@@ -181,7 +181,7 @@ public class TopoGenerateManageController {
     @ApiOperation("NAT策略列表")
     @RequestMapping("/push/recommend/task/searchnatpolicytasklist")
     public Object searchnatpolicytasklist(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/push/recommend/task/searchnatpolicytasklist";
@@ -226,7 +226,7 @@ public class TopoGenerateManageController {
     @ApiOperation("场景")
     @RequestMapping("/push/api/disposal/scenes/pageList")
     public Object pageList(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/push/api/disposal/scenes/pageList";
@@ -261,7 +261,7 @@ public class TopoGenerateManageController {
     @ApiOperation("策略生成（保存）")
     @RequestMapping("push/recommend/task/new-policy-push")
     public Object push(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/push/recommend/task/new-policy-push";
@@ -278,7 +278,7 @@ public class TopoGenerateManageController {
     @ApiOperation("策略生成（删除）")
     @RequestMapping("push/recommend/task/deletesecuritypolicytasklist")
     public Object delete(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -292,7 +292,7 @@ public class TopoGenerateManageController {
     @ApiOperation("策略生成（命令行）")
     @RequestMapping("push/recommend/task/getcommand")
     public Object getcommand(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -306,7 +306,7 @@ public class TopoGenerateManageController {
     @ApiOperation("策略生成（下载）")
     @GetMapping("push/recommend/task/download")
     public Object download(@RequestParam(name = "ids") String ids){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -322,7 +322,7 @@ public class TopoGenerateManageController {
     @ApiOperation("策略生成（策略生成导出）")
     @RequestMapping("push/recommend/task/exportTask")
     public Object exportTask(OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -336,7 +336,7 @@ public class TopoGenerateManageController {
     @ApiOperation("策略生成（策略下载）")
     @RequestMapping("push/recommend/task/exportTaskDown")
     public Object exportTaskDownLoad(String isReload) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if (token != null) {
@@ -351,7 +351,7 @@ public class TopoGenerateManageController {
     @ApiOperation("策略生成（批量生成-模板下载）")
     @RequestMapping("push/recommend/task/downloadsecuritytemplate")
     public Object downloadsecuritytemplate() {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if (token != null) {
@@ -364,7 +364,7 @@ public class TopoGenerateManageController {
     @ApiOperation("源NAT")
     @RequestMapping("/push/recommend/task/addsrcnatpolicy")
     public Object addsrcnatpolicy(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -382,7 +382,7 @@ public class TopoGenerateManageController {
     @ApiOperation("目的NAT")
     @RequestMapping("/push/recommend/task/adddstnatpolicy")
     public Object adddstnatpolicy(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -400,7 +400,7 @@ public class TopoGenerateManageController {
     @ApiOperation("静态NAT")
     @RequestMapping("/push/recommend/task/addstaticnatpolicy")
     public Object addstaticnatpolicy(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -419,7 +419,7 @@ public class TopoGenerateManageController {
     @ApiOperation("Both NAT")
     @RequestMapping("/push/recommend/task/addbothnatpolicy")
     public Object addbothnatpolicy(@RequestBody(required = false) OperationDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

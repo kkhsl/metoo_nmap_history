@@ -21,7 +21,7 @@
             <patternLayout pattern="%d{yyyy-MM-dd HH:mm}[%t]%-5level %logger{36} - %msg%n" />
         </console>
         <!--文件位置-->
-        <File name="nspm" fileName="logs/nspm.log" append="true">
+        <File name="nspm" fileName="/opt/nmap/service/nmap/logs/nmap.log" append="true">
             <patternLayout pattern="%d{yyyy-MM-dd HH:mm}[%t]%-5level %logger{36} - %msg%n" />
         </File>
     </appenders>

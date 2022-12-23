@@ -1,11 +1,11 @@
 package com.metoo.nspm.core.manager.view.action;
 
-import com.metoo.nspm.core.service.IRegisterService;
-import com.metoo.nspm.core.service.IRoleService;
-import com.metoo.nspm.core.service.IUserRoleService;
-import com.metoo.nspm.entity.Role;
-import com.metoo.nspm.entity.User;
-import com.metoo.nspm.entity.UserRole;
+import com.metoo.nspm.core.service.nspm.IRegisterService;
+import com.metoo.nspm.core.service.nspm.IRoleService;
+import com.metoo.nspm.core.service.nspm.IUserRoleService;
+import com.metoo.nspm.entity.nspm.Role;
+import com.metoo.nspm.entity.nspm.User;
+import com.metoo.nspm.entity.nspm.UserRole;
 import com.metoo.nspm.vo.Result;
 import org.apache.shiro.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;

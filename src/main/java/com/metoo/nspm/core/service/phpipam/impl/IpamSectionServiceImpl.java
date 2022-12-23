@@ -2,7 +2,7 @@ package com.metoo.nspm.core.service.phpipam.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.http.IpamHttpBase;
+import com.metoo.nspm.core.http.IpamApiUtil;
 import com.metoo.nspm.core.service.phpipam.IpamSectionService;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +18,14 @@ public class IpamSectionServiceImpl implements IpamSectionService {
         if(path != null){
             url += "/" + path;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         return base.get();
     }
 
     @Override
     public Integer getSectionsId() {
         String url = "/sections/";
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
          JSONObject section = base.get();
         if(section.getBoolean("success")){
             JSONArray datas = JSONArray.parseArray(section.getString("data"));

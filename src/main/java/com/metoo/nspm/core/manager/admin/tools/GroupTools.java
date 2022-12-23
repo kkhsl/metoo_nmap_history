@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.manager.admin.tools;
 
-import com.metoo.nspm.core.service.IGroupService;
-import com.metoo.nspm.entity.Group;
+import com.metoo.nspm.core.service.nspm.IGroupService;
+import com.metoo.nspm.entity.nspm.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,9 +36,7 @@ public class GroupTools {
         if(groups.size() > 0){
             for(Group child : groups){
                 Set<Long> cids = genericGroupId(child.getId());
-                for(Long c : cids){
-                    ids.add(c);
-                }
+                ids.addAll(cids);
                 ids.add(child.getId());
             }
         }

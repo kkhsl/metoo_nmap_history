@@ -2,16 +2,15 @@ package com.metoo.nspm.core.manager.ipam;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.http.IpamHttpBase;
-import com.metoo.nspm.core.http.NtasHttpBase;
+import com.metoo.nspm.core.http.IpamApiUtil;
 import com.metoo.nspm.core.service.phpipam.IpamSectionService;
 import com.metoo.nspm.core.service.phpipam.IpamSubnetService;
 import com.metoo.nspm.core.service.phpipam.IpamVlanService;
-import com.metoo.nspm.core.service.zabbix.IpDetailService;
+import com.metoo.nspm.core.service.nspm.IpDetailService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.Ipam.IpamSubnet;
-import com.metoo.nspm.entity.zabbix.IpDetail;
+import com.metoo.nspm.entity.nspm.IpDetail;
 import com.github.pagehelper.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -159,7 +158,7 @@ public class IPamSubnetManagerController {
                                 if(subnetId != null){
                                     url += subnetId + "/addresses";
                                 }
-                                IpamHttpBase base = new IpamHttpBase(url);
+                                IpamApiUtil base = new IpamApiUtil(url);
                                 JSONObject subnetAddresses = base.get();
                                 JSONArray addressDatas = null;
                                 if(subnetAddresses != null && subnetAddresses.getBoolean("success")) {
@@ -240,7 +239,7 @@ public class IPamSubnetManagerController {
                                         if(subnetId != null){
                                             url += "/" + subnetId;
                                         }
-                                        IpamHttpBase base = new IpamHttpBase(url);
+                                        IpamApiUtil base = new IpamApiUtil(url);
                                         JSONObject addresses = base.get();
                                         if(addresses != null && addresses.getBoolean("success")) {
                                             JSONObject addressData = JSONObject.parseObject(addresses.getString("data"));

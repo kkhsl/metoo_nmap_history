@@ -37,7 +37,7 @@ public class ResponseUtil {
     }
 
     public static Object nullPointException() {
-        return result(402, "Data does not exist");
+        return result(502, "Data does not exist");
     }
 
     public static Object arithmeticException() {
@@ -65,6 +65,10 @@ public class ResponseUtil {
     public static Object badArgument(String message) { return fail(400, message);} //未找到指定资源
 
     public static Object badArgumentRepeatedName() { return fail(400, "名称重复");} //未找到指定资源
+
+    public static Object resourceNotFound() { return fail(400, "not found");} //未找到指定资源
+
+    public static Object client() { return fail(400, "客户端错误");} // 禁止随意更改参数
 
     public static Object badArgument(int code, String message) { return fail(code, message);} //未找到指定资源
 

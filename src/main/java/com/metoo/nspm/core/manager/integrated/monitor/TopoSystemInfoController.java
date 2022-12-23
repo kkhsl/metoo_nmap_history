@@ -2,13 +2,13 @@ package com.metoo.nspm.core.manager.integrated.monitor;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.service.IGroupService;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IGroupService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.SysWarnMessageModelDto;
 import com.metoo.nspm.dto.SysXxlChDelLogDto;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class TopoSystemInfoController {
     @PostMapping({"/sysWarnMessage"})
     @ApiOperation("磁盘告警日志")
     public Object listSysWarnMessageLog(@RequestBody SysWarnMessageModelDto dto) throws Exception {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null) {
             String url = "/topology-monitor/system/xxlCh/GET/sysWarnMessage";
@@ -46,7 +46,7 @@ public class TopoSystemInfoController {
     @PostMapping({"/xxlChDelLog"})
     @ApiOperation("查询clickHouse表删除记录")
     public Object listXxlChDelLog(@RequestBody SysXxlChDelLogDto dto) throws Exception {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null) {
             String url = "/topology-monitor/system/xxlCh/GET/xxlChDelLog";

@@ -3,15 +3,15 @@ package com.metoo.nspm.core.manager.integrated.node;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.collections.ListSortUtil;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.TopoNodeDto;
 import com.metoo.nspm.dto.TopoPolicyDto;
-import com.metoo.nspm.entity.SysConfig;
-import com.metoo.nspm.entity.Task;
-import com.metoo.nspm.entity.User;
-import com.metoo.nspm.core.service.*;
+import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.entity.nspm.Task;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +69,7 @@ public class TopoNspmIndexManagerAction {
 
     @RequestMapping("/policy")
     public Object policy(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String policyUrl = "/topology-policy/report/policyView/viewData";
@@ -185,7 +185,7 @@ public class TopoNspmIndexManagerAction {
 
     @RequestMapping(value="/devices")
     public Object devices(@RequestBody(required = false) TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
 
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -199,7 +199,7 @@ public class TopoNspmIndexManagerAction {
     @ApiOperation("策略优化统计")
     @PostMapping(value = "/policy-check-pie")
     public Object policyCheckPie(@RequestBody(required = false) TopoPolicyDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
 
         String token = sysConfig.getNspmToken();
         if(token != null){

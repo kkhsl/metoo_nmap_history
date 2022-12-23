@@ -2,8 +2,8 @@ package com.metoo.nspm.core.manager.admin.action;
 
 import com.metoo.nspm.dto.GradeDto;
 import com.metoo.nspm.dto.UserDto;
-import com.metoo.nspm.entity.Accessory;
-import com.metoo.nspm.entity.Grade;
+import com.metoo.nspm.entity.nspm.Accessory;
+import com.metoo.nspm.entity.nspm.Grade;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,19 +1,19 @@
 package com.metoo.nspm.core.manager.rsms;
 
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.mapper.PlantRoomMapper;
-import com.metoo.nspm.core.service.IPlantRoomService;
-import com.metoo.nspm.core.service.IRackService;
-import com.metoo.nspm.core.service.IRsmsDeviceService;
+import com.metoo.nspm.core.mapper.nspm.PlantRoomMapper;
+import com.metoo.nspm.core.service.nspm.IPlantRoomService;
+import com.metoo.nspm.core.service.nspm.IRackService;
+import com.metoo.nspm.core.service.nspm.IRsmsDeviceService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.PlantRoomDTO;
 import com.metoo.nspm.vo.PlantRoomVO;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.entity.PlantRoom;
-import com.metoo.nspm.entity.Rack;
-import com.metoo.nspm.entity.RsmsDevice;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.PlantRoom;
+import com.metoo.nspm.entity.nspm.Rack;
+import com.metoo.nspm.entity.nspm.RsmsDevice;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +46,17 @@ public class RackManagerController {
 
     @ApiOperation("获取机柜信息")
     @RequestMapping("/getRack")
-    public Object getTack(Long id){
-        Object obj = this.rackService.rack(id);
-        return ResponseUtil.ok(obj);
+    public Object getTackByDeviceId(@RequestParam(value = "id",required = false) Long id,
+                            @RequestParam(value="uuid",required = false) String uuid){
+        if(uuid != null){
+            RsmsDevice device = this.rsmsDeviceService.getObjByUuid(uuid);
+            Object obj = this.rackService.rack(device.getRackId());
+            return ResponseUtil.ok(obj);
+        }else if(id != null){
+            Object obj = this.rackService.rack(id);
+            return ResponseUtil.ok(obj);
+        }
+        return ResponseUtil.ok();
     }
 
 //    @ApiOperation("机柜列表")

@@ -1,15 +1,15 @@
 package com.metoo.nspm.core.manager.admin.action;
 
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.CourseDto;
 import com.metoo.nspm.dto.GradeDto;
+import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.req.GradeReq;
 import com.metoo.nspm.vo.Result;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -88,7 +88,7 @@ public class GradeManagerController {
     }
 
     public Accessory upload(@RequestParam(required = false) MultipartFile file, int type){
-        SysConfig configs = this.configService.findSysConfigList();
+        SysConfig configs = this.configService.select();
         String uploaFilePath = configs.getUploadFilePath();
         String path = configs.getVideoFilePath();
         if(type == 0){
@@ -132,7 +132,7 @@ public class GradeManagerController {
             return new Result(400, "Parameter error");
         }
 
-        SysConfig configs = this.configService.findSysConfigList();
+        SysConfig configs = this.configService.select();
         String path = configs.getPhotoFilePath();
         Accessory accessory = grade.getAccessory();
         if(accessory != null){

@@ -1,13 +1,12 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.ILiveRoomService;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ILiveRoomService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.CommUtils;
-import com.metoo.nspm.entity.LiveRoom;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.LiveRoom;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import com.metoo.nspm.vo.Result;
 import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,21 +24,21 @@ public class SysconfigManagerController {
     @Autowired
     private ILiveRoomService liveRoomService;
 
-    @RequiresPermissions("LK:SYSCONFIG:MANAGER")
+//    @RequiresPermissions("LK:SYSCONFIG:MANAGER")
     @RequestMapping(value = "/list")
     public Object sysConfig(){
-        SysConfig sysconfigList = this.sysConfigService.findSysConfigList();
+        SysConfig sysconfigList = this.sysConfigService.select();
         return sysconfigList;
     }
 
-    @RequiresPermissions("LK:SYSCONFIG:MANAGER")
+//    @RequiresPermissions("LK:SYSCONFIG:MANAGER")
     @ApiOperation("系统配置更新")
     @RequestMapping("/update")
     public Object baseConfig(@RequestBody(required = false) SysConfig dto){
         if(dto != null){
             try {
                 // SysConfig sysConfig = this.sysConfigService.findObjById(dto.getId());
-                SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+                SysConfig sysConfig = this.sysConfigService.select();
                 if(sysConfig != null){
                     if(!sysConfig.getIp().equals(dto.getIp())){
                         List<LiveRoom> liveRoomList = this.liveRoomService.findAllLiveRoom();
@@ -47,7 +46,7 @@ public class SysconfigManagerController {
                         if(liveRoomList.size() > 0){
                             for(LiveRoom liveRoom : liveRoomList){
                                 String bindCode = liveRoom.getBindCode();
-                                SysConfig SysConfig = this.sysConfigService.findSysConfigList();
+                                SysConfig SysConfig = this.sysConfigService.select();
                                 String rtmp = CommUtils.getRtmp(dto.getIp(), liveRoom.getBindCode());
                                 String obsRtmp = CommUtils.getObsRtmp(dto.getIp());
                                 liveRoom.setRtmp(rtmp);
@@ -74,7 +73,7 @@ public class SysconfigManagerController {
 
         SysConfig sysconfig = new SysConfig();
         sysconfig.setId(Long.parseLong("1"));
-        sysconfig.setNspmToken("a");
+        sysconfig.setNspmToken("zabbix");
         this.sysConfigService.update(sysconfig);
     }
 

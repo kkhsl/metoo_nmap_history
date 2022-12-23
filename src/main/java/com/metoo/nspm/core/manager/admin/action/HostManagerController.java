@@ -3,23 +3,19 @@ package com.metoo.nspm.core.manager.admin.action;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.util.StringUtil;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.IHostService;
+import com.metoo.nspm.core.service.nspm.IHostService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.HostDTO;
-import com.metoo.nspm.dto.NetworkElementDto;
-import com.metoo.nspm.entity.Host;
-import com.metoo.nspm.entity.LiveRoom;
-import com.metoo.nspm.entity.NetworkElement;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.Host;
+import com.metoo.nspm.entity.nspm.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 @RequestMapping("/admin/host")
 @RestController

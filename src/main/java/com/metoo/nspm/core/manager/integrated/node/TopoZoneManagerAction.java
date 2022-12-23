@@ -1,10 +1,10 @@
 package com.metoo.nspm.core.manager.integrated.node;
 
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.TopoZoneDto;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("安全域")
     @RequestMapping("/alarm/zone/listLogicZone")
     public Object listLogicZone(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -39,7 +39,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("业务域")
     @RequestMapping("/danger/businessZone/pageList")
     public Object pageList(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -53,7 +53,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("业务域节点")
     @RequestMapping("/danger/businessZone/businessZoneTree")
     public Object businessZoneTree(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -67,7 +67,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("编辑业务域")
     @RequestMapping("/danger/businessZone/getByBusinessZoneUuid")
     public Object getByBusinessZoneUuid(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -82,7 +82,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("编辑业务域(名称)")
     @RequestMapping("/danger/businessZone/businessZoneRename")
     public Object businessZoneRename(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -97,7 +97,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("可选逻辑域")
     @RequestMapping("/danger/businessZone/getOptionalLogicZoneList")
     public Object getOptionalLogicZoneList(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -111,7 +111,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("删除逻辑域")
     @RequestMapping("/alarm/zone/deleteLogicZone")
     public Object deleteLogicZone(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -125,7 +125,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("新建业务域")
     @RequestMapping("/danger/businessZone/addOrEdit")
     public Object addOrEdit(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -139,7 +139,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("删除业务域")
     @RequestMapping("/danger/businessZone/deleteByUuid")
     public Object deleteByUuid(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -153,7 +153,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("批量移动")
     @RequestMapping("/danger/businessZone/bulkMove")
     public Object bulkMove(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -167,7 +167,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("所含子网")
     @RequestMapping("/alarm/zone/listLogicZoneSubnet")
     public Object listLogicZoneSubnet(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -181,7 +181,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("域分类")
     @RequestMapping("/alarm/zone/listZoneType")
     public Object listZoneType(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -195,7 +195,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("域细分类型")
     @RequestMapping("/alarm/zone/listZoneTypeDetail")
     public Object listZoneTypeDetail(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -209,7 +209,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("子网")
     @RequestMapping("/alarm/zone/listDeviceSubnet")
     public Object listDeviceSubnet(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -223,7 +223,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("新建安全域")
     @RequestMapping("/alarm/zone/saveOrUpdateLogicZone")
     public Object saveOrUpdateLogicZone(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -237,7 +237,7 @@ public class TopoZoneManagerAction {
     @ApiOperation("编辑安全域")
     @RequestMapping("/alarm/zone/getByZoneUuid")
     public Object getByZoneUuid(@RequestBody(required = false) TopoZoneDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

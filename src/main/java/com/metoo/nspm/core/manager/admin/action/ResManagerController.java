@@ -1,9 +1,9 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.IResService;
+import com.metoo.nspm.core.service.nspm.IResService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.ResDto;
-import com.metoo.nspm.entity.Res;
+import com.metoo.nspm.entity.nspm.Res;
 import com.github.pagehelper.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

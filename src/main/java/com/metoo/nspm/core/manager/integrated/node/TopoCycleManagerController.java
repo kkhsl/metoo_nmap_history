@@ -2,13 +2,13 @@ package com.metoo.nspm.core.manager.integrated.node;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.service.IGroupService;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IGroupService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.TopoCycleDto;
-import com.metoo.nspm.entity.Group;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.Group;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +35,22 @@ public class TopoCycleManagerController {
     @Autowired
     private NodeUtil nodeUtil;
 
+    public static void main(String[] args) {
+        long n = 1667388659 / 60;
+        System.out.println(n);
+        long m = 1667388659 / 60;
+        double diff = (1667388778 - 1667388659);
+        System.out.println(diff / 60);
+        double diffMinutes = Math.round(diff / 60);
+        System.out.println(diffMinutes);
+
+
+    }
+
     @ApiOperation("列表")
     @RequestMapping("/topology/cycle/getCyclePage")
     public Object getCyclePage(@RequestBody(required = false) TopoCycleDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -66,7 +78,7 @@ public class TopoCycleManagerController {
     @ApiOperation("新增")
     @RequestMapping("/topology/cycle/saveCycle")
     public Object saveCycle(TopoCycleDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -80,7 +92,7 @@ public class TopoCycleManagerController {
     @ApiOperation("编辑")
     @RequestMapping("/topology/cycle/updateCycle")
     public Object updateCycle(TopoCycleDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -94,7 +106,7 @@ public class TopoCycleManagerController {
     @ApiOperation("分配组")
     @RequestMapping("/topology/cycle/batch-cycle-update")
     public Object batchUpdate(@RequestBody(required = false) TopoCycleDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -108,7 +120,7 @@ public class TopoCycleManagerController {
     @ApiOperation("删除")
     @PostMapping("/topology/cycle/deleteCycle")
     public Object deleteCycle(@RequestBody(required = false) TopoCycleDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/cycle/deleteCycle";

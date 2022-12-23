@@ -1,6 +1,6 @@
 package com.metoo.nspm.dto;
 
-import com.metoo.nspm.entity.Accessory;
+import com.metoo.nspm.entity.nspm.Accessory;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

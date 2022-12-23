@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.DoubleSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.entity.RsmsDevice;
+import com.metoo.nspm.entity.nspm.RsmsDevice;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -21,6 +21,7 @@ import java.util.Set;
 public class RsmsDeviceDTO extends PageDto<RsmsDevice> {
 
     private Long id;
+    private String filter;
     @ApiModelProperty("名称")
     private String name;
     @ApiModelProperty("ip")

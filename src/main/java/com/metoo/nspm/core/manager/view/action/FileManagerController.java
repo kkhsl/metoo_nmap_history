@@ -1,9 +1,9 @@
 package com.metoo.nspm.core.manager.view.action;
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -58,7 +58,7 @@ public class FileManagerController {
     @ApiOperation("策略列表")
     @GetMapping(value = "uploadByte")
     public ResponseEntity uploadByte(HttpServletResponse response) throws IOException {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String url = sysConfig.getNspmUrl();
         String token = sysConfig.getNspmToken();
         if(url != null && token != null){

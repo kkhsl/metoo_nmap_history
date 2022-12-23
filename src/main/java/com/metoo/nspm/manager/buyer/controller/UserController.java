@@ -1,7 +1,7 @@
 package com.metoo.nspm.manager.buyer.controller;
 
-import com.metoo.nspm.core.service.IRegisterService;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.core.service.nspm.IRegisterService;
+import com.metoo.nspm.entity.nspm.User;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;

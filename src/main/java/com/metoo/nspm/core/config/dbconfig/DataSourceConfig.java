@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Primary;
 import javax.sql.DataSource;
 
 /**
+ * 手动配置数据源类
  * 数据库多数据源配置
  */
 @Configuration
@@ -30,7 +31,7 @@ public class DataSourceConfig {
         return dataSourceProperties.initializeDataSourceBuilder().build();
     }
 
-    // topology数据库配置
+//     topology数据库配置
     @Bean(name = "topologyDataSpringProperties")
     @ConfigurationProperties(prefix = "spring.datasource.topology")
     public DataSourceProperties topologyDataSourceProperties(){
@@ -40,6 +41,19 @@ public class DataSourceConfig {
     // topology数据库数据源
     @Bean("topologyDataSource")
     public DataSource topologyDataSource(@Qualifier("topologyDataSpringProperties") DataSourceProperties dataSourceProperties){
+        return dataSourceProperties.initializeDataSourceBuilder().build();
+    }
+
+    // zabbix数据库配置
+    @Bean(name = "zabbixDataSpringProperties")
+    @ConfigurationProperties(prefix = "spring.datasource.zabbix")
+    public DataSourceProperties zabbixDataSourceProperties(){
+        return new DataSourceProperties();
+    }
+
+    // zabbix数据库数据源
+    @Bean("zabbixDataSource")
+    public DataSource zabbixDataSource(@Qualifier("zabbixDataSpringProperties") DataSourceProperties dataSourceProperties){
         return dataSourceProperties.initializeDataSourceBuilder().build();
     }
 }

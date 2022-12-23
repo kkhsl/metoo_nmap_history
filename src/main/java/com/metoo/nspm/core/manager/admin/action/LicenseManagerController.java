@@ -3,15 +3,15 @@ package com.metoo.nspm.core.manager.admin.action;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.LicenseTools;
-import com.metoo.nspm.core.service.ILicenseService;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ILicenseService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.AesEncryptUtils;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.SystemInfoUtils;
 import com.metoo.nspm.dto.TopoNodeDto;
-import com.metoo.nspm.entity.License;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.License;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import com.metoo.nspm.vo.LicenseVo;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +113,7 @@ public class LicenseManagerController {
             String licenseInfo = this.aesEncryptUtils.decrypt(obj.getLicense());
             LicenseVo license = JSONObject.parseObject(licenseInfo, LicenseVo.class);
             if(license != null){
-                SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+                SysConfig sysConfig = this.sysConfigService.select();
                 String token = sysConfig.getNspmToken();
                 String url = "/topology/ums/getLicenseInfo.action";
                 TopoNodeDto dto = new TopoNodeDto();

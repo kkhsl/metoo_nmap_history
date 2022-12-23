@@ -2,7 +2,7 @@ package com.metoo.nspm.core.manager.admin.tools;
 
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.utils.AesEncryptUtils;
-import com.metoo.nspm.entity.License;
+import com.metoo.nspm.entity.nspm.License;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

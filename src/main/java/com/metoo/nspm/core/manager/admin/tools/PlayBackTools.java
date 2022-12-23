@@ -1,9 +1,9 @@
 package com.metoo.nspm.core.manager.admin.tools;
 
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.CommUtils;
 import com.metoo.nspm.core.video.VideoUtil;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.*;
+import com.metoo.nspm.entity.nspm.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,9 +37,9 @@ public class PlayBackTools {
      */
     public boolean create(Long live, RoomProgram program, String bindCode){
         User user = ShiroUserHolder.currentUser();
-        SysConfig sysconfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysconfig = this.sysConfigService.select();
         String currentDate = CommUtils.formatTime("yyyyMMddHHmmss", new Date());
-        SysConfig configs = this.configService.findSysConfigList();
+        SysConfig configs = this.configService.select();
         String uploaFilePath = configs.getUploadFilePath() + File.separator + "video";
         String path = sysconfig.getPath() + File.separator + bindCode;
 //        String playback = path + File.separator + currentDate;
@@ -65,7 +65,7 @@ public class PlayBackTools {
             video.setGrade(program.getGrade());
             video.setCourse(program.getCourse());
             // 视频审核
-            SysConfig sysConfigList = sysConfigService.findSysConfigList();
+            SysConfig sysConfigList = sysConfigService.select();
             if(sysConfigList.getVideoAudit()==0){
                 video.setStatus(1);
             }else{

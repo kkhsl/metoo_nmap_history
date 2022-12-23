@@ -15,7 +15,7 @@ public class MyKafkaController {
 //
 //    @RequestMapping("/send")
 //    public String sendMsg(){
-//        kafkaTemplate.send(TOPIC_NAME, 0,"key","this is a message");
+//        kafkaTemplate.send(TOPIC_NAME, 0,"key","this is zabbix message");
 //        return "send success";
 //    }
 

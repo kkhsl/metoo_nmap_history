@@ -1,9 +1,9 @@
 package com.metoo.nspm.core.manager.view.action;
 
-import com.metoo.nspm.core.service.IBannerService;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IBannerService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.entity.Banner;
+import com.metoo.nspm.entity.nspm.Banner;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -17,7 +17,7 @@ import javax.sql.DataSource;
  * nspm数据库配置
  */
 @Configuration
-@MapperScan(basePackages = "com.metoo.nspm.core.mapper", sqlSessionTemplateRef = "nspmSqlSessionTemplate")
+@MapperScan(basePackages = "com.metoo.nspm.core.mapper.nspm", sqlSessionTemplateRef = "nspmSqlSessionTemplate")
 public class NspmDataSourceConfig {
 
     // 主数据源 nspm数据源
@@ -27,7 +27,7 @@ public class NspmDataSourceConfig {
         SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(dataSource);
         sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().
-                getResources("classpath*:mapper/*.xml"));
+                getResources("classpath*:mapper/nspm/*.xml"));
         return sqlSessionFactory.getObject();
     }
 

@@ -9,5 +9,10 @@ public interface ITopoNodeService {
     List<Map> queryAnt();
 
     // 获取所有网元
-    List<Map> queryMetoo();
+
+    /**
+     * 获取所有可用网元
+     * @return
+     */
+    List<Map> queryNetworkElement();
 }

@@ -25,8 +25,18 @@ public class ApplicationContextUtils implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext=applicationContext;
+        if(ApplicationContextUtils.applicationContext == null) {
+            ApplicationContextUtils.applicationContext = applicationContext;
+        }
     }
+
+    /**
+     * 获取applicationContext
+     */
+    public static ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
 
     // 通过bean名称获取工厂中指定bean对象
     public static Object getBean(String beanName){

@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Object badArgumentHandler(IllegalArgumentException e){
         log.error(e.getMessage(),e);
-        return ResponseUtil.badArgumentValue();
+        return ResponseUtil.badArgument();
     }
 
     @ExceptionHandler(NullPointerException.class)
@@ -126,7 +126,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = NumberFormatException.class)
     @ResponseBody
     public Object NumberFormatException(NumberFormatException e){
-        return ResponseUtil.badArgument("参数类型错误");
+        return ResponseUtil.badArgument("数据类型错误");
     }
 
 

@@ -1,7 +1,7 @@
 package com.metoo.nspm.dto;
 
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.entity.Topology;
+import com.metoo.nspm.entity.nspm.Topology;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,5 +29,6 @@ public class TopologyDTO extends PageDto<Topology> {
     private String userName;
     private Set<Long> groupIds;
     private String baseUrl;
+    private Date time;
 
 }

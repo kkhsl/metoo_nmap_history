@@ -1,7 +1,7 @@
 package com.metoo.nspm.req;
 
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.entity.Video;
+import com.metoo.nspm.entity.nspm.Video;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

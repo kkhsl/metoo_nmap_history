@@ -1,13 +1,13 @@
 package com.metoo.nspm.core.manager.integrated.node;
 
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.ISysConfigService;
-import com.metoo.nspm.core.service.IUserService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.SceneDto;
-import com.metoo.nspm.entity.SysConfig;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class TopoSceneSettingManagerController {
     @ApiOperation("场景列表")
     @PostMapping(value = "/push/api/disposal/scenes/pageList")
     public Object list(@RequestBody(required = false) SceneDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/push/api/disposal/scenes/pageList";
@@ -49,7 +49,7 @@ public class TopoSceneSettingManagerController {
     @ApiOperation("场景新建")
     @PostMapping(value = "/push/api/disposal/scenes/edit")
     public Object edit(@RequestBody(required = false) SceneDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/push/api/disposal/scenes/edit";
@@ -65,7 +65,7 @@ public class TopoSceneSettingManagerController {
     @ApiOperation("场景编辑")
     @PostMapping(value = "/push/api/disposal/scenes/getByUUId")
     public Object getByUUId(@RequestBody(required = false) SceneDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -79,7 +79,7 @@ public class TopoSceneSettingManagerController {
     @ApiOperation("场景删除")
     @PostMapping(value = "/push/api/disposal/scenes/delete")
     public Object delete(@RequestBody(required = false) SceneDto dto) {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

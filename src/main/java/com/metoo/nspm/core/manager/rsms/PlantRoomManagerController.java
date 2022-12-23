@@ -1,19 +1,18 @@
 package com.metoo.nspm.core.manager.rsms;
 
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.IPlantRoomService;
-import com.metoo.nspm.core.service.IRackService;
-import com.metoo.nspm.core.service.IRsmsDeviceService;
+import com.metoo.nspm.core.service.nspm.IPlantRoomService;
+import com.metoo.nspm.core.service.nspm.IRackService;
+import com.metoo.nspm.core.service.nspm.IRsmsDeviceService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.PlantRoomDTO;
-import com.metoo.nspm.entity.*;
+import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.vo.PlantRoomVO;
 import com.github.pagehelper.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
-import org.nutz.lang.random.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

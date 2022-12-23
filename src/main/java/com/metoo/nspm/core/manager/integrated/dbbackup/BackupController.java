@@ -1,12 +1,12 @@
 package com.metoo.nspm.core.manager.integrated.dbbackup;
 
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.httpclient.UrlConvertUtil;
-import com.metoo.nspm.entity.BackUp;
-import com.metoo.nspm.entity.BackupFtp;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.BackUp;
+import com.metoo.nspm.entity.nspm.BackupFtp;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class BackupController {
     @ApiOperation("ftp设置")
     @RequestMapping("/getBackupFtpList")
     public Object getBackupFtpList(@RequestBody(required = false) BackupFtp backupFtp){
-            SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+            SysConfig sysConfig = this.sysConfigService.select();
 
             String token = sysConfig.getNspmToken();
             if(token != null){
@@ -56,7 +56,7 @@ public class BackupController {
     @ApiOperation("数据库安装模式信息")
     @RequestMapping("/getMasterOrSlave")
     public Object getMasterOrSlave(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/db/getMasterOrSlave.action";
@@ -70,7 +70,7 @@ public class BackupController {
     @ApiOperation("备份结果查看/系统还原")
     @GetMapping("/querybackupdata")
     public Object getMasterOrSlave(BackUp backUp){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/db/querybackupdata.action";
@@ -84,7 +84,7 @@ public class BackupController {
     @ApiOperation("备份方式")
     @RequestMapping("/querybackupconfig")
     public Object querybackupconfig(@RequestBody(required = false)BackUp backUp){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/db/querybackupconfig.action";
@@ -98,7 +98,7 @@ public class BackupController {
     @ApiOperation("系统工作目录剩余空间")
     @RequestMapping("/getFreeDiskSize")
     public Object getFreeDiskSize(@RequestBody(required = false)BackUp backUp){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/db/getFreeDiskSize.action";
@@ -112,7 +112,7 @@ public class BackupController {
     @ApiOperation("保存期限设置")
     @RequestMapping("/addBackupConfig")
     public Object addBackupConfig(@RequestBody(required = false)BackUp backUp){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/db/addBackupConfig.action";
@@ -126,7 +126,7 @@ public class BackupController {
     @ApiOperation("删除")
     @RequestMapping("/deletebackupdata")
     public Object deletebackupdata(@RequestBody BackUp backUp){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology/db/deletebackupdata.action";
@@ -140,7 +140,7 @@ public class BackupController {
     @ApiOperation("上传")
     @PostMapping(value = "/upload")
     public Object upload(@RequestParam(value = "file", required = false) MultipartFile file, String fileName, Integer fileSize) throws IOException {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
 
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -177,7 +177,7 @@ public class BackupController {
     @ApiOperation("下载")
     @GetMapping(value="/downloadBackupDate")
     public Object downloadBackupDate(@RequestParam("filePath") String filePath){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url =  "/topology/db/downloadBackupDate.action";
@@ -191,7 +191,7 @@ public class BackupController {
     @ApiOperation("备份")
     @GetMapping(value="/backup")
     public Object backup(BackUp backUp){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url =  "/topology/db/backup.action";
@@ -204,7 +204,7 @@ public class BackupController {
     @ApiOperation("还原")
     @GetMapping(value="/dbRestore")
     public Object downloadBackupDate(BackUp backUp){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url =  "/topology/db/dbRestore.action";
@@ -217,7 +217,7 @@ public class BackupController {
     @ApiOperation("还原状态")
     @PostMapping(value="/getBackupOrRecoverStatusData")
     public Object getBackupOrRecoverStatusData(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url =  "/topology/db/getBackupOrRecoverStatusData.action";
@@ -230,7 +230,7 @@ public class BackupController {
     @ApiOperation("重置")
     @PostMapping(value="/resetStatus.action")
     public Object resetStatus(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url =  "/topology/db/resetStatus.action";
@@ -243,7 +243,7 @@ public class BackupController {
     @ApiOperation("FTP设置-保存")
     @PostMapping(value="/saveOrUpdateBackupFtp.action")
     public Object saveOrUpdateBackupFtp(@RequestBody(required = false) BackUp backUp){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url =  "/topology/db/saveOrUpdateBackupFtp.action";

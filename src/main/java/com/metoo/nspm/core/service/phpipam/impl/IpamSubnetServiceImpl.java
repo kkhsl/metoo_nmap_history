@@ -2,15 +2,13 @@ package com.metoo.nspm.core.service.phpipam.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.http.IpamHttpBase;
+import com.metoo.nspm.core.http.IpamApiUtil;
 import com.metoo.nspm.core.service.phpipam.IpamSubnetService;
 import com.metoo.nspm.entity.Ipam.IpamSubnet;
-import com.metoo.nspm.entity.Subnet;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,7 +24,7 @@ public class IpamSubnetServiceImpl implements IpamSubnetService {
         if(path != null){
             url += "/" + path;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         return base.get();
     }
 
@@ -34,7 +32,7 @@ public class IpamSubnetServiceImpl implements IpamSubnetService {
     public Integer getSubnetsBySubnet(String subnet, Integer mask) {
         if(subnet != null && mask != null) {
             String path = "/subnets/search/" + subnet + "/" + mask;
-            IpamHttpBase base = new IpamHttpBase(path);
+            IpamApiUtil base = new IpamApiUtil(path);
             Object body = base.get();
             if (body != null) {
                 JSONObject result = JSONObject.parseObject(body.toString());
@@ -55,7 +53,7 @@ public class IpamSubnetServiceImpl implements IpamSubnetService {
     public JSONObject create(IpamSubnet ipamSubnet) {
         String url = "/subnets/";
         Map<String, Object> map =  beanToMap(ipamSubnet, true);
-        IpamHttpBase base = new IpamHttpBase(url, map);
+        IpamApiUtil base = new IpamApiUtil(url, map);
         return base.post();
     }
 
@@ -63,7 +61,7 @@ public class IpamSubnetServiceImpl implements IpamSubnetService {
     public JSONObject update(IpamSubnet ipamSubnet) {
         String url = "/subnets/";
         Map<String, Object> map =  beanToMap(ipamSubnet, true);
-        IpamHttpBase base = new IpamHttpBase(url, map);
+        IpamApiUtil base = new IpamApiUtil(url, map);
         return base.patch();
     }
 
@@ -76,7 +74,7 @@ public class IpamSubnetServiceImpl implements IpamSubnetService {
         if(path != null){
             url += "/" + path;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         return base.del();
     }
 

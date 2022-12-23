@@ -1,6 +1,6 @@
 package com.metoo.nspm.core.config.listerner;
 
-import com.metoo.nspm.core.service.ILicenseService;
+import com.metoo.nspm.core.service.nspm.ILicenseService;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 

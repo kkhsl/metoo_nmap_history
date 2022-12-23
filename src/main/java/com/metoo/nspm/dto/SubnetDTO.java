@@ -1,7 +1,7 @@
 package com.metoo.nspm.dto;
 
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.entity.Subnet;
+import com.metoo.nspm.entity.nspm.Subnet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

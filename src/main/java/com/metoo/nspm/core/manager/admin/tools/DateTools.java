@@ -23,6 +23,7 @@ public class DateTools {
 
     public static String FORMAT_yyyyMMdd = "yyyyMMdd";
     public static String FORMAT_STANDARD = "yyyy-MM-dd HH:mm:ss";
+    public static String FORMAT_yyyyMMddHHmm= "yyyy-MM-dd HH:mm";
     public static String FORMAT_yyyyMMddHHmmss = "yyyyMMddHHmmss";
     public static String TIME_000000 = "000000";
     public static String TIME_000 = "000";
@@ -30,7 +31,10 @@ public class DateTools {
     public static long ONEDAY_TIME = 86400000L;
 
     public static void main(String[] args) {
-        System.out.println(getCurrentDate(null));
+        System.out.println(1670317656L * 1000L);
+        System.out.println(1670317656 * 1000L);
+        System.out.println((1 * 60000));
+        System.out.println(longToStr((1670317656 * 1000L) + (1 * 60000L), "yyyy-MM-dd HH:mm"));
     }
 
     /**
@@ -52,6 +56,12 @@ public class DateTools {
         } catch (Exception var4) {
             return null;
         }
+    }
+    public static Date getCurrentTimeNoSecond(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.clear(Calendar.SECOND);
+        return cal.getTime();
     }
 
    // 字符串转时间戳
@@ -104,6 +114,13 @@ public class DateTools {
     // 转换 10位时间戳
     public static long getTimesTamp10(){
         Date date = new Date();
+        return date.getTime() / 1000;
+    }
+
+    public static long getTimesTamp10(Date date){
+        if(date == null){
+            date = new Date();
+        }
         return date.getTime() / 1000;
     }
 

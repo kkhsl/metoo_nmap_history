@@ -1,13 +1,13 @@
 package com.metoo.nspm.core.manager.view.action;
 
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.CommUtils;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.LiveRoomDto;
+import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.vo.CourseVo;
 import com.metoo.nspm.vo.WebLiveRoomVo;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +102,7 @@ public class LiveRoomViewController {
         }
         Accessory accessory = this.accessoryService.getObjById(liveRoom.getCover());
         if(accessory != null){
-            String photo = this.configService.findSysConfigList().getDomain()
+            String photo = this.configService.select().getDomain()
                     + "/"
                     + accessory.getA_path()
                     + "/"

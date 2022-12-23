@@ -1,13 +1,13 @@
 package com.metoo.nspm.core.manager.monitor;
 
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.IMonitorService;
+import com.metoo.nspm.core.service.nspm.IMonitorService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.MonitorDto;
-import com.metoo.nspm.entity.LiveRoom;
-import com.metoo.nspm.entity.Monitor;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.LiveRoom;
+import com.metoo.nspm.entity.nspm.Monitor;
+import com.metoo.nspm.entity.nspm.User;
 import com.github.pagehelper.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

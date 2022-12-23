@@ -1,6 +1,6 @@
 package com.metoo.nspm.core.config.listerner;
 
-import com.metoo.nspm.core.service.ILicenseService;
+import com.metoo.nspm.core.service.nspm.ILicenseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -27,7 +27,7 @@ public class MyListnerter implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         context = WebApplicationContextUtils.getWebApplicationContext(servletContextEvent.getServletContext());
         ILicenseService licenseService = (ILicenseService)context.getBean("licenseServiceImpl");
-        licenseService.detection();
+//        licenseService.detection();
     }
 
 

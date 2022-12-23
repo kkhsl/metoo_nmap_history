@@ -36,4 +36,6 @@ public class IpamSubnet {
     private Integer location;
     private Date editDate;
 
+
+
 }

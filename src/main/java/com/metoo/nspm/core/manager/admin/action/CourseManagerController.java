@@ -1,13 +1,13 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.ICourseService;
-import com.metoo.nspm.core.service.IRoomProgramService;
-import com.metoo.nspm.core.service.IVideoService;
+import com.metoo.nspm.core.service.nspm.ICourseService;
+import com.metoo.nspm.core.service.nspm.IRoomProgramService;
+import com.metoo.nspm.core.service.nspm.IVideoService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.CourseDto;
-import com.metoo.nspm.entity.Course;
-import com.metoo.nspm.entity.RoomProgram;
-import com.metoo.nspm.entity.Video;
+import com.metoo.nspm.entity.nspm.Course;
+import com.metoo.nspm.entity.nspm.RoomProgram;
+import com.metoo.nspm.entity.nspm.Video;
 import com.metoo.nspm.req.CourseReq;
 import com.metoo.nspm.vo.Result;
 import com.github.pagehelper.Page;

@@ -57,8 +57,8 @@ public class IpUtil {
     // 验证ip是否为网段
     @Test
     public void test3(){
-        Map map = getNetworkIp("59.51.0.1", "255.255.255.0");
-        System.out.println(map);
+//        Map map = getNetworkIp("59.51.0.1", "255.255.255.0");
+//        System.out.println(map);
     }
 
 
@@ -101,14 +101,12 @@ public class IpUtil {
         Comparator<String> ipv4Comparator = Comparator.comparing(IpUtil::ipv4ToNumeric);
         SortedSet<String> rest_ipv4 = new TreeSet<>(ipv4Comparator);
         rest_ipv4.addAll(ipv4);
-        System.out.println(rest_ipv4);
         restMap.put("ipv4", rest_ipv4);
 
         // ipv6排序
         Comparator<String> ipv6Comparator = Comparator.comparing(IpUtil::ipv6ToNumeric);
         SortedSet<String> rest_ipv6 = new TreeSet<>(ipv6Comparator);
         rest_ipv6.addAll(ipv6);
-        System.out.println(rest_ipv6);
         restMap.put("ipv4", rest_ipv6);
 
         // 返回排序结果
@@ -195,11 +193,9 @@ public class IpUtil {
         String[] split = ip.split("\\.");
         Long rs=0L;
         for(int i=0,j=split.length-1;i<split.length;j--,i++){
-//            System.out.println(split[i]);
             Long intIp=Long.parseLong(split[i]) << 8 * j;
             rs=rs | intIp;
         }
-        System.out.println(rs);  //3232235777
         return rs.toString();
     }
 
@@ -218,13 +214,7 @@ public class IpUtil {
             ipString[j] = String.valueOf(and >>> pos);
         }
         String join = String.join(".", ipString);
-//        System.out.println(join);//192.168.1.1
         return join;
-    }
-
-    // 获取最小ip
-    public String getMinIp(String ip, int mask){
-        return null;
     }
 
     /**
@@ -240,13 +230,7 @@ public class IpUtil {
         return 0;
     }
 
-    // 获取最大ip
-    public String getMaxIp(String ip, String mask){
-
-        return null;
-    }
-
-    // 获取网络号
+    // 获取网络地址
     public static Map<String, String> getNetworkIp(String address, String netmask){
         Map<String, String> map = new HashMap<String, String>();
         String network = new String();
@@ -268,8 +252,8 @@ public class IpUtil {
         return map;
     }
 
-
-    public static Map getNetworkIpDec(String address, String netmask){
+    // 获取网络地址
+    public static Map<String, String> getNetworkIpDec(String address, String netmask){
         Map<String, String> map = new HashMap<String, String>();
         String network = new String();
         String broadcast = new String();
@@ -292,11 +276,72 @@ public class IpUtil {
         return map;
     }
 
-    // 获取广播地址
-    public String getBroadcastIp(String ip, String mask){
 
-        return null;
+    /**
+     * 获取网络地址
+     * @param ip
+     * @param netmask
+     * @return
+     */
+    public static Map getNetworkIpAddress(String ip, String netmask){
+        Map<String, String> map = new HashMap<String, String>();
+        String network = new String();
+        String broadcast = new String();
+        String[] addresses = ip.split("\\.");
+        String[] masks = netmask.split("\\.");
+        for(int i = 0; i < 4; i++) {
+            int opmasksegement = ~Integer.parseInt(masks[i]) & 0xFF;
+            //此处有坑，正常的int有32位，
+            // 如果此数没有32位的话，就会用0填充前面的数，
+            // 从而导致取反0的部分会用1来填充，
+            // 用上述方法可以获取想要的部分
+            int netsegment = Integer.parseInt(addresses[i]) & Integer.parseInt(masks[i]);
+            network = network + String.valueOf(netsegment) + ".";
+            broadcast = broadcast + String.valueOf(opmasksegement | netsegment) + ".";
+        }
+        network = ipConvertDec(network.substring(0, network.length() - 1));
+        broadcast = ipConvertDec(broadcast.substring(0, broadcast.length() - 1));
+        map.put("network", network);
+        map.put("broadcast", broadcast);
+        return map;
     }
+
+    /**
+     * 获取广播地址
+     * @param ip 192.168.0.0
+     * @param netmask 255.255.255.0
+     * @param type 0：网络地址 1：广播地址
+     * @return 默认返回主机地址
+     */
+    public static String getNBIP(String ip, String netmask, Integer type){
+        Map<String, String> map = new HashMap<String, String>();
+        String network = new String();
+        String broadcast = new String();
+        String[] addresses = ip.split("\\.");
+        String[] masks = netmask.split("\\.");
+        for(int i = 0; i < 4; i++) {
+            int opmasksegement = ~Integer.parseInt(masks[i]) & 0xFF;
+            //此处有坑，正常的int有32位，
+            // 如果此数没有32位的话，就会用0填充前面的数，
+            // 从而导致取反0的部分会用1来填充，
+            // 用上述方法可以获取想要的部分
+            int netsegment = Integer.parseInt(addresses[i]) & Integer.parseInt(masks[i]);
+            network = network + String.valueOf(netsegment) + ".";
+            broadcast = broadcast + String.valueOf(opmasksegement | netsegment) + ".";
+        }
+        network = ipConvertDec(network.substring(0, network.length() - 1));
+        broadcast = ipConvertDec(broadcast.substring(0, broadcast.length() - 1));
+        map.put("network", network);
+        map.put("broadcast", broadcast);
+        if(type  == 0){
+            return network;
+        }else
+        if(type == 1){
+            return broadcast;
+        }
+        return network;
+    }
+
 
     // 获取子网列表
     public  static String[] getSubnetList(String ip, int mask){

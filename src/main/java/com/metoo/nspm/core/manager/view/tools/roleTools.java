@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.manager.view.tools;
 
-import com.metoo.nspm.core.service.IRoleService;
-import com.metoo.nspm.entity.Role;
+import com.metoo.nspm.core.service.nspm.IRoleService;
+import com.metoo.nspm.entity.nspm.Role;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

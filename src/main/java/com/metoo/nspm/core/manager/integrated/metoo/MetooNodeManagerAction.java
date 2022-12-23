@@ -3,16 +3,16 @@ package com.metoo.nspm.core.manager.integrated.metoo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.TopoNodeDto;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.core.service.*;
-import com.metoo.nspm.entity.Group;
-import com.metoo.nspm.entity.SysConfig;
-import com.metoo.nspm.entity.TopoNode;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.Group;
+import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.entity.nspm.TopoNode;
+import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class MetooNodeManagerAction {
     @ApiOperation("历史节点同步")
     @RequestMapping("/nodeQuery/backup")
     public Object nodeQuery1(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -107,7 +107,7 @@ public class MetooNodeManagerAction {
     @ApiOperation("节点列表")
     @RequestMapping("/nodeQuery")
     public Object nodeQuery(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null) {
@@ -158,7 +158,7 @@ public class MetooNodeManagerAction {
     @ApiOperation("节点保存(local)")
     @RequestMapping("/addGatherNode")
     public Object addGatherNodeLocal(TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -200,7 +200,7 @@ public class MetooNodeManagerAction {
     @ApiOperation("编辑保存（防火墙）")
     @RequestMapping("/updateNode")
     public Object updateNode(TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -232,7 +232,7 @@ public class MetooNodeManagerAction {
     @ApiOperation("节点删除")
     @RequestMapping("/nodeDelete")
     public Object nodeDelete(@RequestBody TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

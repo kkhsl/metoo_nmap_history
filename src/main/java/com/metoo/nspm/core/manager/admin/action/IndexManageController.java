@@ -1,16 +1,15 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.IDeviceTypeService;
-import com.metoo.nspm.core.service.IIndexService;
-import com.metoo.nspm.core.service.ISysConfigService;
-import com.metoo.nspm.core.service.IssuedService;
+import com.metoo.nspm.core.service.nspm.IDeviceTypeService;
+import com.metoo.nspm.core.service.nspm.IIndexService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IssuedService;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.entity.DeviceType;
-import com.metoo.nspm.entity.SysConfig;
-import com.metoo.nspm.entity.Task;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.DeviceType;
+import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.entity.nspm.Task;
+import com.metoo.nspm.entity.nspm.User;
 import com.metoo.nspm.vo.DeviceTypeVO;
 import com.metoo.nspm.vo.MenuVo;
 import io.swagger.annotations.Api;
@@ -46,7 +45,7 @@ public class IndexManageController {
         List<MenuVo> menuList = this.indexService.findMenu(user.getId());
         map.put("obj", menuList);
         map.put("userRole", user.getUserRole());
-        SysConfig configs = this.configService.findSysConfigList();
+        SysConfig configs = this.configService.select();
         map.put("domain", configs.getDomain());
         return ResponseUtil.ok(map);
     }
@@ -58,7 +57,7 @@ public class IndexManageController {
         User user = ShiroUserHolder.currentUser();
         List<MenuVo> menuList = this.indexService.findMenu(user.getId());
         map.put("obj", menuList);
-        SysConfig configs = this.configService.findSysConfigList();
+        SysConfig configs = this.configService.select();
         map.put("domain", configs.getDomain());
         return ResponseUtil.ok(map);
     }

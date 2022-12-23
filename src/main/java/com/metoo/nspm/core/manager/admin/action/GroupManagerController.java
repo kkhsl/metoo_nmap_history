@@ -2,12 +2,12 @@ package com.metoo.nspm.core.manager.admin.action;
 
 import com.metoo.nspm.core.manager.admin.tools.GroupTools;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.core.service.IGroupService;
-import com.metoo.nspm.core.service.IUserService;
+import com.metoo.nspm.core.service.nspm.IGroupService;
+import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.GroupDto;
-import com.metoo.nspm.entity.Group;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.Group;
+import com.metoo.nspm.entity.nspm.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

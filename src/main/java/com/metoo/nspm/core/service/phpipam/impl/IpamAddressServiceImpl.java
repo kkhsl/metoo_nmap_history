@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.service.phpipam.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.http.IpamHttpBase;
+import com.metoo.nspm.core.http.IpamApiUtil;
 import com.metoo.nspm.core.service.phpipam.IpamAddressService;
 import com.metoo.nspm.entity.Ipam.IpamAddress;
 import org.springframework.cglib.beans.BeanMap;
@@ -24,7 +24,7 @@ public class IpamAddressServiceImpl implements IpamAddressService {
         if(path != null){
             url += "/" + path;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         return base.get();
     }
 
@@ -32,7 +32,7 @@ public class IpamAddressServiceImpl implements IpamAddressService {
     public JSONObject create(IpamAddress instance) {
         String url = "/addresses/";
         Map<String, Object> map =  beanToMap(instance, true);
-        IpamHttpBase base = new IpamHttpBase(url, map);
+        IpamApiUtil base = new IpamApiUtil(url, map);
         return base.post();
     }
 
@@ -40,7 +40,7 @@ public class IpamAddressServiceImpl implements IpamAddressService {
     public JSONObject update(IpamAddress instance) {
         String url = "/addresses/";
         Map<String, Object> map =  beanToMap(instance, true);
-        IpamHttpBase base = new IpamHttpBase(url, map);
+        IpamApiUtil base = new IpamApiUtil(url, map);
         return base.patch();
     }
 
@@ -54,7 +54,7 @@ public class IpamAddressServiceImpl implements IpamAddressService {
         if(path != null){
             url += "/" + path;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         return base.del();
     }
 

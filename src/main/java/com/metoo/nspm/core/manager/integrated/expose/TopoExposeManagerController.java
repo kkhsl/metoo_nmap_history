@@ -1,10 +1,10 @@
 package com.metoo.nspm.core.manager.integrated.expose;
 
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.ExposureDto;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +25,7 @@ public class TopoExposeManagerController {
     @ApiOperation("防御优化-资产主机列表")
     @PostMapping(value = "/api/danger/attackSurface/hostExposureList")
     public Object statisticalInformation(@RequestBody ExposureDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

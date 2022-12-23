@@ -1,12 +1,12 @@
 package com.metoo.nspm.core.manager.integrated.policy;
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.CheckDto;
 import com.metoo.nspm.dto.TopoPolicyDto;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.beanutils.BeanMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class TopoPolicyCheckManagerController {
     @ApiOperation("检查是设备和正在执行的任务")
     @PostMapping(value = "/check/overview/node/isExist")
     public Object isExist(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/patrol/api/check/overview/node/isExist";
@@ -45,7 +45,7 @@ public class TopoPolicyCheckManagerController {
     @ApiOperation("获取检查最新记录")
     @PostMapping(value = "/check/newestRecord")
     public Object ruleList(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/patrol/api/check/overview/newestRecord";
@@ -64,7 +64,7 @@ public class TopoPolicyCheckManagerController {
     @ApiOperation("检查设备计数")
     @PostMapping(value = "/check/statistics/mark")
     public Object mark(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/patrol/api/check/statistics/mark";
@@ -83,7 +83,7 @@ public class TopoPolicyCheckManagerController {
     @ApiOperation("查询结果统计小类数据")
     @PostMapping(value = "/check/ruleType/list")
     public Object ruleType(@RequestBody(required = false)CheckDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/patrol/api/check/statistics/ruleType/list";
@@ -102,7 +102,7 @@ public class TopoPolicyCheckManagerController {
     @ApiOperation("统计列表数据")
     @PostMapping(value = "/check/summary/list")
     public Object summary(@RequestBody(required = false)CheckDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/patrol/api/check/statistics/summary/list";
@@ -121,7 +121,7 @@ public class TopoPolicyCheckManagerController {
     @ApiOperation("风险规则检查")
     @PostMapping(value = "/check/overview/check")
     public Object check(@RequestBody(required = false)CheckDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/patrol/api/check/overview/check";
@@ -140,7 +140,7 @@ public class TopoPolicyCheckManagerController {
     @ApiOperation("风险规则检查进度条")
     @PostMapping(value = "/check/overview/percentage")
     public Object percentage(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/patrol/api/check/overview/percentage";
@@ -159,7 +159,7 @@ public class TopoPolicyCheckManagerController {
     @ApiOperation("停止当前正在检查的线程")
     @PostMapping(value = "/check/overview/stop/check")
     public Object stop(@RequestBody(required = false)CheckDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/patrol/api/check/overview/stop/check";
@@ -178,7 +178,7 @@ public class TopoPolicyCheckManagerController {
     @ApiOperation("下载策略优化Excel文件")
     @RequestMapping("/report/policyCheck/download")
     public Object policyCheck(HttpServletRequest request, String deviceUuid, String isReload){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/topology-policy/report/policyCheck/download";

@@ -1,9 +1,9 @@
 package com.metoo.nspm.core.jwt.action;
 
 import com.metoo.nspm.core.jwt.util.JwtUtil;
-import com.metoo.nspm.core.service.IUserService;
+import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;

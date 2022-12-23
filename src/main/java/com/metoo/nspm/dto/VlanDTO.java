@@ -1,9 +1,7 @@
 package com.metoo.nspm.dto;
 
-import com.metoo.nspm.core.domain.IdEntity;
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.entity.Vlan;
-import io.swagger.annotations.ApiModel;
+import com.metoo.nspm.entity.nspm.Vlan;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;

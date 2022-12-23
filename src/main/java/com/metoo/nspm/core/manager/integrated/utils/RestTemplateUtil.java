@@ -1,9 +1,9 @@
 package com.metoo.nspm.core.manager.integrated.utils;
 
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.httpclient.UrlConvertUtil;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 
 import java.io.*;
 import java.util.Base64;
@@ -35,7 +35,7 @@ public class RestTemplateUtil {
     }
 
     public String getToken(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         return sysConfig.getNspmToken();
 
     }
@@ -51,7 +51,7 @@ public class RestTemplateUtil {
     // 获取文件流
    /* public String getInputStream(String url){
         // 通过url获取输入流
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(url != null && token != null){
             HttpHeaders headers = new HttpHeaders();
@@ -78,7 +78,7 @@ public class RestTemplateUtil {
 
     public String getInputStream(String url){
         // 通过url获取输入流
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(url != null && token != null){
             HttpHeaders headers = new HttpHeaders();

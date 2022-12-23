@@ -1,22 +1,42 @@
 package com.metoo.nspm.core.service.zabbix.impl;
 
-import com.metoo.nspm.core.manager.zabbix.utils.ZabbixApiUtil;
-import com.metoo.nspm.core.service.zabbix.ProblemService;
-import com.metoo.nspm.dto.zabbix.ProblemDTO;
-import io.github.hengyunabc.zabbix.api.Request;
+import com.metoo.nspm.core.mapper.nspm.zabbix.NspmProoblemMapper;
+import com.metoo.nspm.core.mapper.zabbix.ProblemMapper;
+import com.metoo.nspm.core.service.zabbix.IProblemService;
+import com.metoo.nspm.entity.zabbix.Problem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
-public class ProblemServiceImpl implements ProblemService {
+@Transactional
+public class ProblemServiceImpl implements IProblemService {
 
     @Autowired
-    private ZabbixApiUtil zabbixApiUtil;
-
+    private ProblemMapper problemMapper;
+    @Autowired
+    private NspmProoblemMapper nspmProoblemMapper;
 
     @Override
-    public Object get(ProblemDTO dto) {
-        Request request = this.zabbixApiUtil.parseParam(dto, "problem.get");
-        return zabbixApiUtil.call(request);
+    public List<Problem> selectObjByMap(Map params) {
+        return this.nspmProoblemMapper.selectObjByMap(params);
+    }
+
+    @Override
+    public int selectCount(Map params) {
+        return this.problemMapper.selectCount(params);
+    }
+
+    @Override
+    public void truncateTable() {
+        this.nspmProoblemMapper.truncateTable();
+    }
+
+    @Override
+    public void copyProblemTemp(Map params) {
+        this.nspmProoblemMapper.copyProblemTemp(params);
     }
 }

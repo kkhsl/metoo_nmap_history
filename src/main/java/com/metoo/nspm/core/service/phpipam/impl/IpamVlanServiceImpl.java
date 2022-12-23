@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.service.phpipam.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.http.IpamHttpBase;
+import com.metoo.nspm.core.http.IpamApiUtil;
 import com.metoo.nspm.core.service.phpipam.IpamVlanService;
 import com.metoo.nspm.entity.Ipam.IpamVlan;
 import org.springframework.cglib.beans.BeanMap;
@@ -20,7 +20,7 @@ public class IpamVlanServiceImpl implements IpamVlanService {
         if(id != null){
             url += id;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         Object body = base.get();
         if (body != null) {
             JSONObject result = JSONObject.parseObject(body.toString());
@@ -38,7 +38,7 @@ public class IpamVlanServiceImpl implements IpamVlanService {
         if(id != null){
             url += id + "/subnets";
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         Object body = base.get();
         if (body != null) {
             JSONObject result = JSONObject.parseObject(body.toString());
@@ -54,7 +54,7 @@ public class IpamVlanServiceImpl implements IpamVlanService {
     public JSONObject create(IpamVlan instance) {
         String url = "/vlan/";
         Map<String, Object> map =  beanToMap(instance, true);
-        IpamHttpBase base = new IpamHttpBase(url, map);
+        IpamApiUtil base = new IpamApiUtil(url, map);
         return base.post();
     }
 
@@ -62,7 +62,7 @@ public class IpamVlanServiceImpl implements IpamVlanService {
     public JSONObject update(IpamVlan instance) {
         String url = "/vlan/";
         Map<String, Object> map =  beanToMap(instance, true);
-        IpamHttpBase base = new IpamHttpBase(url, map);
+        IpamApiUtil base = new IpamApiUtil(url, map);
         return base.patch();
     }
 
@@ -75,7 +75,7 @@ public class IpamVlanServiceImpl implements IpamVlanService {
         if(path != null){
             url += "/" + path;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         return base.del();
     }
 

@@ -2,12 +2,12 @@ package com.metoo.nspm.core.manager.integrated.asset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.AssetDto;
 import com.metoo.nspm.dto.Risk;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class AssetManagerAction {
     @ApiOperation("主机组")
     @RequestMapping("/risk/api/danger/hostComputerSoftware/assetGroupTree")
     public Object assetGroupTree(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url =  "/risk/api/danger/hostComputerSoftware/assetGroupTree";
@@ -71,7 +71,7 @@ public class AssetManagerAction {
     @ApiOperation("主机列表")
     @RequestMapping("/risk/api/danger/assetHost/pageTreeList")
     public Object pageTreeList(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if(token != null){
             String url = "/risk/api/danger/assetHost/pageTreeList";
@@ -117,7 +117,7 @@ public class AssetManagerAction {
     @ApiOperation("包含服务")
     @RequestMapping("/risk/api/danger/hostComputerSoftware/hostComputerSoftwareListByAssetId")
     public Object hostComputerSoftwareListByAssetId(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -135,7 +135,7 @@ public class AssetManagerAction {
     @ApiOperation("防火墙规则(iptables)")
     @RequestMapping("/risk/api/danger/assetHost/findIptablesByAssetUuid")
     public Object findIptablesByAssetUuid(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -153,7 +153,7 @@ public class AssetManagerAction {
     @ApiOperation("子网")
     @RequestMapping("/risk/api/danger/hostComputerSoftware/querySubnetUuidByIp")
     public Object querySubnetUuidByIp(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -171,7 +171,7 @@ public class AssetManagerAction {
     @ApiOperation("添加")
     @RequestMapping("/risk/api/danger/assetHost/addOrEdit")
     public Object addOrEdit(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -189,7 +189,7 @@ public class AssetManagerAction {
     @ApiOperation("编辑")
     @RequestMapping("/risk/api/danger/assetHost/getByAssetUuid")
     public Object getByAssetUuid(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -207,7 +207,7 @@ public class AssetManagerAction {
     @ApiOperation("批量修改主机分组")
     @RequestMapping("/risk/api/danger/hostComputerSoftware/updateAssetGroupByUUIds")
     public Object updateAssetGroupByUUIds(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -225,7 +225,7 @@ public class AssetManagerAction {
     @ApiOperation("主机厂商")
     @RequestMapping("/topology/assets/assetsOBJ_queryManufacturer.action")
     public Object assetsOBJ_queryManufacturer(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -243,7 +243,7 @@ public class AssetManagerAction {
     @ApiOperation("删除")
     @RequestMapping("/risk/api/danger/assetHost/batchDelete")
     public Object batchDelete(@RequestBody Risk dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -261,7 +261,7 @@ public class AssetManagerAction {
     @ApiOperation("主机组列表")
     @RequestMapping("/risk/api/danger/hostComputerSoftware/assetGroupList")
     public Object assetGroupList(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -279,7 +279,7 @@ public class AssetManagerAction {
     @ApiOperation("主机组编辑")
     @RequestMapping("/risk/api/danger/hostComputerSoftware/editAssetGroup")
     public Object editAssetGroup(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -297,7 +297,7 @@ public class AssetManagerAction {
     @ApiOperation("主机组删除")
     @RequestMapping("/risk/api/danger/hostComputerSoftware/deleteAssetGroupByArrayIds")
     public Object deleteAssetGroupByArrayIds(@RequestBody AssetDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

@@ -2,9 +2,6 @@ package com.metoo.nspm.core.service.phpipam;
 
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.entity.Ipam.IpamSubnet;
-import com.metoo.nspm.entity.Subnet;
-
-import java.util.List;
 
 public interface IpamSubnetService {
 

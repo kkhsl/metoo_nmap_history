@@ -1,10 +1,10 @@
 package com.metoo.nspm.core.manager.integrated.node;
 
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.dto.TopoNodeDto;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class TopoSubnetManagerController {
     @ApiOperation("列表")
     @RequestMapping("/topology/whaleSubnet/GET/subnets")
     public Object subnets(@RequestBody(required = false) TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -47,7 +47,7 @@ public class TopoSubnetManagerController {
     @ApiOperation("批量编辑")
     @RequestMapping("/topology/whaleSubnet/PUT/subnets/batch-update-level")
     public Object batchUpdateLevel(@RequestBody(required = false) TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -61,7 +61,7 @@ public class TopoSubnetManagerController {
     @ApiOperation("批量编辑")
     @RequestMapping("/topology/whaleSubnet/PUT/subnet")
     public Object subnet(@RequestBody(required = false) TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -75,7 +75,7 @@ public class TopoSubnetManagerController {
     @ApiOperation("起点标签")
     @RequestMapping("/push/recommend/label/list")
     public Object labelList(@RequestBody(required = false) TopoNodeDto dto){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){
@@ -89,7 +89,7 @@ public class TopoSubnetManagerController {
     @ApiOperation("子网Excel下载")
     @GetMapping("/topology/whaleSubnet/GET/subnet/excel")
     public Object download(){
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         
         String token = sysConfig.getNspmToken();
         if(token != null){

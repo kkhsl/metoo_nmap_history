@@ -1,12 +1,13 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.IAddressService;
-import com.metoo.nspm.core.service.zabbix.ZabbixSubnetService;
+import com.metoo.nspm.core.service.nspm.IAddressService;
+import com.metoo.nspm.core.service.nspm.IpDetailService;
+import com.metoo.nspm.core.service.nspm.ZabbixSubnetService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
-import com.metoo.nspm.entity.Address;
-import com.metoo.nspm.entity.zabbix.Subnet;
-import org.nutz.lang.random.R;
+import com.metoo.nspm.entity.nspm.Address;
+import com.metoo.nspm.entity.nspm.IpDetail;
+import com.metoo.nspm.entity.nspm.Subnet;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,8 @@ public class AddressManagerController {
     private IAddressService addressService;
     @Autowired
     private ZabbixSubnetService zabbixSubnetService;
+    @Autowired
+    private IpDetailService ipDetailService;
 
     /**
      * 创建子网Ip地址
@@ -55,6 +58,14 @@ public class AddressManagerController {
                         return ResponseUtil.ok();
                     }
                     return ResponseUtil.error();
+                }else{
+                    // 创建ip_detail
+                    IpDetail ipDetail = new IpDetail();
+                    ipDetail.setDeviceName(address.getHostName());
+                    ipDetail.setMac(address.getMac());
+                    ipDetail.setOnline(true);
+                    ipDetail.setIp(IpUtil.ipConvertDec(address.getIp()));
+                    this.ipDetailService.save(ipDetail);
                 }
             }
             address.setIp(IpUtil.ipConvertDec(address.getIp()));

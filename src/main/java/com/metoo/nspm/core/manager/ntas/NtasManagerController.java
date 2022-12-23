@@ -3,23 +3,30 @@ package com.metoo.nspm.core.manager.ntas;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
-import com.metoo.nspm.core.http.NtasHttpBase;
+import com.metoo.nspm.core.http.NtasApiUtil;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.BasicDate.BasicDataConvertUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.bytes.ByteConvertUtil;
+import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.vo.SysConfigVo;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@Api("网络流量分析：network traffic analysis")
 @RequestMapping("/ntas")
 @RestController
 public class NtasManagerController {
+
+    @Autowired
+    private ISysConfigService sysConfigService;
 
     public static void main(String[] args) {
         double i =  0.49548076923076934;
@@ -39,7 +46,7 @@ public class NtasManagerController {
             Map params = new HashMap();
             params.put("start_time", DateTools.dateToLong(start_time));
             params.put("end_time", DateTools.dateToLong(end_time));
-            NtasHttpBase base = new NtasHttpBase(url, params);
+            NtasApiUtil base = new NtasApiUtil(url, params);
             JSONObject result = base.get();
             if(result != null){
                 if(result.get("data") != null){
@@ -79,7 +86,7 @@ public class NtasManagerController {
         Map params = new HashMap();
         params.put("start_time", DateTools.dateToLong(start_time));
         params.put("end_time", DateTools.dateToLong(end_time));
-        NtasHttpBase base = new NtasHttpBase(url, params);
+        NtasApiUtil base = new NtasApiUtil(url, params);
         JSONObject result = base.get();
         return result;
     }
@@ -95,7 +102,7 @@ public class NtasManagerController {
         Map params = new HashMap();
         params.put("start_time", DateTools.dateToLong(start_time));
         params.put("end_time", DateTools.dateToLong(end_time));
-        NtasHttpBase base = new NtasHttpBase(url, params);
+        NtasApiUtil base = new NtasApiUtil(url, params);
         JSONObject result = base.get();
         if(result != null){
             if(result.get("data") != null){
@@ -134,7 +141,7 @@ public class NtasManagerController {
         Map params = new HashMap();
         params.put("start_time", DateTools.dateToLong(start_time));
         params.put("end_time", DateTools.dateToLong(end_time));
-        NtasHttpBase base = new NtasHttpBase(url, params);
+        NtasApiUtil base = new NtasApiUtil(url, params);
         JSONObject result = base.get();
         if(result != null){
             if(result.get("data") != null){
@@ -171,7 +178,7 @@ public class NtasManagerController {
         Map params = new HashMap();
         params.put("start_time", DateTools.dateToLong(start_time));
         params.put("end_time", DateTools.dateToLong(end_time));
-        NtasHttpBase base = new NtasHttpBase(url, params);
+        NtasApiUtil base = new NtasApiUtil(url, params);
         JSONObject result = base.get();
         if(result != null){
             if(result.get("data") != null){
@@ -206,7 +213,7 @@ public class NtasManagerController {
         Map params = new HashMap();
         params.put("start_time", DateTools.dateToLong(start_time));
         params.put("end_time", DateTools.dateToLong(end_time));
-        NtasHttpBase base = new NtasHttpBase(url, params);
+        NtasApiUtil base = new NtasApiUtil(url, params);
         JSONObject result = base.get();
         return result;
     }
@@ -222,7 +229,7 @@ public class NtasManagerController {
         Map params = new HashMap();
         params.put("start_time", DateTools.dateToLong(start_time));
         params.put("end_time", DateTools.dateToLong(end_time));
-        NtasHttpBase base = new NtasHttpBase(url, params);
+        NtasApiUtil base = new NtasApiUtil(url, params);
         JSONObject result = base.get();
         return result;
     }
@@ -238,9 +245,33 @@ public class NtasManagerController {
         Map params = new HashMap();
         params.put("start_time", DateTools.dateToLong(start_time));
         params.put("end_time", DateTools.dateToLong(end_time));
-        NtasHttpBase base = new NtasHttpBase(url, params);
+        NtasApiUtil base = new NtasApiUtil(url, params);
         JSONObject result = base.get();
         return result;
+    }
+
+    @RequestMapping("/list")
+    public Object list(){
+        SysConfig sysConfig = this.sysConfigService.select();
+        SysConfigVo vo = new SysConfigVo();
+        BeanUtils.copyProperties(sysConfig, vo);
+        return ResponseUtil.ok(vo);
+    }
+
+    @RequestMapping("/update")
+    public Object baseConfig(@RequestBody(required = false) SysConfig dto){
+        if(dto != null){
+            try {
+                SysConfig sysConfig = this.sysConfigService.select();
+                if(sysConfig != null){
+                    this.sysConfigService.modify(dto);
+                }
+                return ResponseUtil.ok();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ResponseUtil.error();
     }
 
 }

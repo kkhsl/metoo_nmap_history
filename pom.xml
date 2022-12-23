@@ -315,6 +315,12 @@
             <version>1.2.58</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
+        </dependency>
+
         <!-- 日志：Log4j2 + self4j --><!-- begin -->
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
         <dependency>
@@ -400,12 +406,49 @@
             <version>3.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+
+        <!-- 文件上传 -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.7</version>
+        </dependency>
+        <!-- POI -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.16</version>
+        </dependency>
+
+        <!--&lt;!&ndash;xls(03) poi：操作XLS&ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.poi</groupId>-->
+            <!--<artifactId>poi</artifactId>-->
+            <!--<version>3.9</version>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash;xlsx(07) poi-ooxml:操作xlsx&ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.poi</groupId>-->
+            <!--<artifactId>poi-ooxml</artifactId>-->
+            <!--<version>3.9</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.httpcomponents</groupId>-->
+            <!--<artifactId>httpmime</artifactId>-->
+            <!--<version>4.5.7</version>-->
+        <!--</dependency>-->
+
     </dependencies>
 
     <!--Profile 多环境开发-->
     <build>
         <!--修改打包后项目名称-->
-        <finalName>nspm</finalName>
+        <finalName>nmap</finalName>
 
         <plugins>
 
@@ -414,7 +457,7 @@
             <artifactId>spring-boot-maven-plugin</artifactId>
             <configuration>
                 <skip>false</skip>
-                <!--<mainClass>NspmApplication</mainClass>-->
+                <!--<mainClass>NspmApplicationTests</mainClass>-->
                 <!--&lt;!&ndash;配置可执行jar的名称，不对原jar重命名为.original&ndash;&gt;-->
                 <!--<classifier>exec</classifier>-->
             </configuration>

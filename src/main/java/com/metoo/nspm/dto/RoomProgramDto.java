@@ -1,7 +1,7 @@
 package com.metoo.nspm.dto;
 
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.entity.RoomProgram;
+import com.metoo.nspm.entity.nspm.RoomProgram;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.service.phpipam.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.http.IpamHttpBase;
+import com.metoo.nspm.core.http.IpamApiUtil;
 import com.metoo.nspm.core.service.phpipam.IpamL2DomainService;
 import com.metoo.nspm.entity.Ipam.IpamDomain;
 import org.springframework.cglib.beans.BeanMap;
@@ -21,7 +21,7 @@ public class IpamL2DoaminServiceImpl implements IpamL2DomainService {
         if(id != null){
             url += id;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         Object body = base.get();
         JSONObject result = JSONObject.parseObject(body.toString());
         return result;
@@ -34,7 +34,7 @@ public class IpamL2DoaminServiceImpl implements IpamL2DomainService {
             url += id + "/" + "/vlans";
 
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         Object body = base.get();
         JSONObject result = JSONObject.parseObject(body.toString());
         return result;
@@ -44,7 +44,7 @@ public class IpamL2DoaminServiceImpl implements IpamL2DomainService {
     public JSONObject create(IpamDomain instance) {
         String url = "/l2domains/";
         Map<String, Object> map =  beanToMap(instance, true);
-        IpamHttpBase base = new IpamHttpBase(url, map);
+        IpamApiUtil base = new IpamApiUtil(url, map);
         return base.post();
     }
 
@@ -52,7 +52,7 @@ public class IpamL2DoaminServiceImpl implements IpamL2DomainService {
     public JSONObject update(IpamDomain instance) {
         String url = "/l2domains/";
         Map<String, Object> map =  beanToMap(instance, true);
-        IpamHttpBase base = new IpamHttpBase(url, map);
+        IpamApiUtil base = new IpamApiUtil(url, map);
         return base.patch();
     }
 
@@ -65,7 +65,7 @@ public class IpamL2DoaminServiceImpl implements IpamL2DomainService {
         if(path != null){
             url += "/" + path;
         }
-        IpamHttpBase base = new IpamHttpBase(url);
+        IpamApiUtil base = new IpamApiUtil(url);
         return base.del();
     }
 

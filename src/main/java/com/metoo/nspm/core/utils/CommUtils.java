@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.utils;
 
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
-import com.metoo.nspm.entity.User;
+import com.metoo.nspm.entity.nspm.User;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

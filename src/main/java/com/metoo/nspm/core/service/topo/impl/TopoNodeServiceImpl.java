@@ -2,14 +2,17 @@ package com.metoo.nspm.core.service.topo.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.service.INetworkElementService;
-import com.metoo.nspm.core.service.ISysConfigService;
-import com.metoo.nspm.core.service.IUserService;
+import com.metoo.nspm.core.manager.myzabbix.utils.ItemUtil;
+import com.metoo.nspm.core.manager.zabbix.tools.InterfaceUtil;
+import com.metoo.nspm.core.service.nspm.INetworkElementService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.service.topo.ITopoNodeService;
+import com.metoo.nspm.core.service.api.zabbix.ZabbixHostInterfaceService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.dto.TopoNodeDto;
-import com.metoo.nspm.entity.NetworkElement;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.NetworkElement;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +32,16 @@ public class TopoNodeServiceImpl implements ITopoNodeService {
     private IUserService userService;
     @Autowired
     private INetworkElementService networkElementService;
+    @Autowired
+    private ZabbixHostInterfaceService zabbixHostInterfaceService;
+    @Autowired
+    private ItemUtil itemUtil;
+    @Autowired
+    private InterfaceUtil interfaceUtil;
 
     @Override
     public List<Map> queryAnt() {
-        SysConfig sysConfig = this.sysConfigService.findSysConfigList();
+        SysConfig sysConfig = this.sysConfigService.select();
         String token = sysConfig.getNspmToken();
         if (token != null) {
             List<Map> ipList = new ArrayList<>();
@@ -73,17 +82,21 @@ public class TopoNodeServiceImpl implements ITopoNodeService {
     }
 
     @Override
-    public List<Map> queryMetoo() {
+    public List<Map> queryNetworkElement() {
         List<NetworkElement> nes = this.networkElementService.selectObjByMap(null);
         List<Map> ipList = new ArrayList<>();
         if(nes.size() > 0) {
             for (NetworkElement ne : nes) {
-                Map map = new HashMap();
-                map.put("ip", ne.getIp());
-                map.put("deviceName", ne.getDeviceName());
-                map.put("uuid", ne.getUuid());
-                map.put("deviceType", ne.getDeviceTypeName());
-                ipList.add(map);
+                boolean available = this.interfaceUtil.verifyHostIsAvailable(ne.getIp());
+                // 校验主机是否宕机
+                if(available){
+                    Map map = new HashMap();
+                    map.put("ip", ne.getIp());
+                    map.put("deviceName", ne.getDeviceName());
+                    map.put("uuid", ne.getUuid());
+                    map.put("deviceType", ne.getDeviceTypeName());
+                    ipList.add(map);
+                }
             }
         }
         return ipList;

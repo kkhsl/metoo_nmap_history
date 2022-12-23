@@ -1,7 +1,7 @@
 package com.metoo.nspm.dto;
 
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.entity.Host;
+import com.metoo.nspm.entity.nspm.Host;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

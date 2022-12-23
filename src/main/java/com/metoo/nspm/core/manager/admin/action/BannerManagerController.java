@@ -1,13 +1,13 @@
 package com.metoo.nspm.core.manager.admin.action;
 
-import com.metoo.nspm.core.service.IBannerService;
-import com.metoo.nspm.core.service.ISysConfigService;
+import com.metoo.nspm.core.service.nspm.IBannerService;
+import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.BannerDto;
-import com.metoo.nspm.entity.Banner;
-import com.metoo.nspm.entity.RoomProgram;
-import com.metoo.nspm.entity.SysConfig;
+import com.metoo.nspm.entity.nspm.Banner;
+import com.metoo.nspm.entity.nspm.RoomProgram;
+import com.metoo.nspm.entity.nspm.SysConfig;
 import com.github.pagehelper.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,7 +51,7 @@ public class BannerManagerController {
             if(banner != null){
                 Map map = new HashMap();
                 map.put("obj", banner);
-                SysConfig configs = this.configService.findSysConfigList();
+                SysConfig configs = this.configService.select();
                 map.put("domain", configs.getDomain());
                 return ResponseUtil.ok(map);
             }

@@ -3,15 +3,18 @@ package com.metoo.nspm;
 //import DataSourceConfig;
 //import NspmDataSourceConfig;
 //import TopologyDataSourceConfig;
-import com.metoo.nspm.core.service.ITopologyTokenService;
-import com.metoo.nspm.core.service.TestInitService;
+import com.metoo.nspm.core.service.nspm.ITopologyTokenService;
+import com.metoo.nspm.core.service.nspm.TestInitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,8 +39,9 @@ import org.springframework.stereotype.Component;
 //@EnableTransactionManagement// 事务
 //@SpringBootApplication(exclude = {NspmDataSourceConfig.class, DataSourceConfig.class, TopologyDataSourceConfig.class}) // 申明让spring boot自动给程序进行必要的配置 == @Configuration ，@EnableAutoConfiguration 和 @ComponentScan
 //@MapperScan
-//@ServletComponentScan(basePackages ={ "com.cloud.tv.core.*"})//只用注解配置时，需要扫描包
-@SpringBootApplication
+@EnableScheduling // 开启定时任务（启动类增加该注解，使项目启动后执行定时任务）
+@ServletComponentScan(basePackages ={ "com.metoo.nspm"})//只用注解配置时，需要扫描包
+@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 public class NspmApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
@@ -65,7 +69,7 @@ public class NspmApplication extends SpringBootServletInitializer {
         public void run(String... args) {
             Long time=System.currentTimeMillis();
             System.out.println("begin======================================");
-            this.topologyTokenService.initToken();
+//            this.topologyTokenService.initToken();
 //            this.testInitService.init();
             System.out.println("Init time：" + (System.currentTimeMillis() - time));
         }
