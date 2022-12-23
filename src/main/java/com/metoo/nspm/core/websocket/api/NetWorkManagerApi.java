@@ -102,66 +102,71 @@ public class NetWorkManagerApi {
                 for(Map.Entry<String, String> entry : entrySet){
                     if(entry.getKey().equals("from") || entry.getKey().equals("to")){
                         String[] data = entry.getValue().split("&");
-                        String ip = data[0];
-                        String interfaceName = data[1];
-                        // 获取端口事件状态
-                        Map params = new HashMap();
-                        params.clear();
-                        params.put("ip", ip);
-                        params.put("interfaceName", interfaceName);
-                        params.put("event", "is not null");
-                        List<Problem> problemList = this.problemService.selectObjByMap(params);
-                        if(problemList.size() > 0){
-                            for(Problem problem : problemList){
-                                Map event = new HashMap();
-                                if(problem.getEvent().equals("interfacestatus") && problem.getStatus() == 0){
-                                    event.put("event", problem.getEvent());
-                                    event.put("status", problem.getStatus());
-                                    event.put("level",  3);
-                                    list.add(event);
-                                    break;
-                                }else if(problem.getEvent().equals("interfacestatus") && problem.getStatus() == 1){
-                                    event.put("event", problem.getEvent());
-                                    event.put("status", problem.getStatus());
-                                    event.put("level",  1);
-                                }else if(problem.getEvent().equals("interfacestatus") && problem.getStatus() == 2){
-                                    event.put("event", problem.getEvent());
-                                    event.put("status", problem.getStatus());
-                                    event.put("level",  1);
-                                }else if(problem.getEvent().equals("trafficexceeded") && problem.getStatus() == 0){
-                                    event.put("event", problem.getEvent());
-                                    event.put("status", problem.getStatus());
-                                    event.put("level",  2);
-                                }else if(problem.getEvent().equals("trafficexceeded") && problem.getStatus() == 1){
-                                    event.put("event", problem.getEvent());
-                                    event.put("status", problem.getStatus());
-                                    event.put("level",  1);
-                                }else if(problem.getEvent().equals("trafficexceeded") && problem.getStatus() == 2){
-                                    event.put("event", problem.getEvent());
-                                    event.put("status", problem.getStatus());
-                                    event.put("level",  1);
-                                }
-                                if(event.size() > 0){
-                                    list.add(event);
-                                }
-                            }
-                            if(list.size() == 1){
-                                map.put(requestParam, list.get(0));
-                            }else{
-                                if(list.size() > 0){
-                                    ListSortUtil.intSort(list);
-                                    ele.put(entry.getKey(), list.get(0));
-                                }else{
+                        if(data.length > 1){
+                            String ip = data[0];
+                            String interfaceName = data[1];
+                            // 获取端口事件状态
+                            Map params = new HashMap();
+                            params.clear();
+                            params.put("ip", ip);
+                            params.put("interfaceName", interfaceName);
+                            params.put("event", "is not null");
+                            List<Problem> problemList = this.problemService.selectObjByMap(params);
+                            if(problemList.size() > 0){
+                                List list2 = new ArrayList();
+                                for(Problem problem : problemList){
                                     Map event = new HashMap();
-                                    event.put("status", 2);
-                                    ele.put(entry.getKey(), event);
+                                    if(problem.getEvent().equals("interfacestatus") && problem.getStatus() == 0){
+                                        event.put("event", problem.getEvent());
+                                        event.put("status", problem.getStatus());
+                                        event.put("level",  3);
+                                        list.add(event);
+                                        break;
+                                    }else if(problem.getEvent().equals("interfacestatus") && problem.getStatus() == 1){
+                                        event.put("event", problem.getEvent());
+                                        event.put("status", problem.getStatus());
+                                        event.put("level",  1);
+                                    }else if(problem.getEvent().equals("interfacestatus") && problem.getStatus() == 2){
+                                        event.put("event", problem.getEvent());
+                                        event.put("status", problem.getStatus());
+                                        event.put("level",  1);
+                                    }else if(problem.getEvent().equals("trafficexceeded") && problem.getStatus() == 0){
+                                        event.put("event", problem.getEvent());
+                                        event.put("status", problem.getStatus());
+                                        event.put("level",  2);
+                                    }else if(problem.getEvent().equals("trafficexceeded") && problem.getStatus() == 1){
+                                        event.put("event", problem.getEvent());
+                                        event.put("status", problem.getStatus());
+                                        event.put("level",  1);
+                                    }else if(problem.getEvent().equals("trafficexceeded") && problem.getStatus() == 2){
+                                        event.put("event", problem.getEvent());
+                                        event.put("status", problem.getStatus());
+                                        event.put("level",  1);
+                                    }
+                                    if(event.size() > 0){
+                                        list2.add(event);
+                                    }
                                 }
+                                if(list2.size() == 1){
+                                    map.put(requestParam, list2.get(0));
+                                }else{
+                                    if(list2.size() > 0){
+                                        ListSortUtil.intSort(list2);
+                                        ele.put(entry.getKey(), list2.get(0));
+                                    }else{
+                                        Map event = new HashMap();
+                                        event.put("status", 2);
+                                        ele.put(entry.getKey(), event);
+                                    }
+                                }
+                            }else{
+                                Map event = new HashMap();
+                                event.put("event", "");
+                                event.put("status", 2);
+                                ele.put(entry.getKey(), event);
                             }
                         }else{
-                            Map event = new HashMap();
-                            event.put("event", "");
-                            event.put("status", 2);
-                            ele.put(entry.getKey(), event);
+                            ele.put(entry.getKey(), "");
                         }
                     }
                 }
