@@ -146,7 +146,7 @@ public class SaticScheduleTask {
 
     // 采集 zabbix problem
 //    @Scheduled(cron = "0 */1 * * * ?")
-    @Scheduled(cron = "*/20 * * * * ?")
+    @Scheduled(cron = "*/30 * * * * ?")
     public void gatherProblem(){
 //        ThreadContext.bind(manager);
         //下面正常使用业务代码即可
@@ -165,11 +165,11 @@ public class SaticScheduleTask {
         }
     }
 
-    @Scheduled(cron = "0 */1 * * * ?")
-    public void updateProblemStatus(){
-        System.out.println("执行更新problem");
-        this.zabbixService.updateProblemStatus();
-    }
+//    @Scheduled(cron = "0 */1 * * * ?")
+//    public void updateProblemStatus(){
+//        System.out.println("执行更新problem");
+//        this.zabbixService.updateProblemStatus();
+//    }
 
     @Scheduled(cron = "0 */1 * * * ?")
     // 添加定时任务

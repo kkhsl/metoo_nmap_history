@@ -102,7 +102,7 @@ public class NetWorkManagerApi {
                 for(Map.Entry<String, String> entry : entrySet){
                     if(entry.getKey().equals("from") || entry.getKey().equals("to")){
                         String[] data = entry.getValue().split("&");
-                        if(data.length > 1){
+                        if(data.length >= 2){
                             String ip = data[0];
                             String interfaceName = data[1];
                             // 获取端口事件状态
@@ -113,14 +113,14 @@ public class NetWorkManagerApi {
                             params.put("event", "is not null");
                             List<Problem> problemList = this.problemService.selectObjByMap(params);
                             if(problemList.size() > 0){
-                                List list2 = new ArrayList();
+                                List events = new ArrayList();
                                 for(Problem problem : problemList){
                                     Map event = new HashMap();
                                     if(problem.getEvent().equals("interfacestatus") && problem.getStatus() == 0){
                                         event.put("event", problem.getEvent());
                                         event.put("status", problem.getStatus());
                                         event.put("level",  3);
-                                        list.add(event);
+                                        events.add(event);
                                         break;
                                     }else if(problem.getEvent().equals("interfacestatus") && problem.getStatus() == 1){
                                         event.put("event", problem.getEvent());
@@ -144,15 +144,15 @@ public class NetWorkManagerApi {
                                         event.put("level",  1);
                                     }
                                     if(event.size() > 0){
-                                        list2.add(event);
+                                        events.add(event);
                                     }
                                 }
-                                if(list2.size() == 1){
-                                    map.put(requestParam, list2.get(0));
+                                if(events.size() == 1){
+                                    ele.put(entry.getKey(), events.get(0));
                                 }else{
-                                    if(list2.size() > 0){
-                                        ListSortUtil.intSort(list2);
-                                        ele.put(entry.getKey(), list2.get(0));
+                                    if(events.size() > 0){
+                                        ListSortUtil.intSort(events);
+                                        ele.put(entry.getKey(), events.get(0));
                                     }else{
                                         Map event = new HashMap();
                                         event.put("status", 2);

@@ -2906,7 +2906,7 @@ public class ZabbixServiceImpl implements ZabbixService {
 
     public void gatherProblem(String ip, String deviceName, String uuid, Long time ){
         // 获取Problem
-        JSONArray problems = this.zabbixProblemService.getProblemByIp(ip, time, false);
+        JSONArray problems = this.zabbixProblemService.getProblemByIp(ip, time, true);
         if(problems.size() > 0){
             List list = new ArrayList();
             for(Object obj : problems){
@@ -2920,7 +2920,6 @@ public class ZabbixServiceImpl implements ZabbixService {
                         problemTemp.setStatus(0);
                     }
                     problemTempService.update(problemTemp);
-                    continue;
                 }else {
                   ProblemTemp instance = new ProblemTemp();
                   Calendar cal = Calendar.getInstance();
@@ -2950,6 +2949,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                       }
                   }
                   list.add(instance);
+
               }
             }
             if(list.size() > 0){
