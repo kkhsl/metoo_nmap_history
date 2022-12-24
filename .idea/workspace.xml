@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" line="197" />
+    <bookmark url="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" line="196" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7426ef73-f003-46a6-9c1f-b19a308fd544" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/api/zabbix/impl/ZabbixServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/api/zabbix/impl/ZabbixServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/quartz/SaticScheduleTask.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/quartz/SaticScheduleTask.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.properties" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -95,7 +91,7 @@
           <entry key="conf" value="5" />
           <entry key="ftl" value="5" />
           <entry key="iml" value="3" />
-          <entry key="java" value="5518" />
+          <entry key="java" value="5519" />
           <entry key="log" value="2" />
           <entry key="md" value="1" />
           <entry key="pom" value="1" />
@@ -108,7 +104,7 @@
           <entry key="CLASS" value="340" />
           <entry key="FTL" value="5" />
           <entry key="IDEA_MODULE" value="3" />
-          <entry key="JAVA" value="5518" />
+          <entry key="JAVA" value="5519" />
           <entry key="Markdown" value="1" />
           <entry key="PLAIN_TEXT" value="19" />
           <entry key="Properties" value="670" />
@@ -119,19 +115,19 @@
         <counts>
           <entry key="class" value="7" />
           <entry key="dummy" value="288" />
-          <entry key="java" value="181928" />
+          <entry key="java" value="181929" />
           <entry key="md" value="24" />
           <entry key="properties" value="1229" />
-          <entry key="txt" value="35" />
+          <entry key="txt" value="63" />
           <entry key="xml" value="33348" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="CLASS" value="7" />
-          <entry key="JAVA" value="181928" />
+          <entry key="JAVA" value="181929" />
           <entry key="Markdown" value="24" />
-          <entry key="PLAIN_TEXT" value="323" />
+          <entry key="PLAIN_TEXT" value="351" />
           <entry key="Properties" value="1229" />
           <entry key="SQL" value="2390" />
           <entry key="XML" value="30958" />
@@ -144,16 +140,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/application-prod.properties">
-          <provider selected="true" editor-type-id="text-editor" />
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="325">
+              <caret line="67" column="46" selection-start-line="67" selection-start-column="46" selection-end-line="67" selection-end-column="46" />
+            </state>
+          </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/application-self.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="10" column="2" lean-forward="true" selection-start-line="10" selection-start-column="2" selection-end-line="10" selection-end-column="2" />
+            <state relative-caret-position="400">
+              <caret line="16" column="34" lean-forward="true" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -367,12 +367,12 @@
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/integrated/node/TopoManagerController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/entity/nspm/Threshold.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/ThresholdManagerController.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" />
         <option value="$PROJECT_DIR$/src/main/resources/application-dev.properties" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/entity/zabbix/Problem.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/api/zabbix/impl/ZabbixServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/quartz/SaticScheduleTask.java" />
         <option value="$PROJECT_DIR$/src/main/resources/application.properties" />
+        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" />
       </list>
     </option>
   </component>
@@ -541,27 +541,6 @@
               <item name="mapper" type="462c0819:PsiDirectoryNode" />
               <item name="nspm" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="metoo_nspm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="metoo_nspm" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="metoo_nspm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="metoo_nspm" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="metoo_nspm" type="b2602c69:ProjectViewProjectNode" />
-              <item name="metoo_nspm" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="nspm" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -583,7 +562,7 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1671856740150" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1671857150693" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/target" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -916,7 +895,7 @@
       <workItem from="1671674725093" duration="27306000" />
       <workItem from="1671762566084" duration="24169000" />
       <workItem from="1671794186581" duration="270000" />
-      <workItem from="1671851082949" duration="5472000" />
+      <workItem from="1671851082949" duration="5918000" />
     </task>
     <task id="LOCAL-00001" summary="2022-08-25 ipam">
       <created>1661409042951</created>
@@ -939,7 +918,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671793424423</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="2022-12-24 12:39（拓扑状态）">
+      <created>1671856805214</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1671856805214</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -975,7 +961,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2212604000" />
+    <option name="totallyTimeSpent" value="2213050000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -990,7 +976,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.35528597" visible="true" weight="0.28284183" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.35528597" visible="true" weight="0.28284183" />
       <window_info id="Structure" order="1" sideWeight="0.64471406" side_tool="true" weight="0.3069705" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -1002,7 +988,7 @@
       <window_info anchor="bottom" id="Message" order="1" />
       <window_info anchor="bottom" id="Terminal" order="2" sideWeight="0.54825735" weight="0.398017" />
       <window_info anchor="bottom" id="Find" order="3" weight="0.2917847" />
-      <window_info active="true" anchor="bottom" id="Run" order="4" sideWeight="0.60656834" visible="true" weight="0.35410765" />
+      <window_info anchor="bottom" id="Run" order="4" sideWeight="0.60656834" visible="true" weight="0.31303117" />
       <window_info anchor="bottom" id="Cvs" order="5" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="6" weight="0.4" />
       <window_info anchor="bottom" id="Debug" order="7" sideWeight="0.5924933" weight="0.3286119" />
@@ -1080,7 +1066,8 @@
     <MESSAGE value="2022-08-25 ipam" />
     <MESSAGE value="idea:测试更新" />
     <MESSAGE value="idea:更新 提交" />
-    <option name="LAST_COMMIT_MESSAGE" value="idea:更新 提交" />
+    <MESSAGE value="2022-12-24 12:39（拓扑状态）" />
+    <option name="LAST_COMMIT_MESSAGE" value="2022-12-24 12:39（拓扑状态）" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1548,13 +1535,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="428">
-          <caret line="171" column="17" selection-start-line="171" selection-start-column="17" selection-end-line="171" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/application-prod.properties">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -1616,8 +1596,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/application-self.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="10" column="2" lean-forward="true" selection-start-line="10" selection-start-column="2" selection-end-line="10" selection-end-column="2" />
+        <state relative-caret-position="400">
+          <caret line="16" column="34" lean-forward="true" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="325">
+          <caret line="67" column="46" selection-start-line="67" selection-start-column="46" selection-end-line="67" selection-end-column="46" />
         </state>
       </provider>
     </entry>

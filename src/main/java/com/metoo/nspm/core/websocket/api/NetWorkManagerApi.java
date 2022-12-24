@@ -66,7 +66,6 @@ public class NetWorkManagerApi {
             Page<NetworkElement> page = this.networkElementService.selectConditionQuery(dto);
             Map nes = new HashMap();
             if (page.getResult().size() > 0) {
-                // 获取主机状态
                 for (NetworkElement ne : page.getResult()) {
                     if (ne.getIp() != null) {
                         Interface obj = this.interfaceService.selectObjByIp(ne.getIp());
