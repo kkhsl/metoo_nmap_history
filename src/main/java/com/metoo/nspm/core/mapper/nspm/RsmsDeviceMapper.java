@@ -31,4 +31,6 @@ public interface RsmsDeviceMapper {
     int delete(Long id);
 
     int batchDel(String ids);
+
+    int batchInsert(List<RsmsDevice> rsmsDevices);
 }

@@ -585,7 +585,7 @@ public class ZabbixItemManagerController {
             }
 
             try {
-                List<Rout> routList = this.routHistoryService.selectObjByMap(params);
+                List<Route> routList = this.routHistoryService.selectObjByMap(params);
                 if(routList.size() > 0){
                     this.routHistoryService.batchDelete(routList);
                 }
@@ -804,8 +804,8 @@ public class ZabbixItemManagerController {
         String mask2 = IpUtil.bitMaskConvertMask(mask);
         Map params = IpUtil.getNetworkIpDec(ip, mask2);
         // 获取nexthop设备
-        List<Rout> nexthops = this.routService.queryDestDevice(params);
-        for (Rout rout : nexthops){
+        List<Route> nexthops = this.routService.queryDestDevice(params);
+        for (Route rout : nexthops){
             // 根据下一跳查询ipaddress(设备)
             params = IpUtil.getNetworkIp(rout.getNextHop(), "255.255.255.255");
             // 起点设备
@@ -863,27 +863,27 @@ public class ZabbixItemManagerController {
         params.put("deviceName", srcIpAddress.getDeviceName());
         params.put("interfaceName", srcIpAddress.getInterfaceName());
         params.put("mac", srcIpAddress.getMac());
-        List<RoutTable> routTables = this.routTableService.selectObjByMap(params);
-        RoutTable srcRoutTable = null;
+        List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
+        RouteTable srcRoutTable = null;
         if(routTables.size() > 0){
             srcRoutTable = routTables.get(0);
         }else{
-            srcRoutTable = new RoutTable();
+            srcRoutTable = new RouteTable();
         }
         String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
         BeanUtils.copyProperties(srcIpAddress, srcRoutTable, IGNORE_ISOLATOR_PROPERTIES);
         this.routTableService.save(srcRoutTable);
         /*List<IpAddress> ipAddresses = */
-        List<RoutTable> routers = new ArrayList<>();
-        Map<String, RoutTable> routersMap = new HashMap();
+        List<RouteTable> routers = new ArrayList<>();
+        Map<String, RouteTable> routersMap = new HashMap();
         this.generatorRout1(srcIpAddress, destIp, destIpAddress.getMask(), routersMap);
         if(!routersMap.isEmpty()){
-            List<RoutTable> a = routersMap.entrySet().stream().map(m -> m.getValue()).collect(Collectors.toList());
+            List<RouteTable> a = routersMap.entrySet().stream().map(m -> m.getValue()).collect(Collectors.toList());
             routers.addAll(a);
         }
         routers.add(srcRoutTable);
 
-        List<RoutTable> routTableList = this.routTableService.selectObjByMap(null);
+        List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
         map.put("destinationDevice", destIpAddress);
         map.put("routTable", routers);
         return ResponseUtil.ok(map);
@@ -923,14 +923,14 @@ public class ZabbixItemManagerController {
      * @param descMask 终点Mask
      * @return
      */
-    public List<RoutTable> generatorRout1(IpAddress ipAddress, String destIp, String descMask, Map<String, RoutTable> routeMap) {
+    public List<RouteTable> generatorRout1(IpAddress ipAddress, String destIp, String descMask, Map<String, RouteTable> routeMap) {
         List<IpAddress> ipAddresses = new ArrayList<>();
         if (ipAddress != null) {
             ipAddress.setStatus(0);
             Map params = new HashMap();
             // 查询当前设备在路由表中是否已记录
-            RoutTable ipaddressRoutTable = new RoutTable();
-            RoutTable r = routeMap.get(ipAddress.getIp());
+            RouteTable ipaddressRoutTable = new RouteTable();
+            RouteTable r = routeMap.get(ipAddress.getIp());
             if(r != null){
                 if(r.getMask().equals(ipAddress.getMask()) &&
                         r.getRemoteDevice().equals(ipAddress.getDeviceName()) &&
@@ -939,21 +939,21 @@ public class ZabbixItemManagerController {
                     ipaddressRoutTable = r;
                 }
             }
-            Rout rout = this.querySrcRout(destIp, descMask, ipAddress.getDeviceName());// 查询起点路由
+            Route rout = this.querySrcRout(destIp, descMask, ipAddress.getDeviceName());// 查询起点路由
             if(rout != null){
                 params.clear();
                 params.put("deviceName", ipAddress.getDeviceName());
                 params.put("destination", rout.getDestination());
                 params.put("mask", rout.getMask());
-                List<Rout> nexthops = this.routService.selectNextHopDevice(params);
+                List<Route> nexthops = this.routService.selectNextHopDevice(params);
                 if (nexthops.size() > 0) {
-                    outCycle:for (Rout nextHop : nexthops) {
+                    outCycle:for (Route nextHop : nexthops) {
                         if(nextHop.getNextHop() != null && !nextHop.getNextHop().equals("")){
                             String nexeIp = nextHop.getNextHop();
                             // 这里使用continue，继续进行下一个nexthop
                             if(nexeIp == null || nexeIp.equals("") || nexeIp.equals("127.0.0.1") || nexeIp.equals("0.0.0.0")){
                                 // 不在执行下一跳，为终端设备
-                                RoutTable routTable = routeMap.get(ipAddress.getIp());
+                                RouteTable routTable = routeMap.get(ipAddress.getIp());
                                 routTable.setStatus(3);
                                 routeMap.put(ipAddress.getIp(), routTable);
                                 continue;
@@ -975,7 +975,7 @@ public class ZabbixItemManagerController {
                                                     && nextIpaddress.getInterfaceName().equals(remoteInterface)
                                                     && nextIpaddress.getDeviceUuid().equals(remoteUuid)){
 
-                                                RoutTable routTable = routeMap.get(ipAddress.getIp());
+                                                RouteTable routTable = routeMap.get(ipAddress.getIp());
                                                 routTable.setStatus(2);
                                                 routeMap.put(ipAddress.getIp(), routTable);
                                                 continue outCycle;
@@ -996,9 +996,9 @@ public class ZabbixItemManagerController {
                                 remote.put("remoteUuid", ipAddress.getDeviceUuid());
                                 list.add(remote);
                                 // 查询下一跳是否已存在
-                                RoutTable nextIpaddressRoutTable = new RoutTable();
+                                RouteTable nextIpaddressRoutTable = new RouteTable();
 
-                                RoutTable r2 = routeMap.get(nextIpaddress.getIp());
+                                RouteTable r2 = routeMap.get(nextIpaddress.getIp());
                                 if(r2 != null){
                                     if(r2.getMask().equals(nextIpaddress.getMask()) &&
                                             r2.getRemoteDevice().equals(nextIpaddress.getDeviceName()) &&
@@ -1021,7 +1021,7 @@ public class ZabbixItemManagerController {
                     ipAddress.setRouts(nexthops);
                 }else{
                     // 修改集合数据，
-                    RoutTable routTable = routeMap.get(ipAddress.getIp());
+                    RouteTable routTable = routeMap.get(ipAddress.getIp());
                     routTable.setStatus(1);
                     routeMap.put(ipAddress.getIp(), routTable);
                 }
@@ -1044,25 +1044,25 @@ public class ZabbixItemManagerController {
             params.put("deviceName", ipAddress.getDeviceName());
             params.put("interfaceName", ipAddress.getInterfaceName());
             params.put("mac", ipAddress.getMac());
-            List<RoutTable> ipaddressRouts = this.routTableService.selectObjByMap(params);
-            RoutTable ipaddressRoutTable = new RoutTable();
+            List<RouteTable> ipaddressRouts = this.routTableService.selectObjByMap(params);
+            RouteTable ipaddressRoutTable = new RouteTable();
             if(ipaddressRouts.size() > 0) {
                 ipaddressRoutTable = ipaddressRouts.get(0);
 
             }
-            Rout rout = this.querySrcRout(destIp, descMask, ipAddress.getDeviceName());// 查询起点路由
+            Route rout = this.querySrcRout(destIp, descMask, ipAddress.getDeviceName());// 查询起点路由
 //            Map params = IpUtil.getNetworkIp(destIp, descMask);
 //            params.put("deviceName", ipAddress.getDeviceName());
-//            Rout rout = this.routService.selectDestDevice(params);
+//            Route rout = this.routService.selectDestDevice(params);
             if(rout != null){
                 params.clear();
                 params.put("deviceName", ipAddress.getDeviceName());
                 params.put("destination", rout.getDestination());
                 params.put("mask", rout.getMask());
-                List<Rout> nexthops = this.routService.selectNextHopDevice(params);
-//              List<Rout> nexthops = this.routService.queryDestDevice(params);
+                List<Route> nexthops = this.routService.selectNextHopDevice(params);
+//              List<Route> nexthops = this.routService.queryDestDevice(params);
                 if (nexthops.size() > 0) {
-                    outCycle:for (Rout nextHop : nexthops) {
+                    outCycle:for (Route nextHop : nexthops) {
                         if(nextHop.getNextHop() != null && !nextHop.getNextHop().equals("")){
                             String nexeIp = nextHop.getNextHop();
                             // 这里使用continue，继续进行下一个nexthop
@@ -1098,11 +1098,11 @@ public class ZabbixItemManagerController {
                                         }
                                     }
                                 }
-//                                RoutTable ipaddressRoutTable = null;
+//                                RouteTable ipaddressRoutTable = null;
 //                                if(ipaddressRouts.size() > 0){
 //                                    ipaddressRoutTable = ipaddressRouts.get(0);
 //                                }else{
-//                                    ipaddressRoutTable = new RoutTable();
+//                                    ipaddressRoutTable = new RouteTable();
 //                                }
                                 List<Map> list = null;
                                 if(ipaddressRoutTable.getRemoteDevices() != null){
@@ -1128,12 +1128,12 @@ public class ZabbixItemManagerController {
                                 params.put("deviceName", nextIpaddress.getDeviceName());
                                 params.put("interfaceName", nextIpaddress.getInterfaceName());
                                 params.put("mac", nextIpaddress.getMac());
-                                List<RoutTable> nextIpaddressRoutTables = this.routTableService.selectObjByMap(params);
-                                RoutTable nextIpaddressRoutTable = null;
+                                List<RouteTable> nextIpaddressRoutTables = this.routTableService.selectObjByMap(params);
+                                RouteTable nextIpaddressRoutTable = null;
                                 if(nextIpaddressRoutTables.size() > 0){
                                     nextIpaddressRoutTable = nextIpaddressRoutTables.get(0);
                                 }else{
-                                    nextIpaddressRoutTable = new RoutTable();
+                                    nextIpaddressRoutTable = new RouteTable();
                                 }
                                 nextIpaddressRoutTable.setRemoteDevices(JSONArray.toJSONString(list));
                                 String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
@@ -1170,7 +1170,7 @@ public class ZabbixItemManagerController {
      * @return
      */
     @RequestMapping("/querySrcRout")
-    public Rout querySrcRout(String descIp, String descMask, String deviceName){
+    public Route querySrcRout(String descIp, String descMask, String deviceName){
 //        String dm = IpUtil.bitMaskConvertMask(Integer.parseInt(descMask));
 //        Map network = IpUtil.getNetworkIp(descIp, dm);
         Map params = new HashMap();
@@ -1178,9 +1178,9 @@ public class ZabbixItemManagerController {
         params.put("descMask", descMask);
         params.put("orderBy", "mask");
         params.put("orderType", "desc");
-        List<Rout> routs = this.routService.selectObjByMap(params);
-        List<Rout> sameRouts = new ArrayList<>();
-        for(Rout rout : routs){
+        List<Route> routs = this.routService.selectObjByMap(params);
+        List<Route> sameRouts = new ArrayList<>();
+        for(Route rout : routs){
             if(!StringUtil.isEmpty(rout.getDestination())
                     && !StringUtil.isEmpty(rout.getMask())){
                 boolean flag = isInRange(descIp,
@@ -1192,7 +1192,7 @@ public class ZabbixItemManagerController {
                 }
             }
         }
-        Rout rout = null;
+        Route rout = null;
         if(sameRouts.size() > 0){
             rout = sameRouts.get(0);
         }

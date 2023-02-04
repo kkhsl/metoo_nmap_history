@@ -1,6 +1,6 @@
 package com.metoo.nspm.core.websocket.api;
 
-import com.metoo.nspm.core.config.socket.NoticeWebsocketResp;
+import com.metoo.nspm.core.config.websocket.demo.NoticeWebsocketResp;
 import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.entity.nspm.User;
 import org.springframework.beans.factory.annotation.Autowired;

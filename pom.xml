@@ -20,7 +20,11 @@
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>1.8</java.version>
+<!--
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>-->
     </properties>
+
 
     <dependencies>
         <dependency>
@@ -339,7 +343,6 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>2.17.1</version>
-            <scope>compile</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
         <dependency>
@@ -406,12 +409,6 @@
             <version>3.3</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-            <version>2.7.0</version>
-        </dependency>
-
         <!-- 文件上传 -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -424,24 +421,47 @@
             <artifactId>poi-ooxml</artifactId>
             <version>3.16</version>
         </dependency>
-
+        <!--poi-ooml 是 poi的升级版-->
         <!--&lt;!&ndash;xls(03) poi：操作XLS&ndash;&gt;-->
         <!--<dependency>-->
             <!--<groupId>org.apache.poi</groupId>-->
             <!--<artifactId>poi</artifactId>-->
-            <!--<version>3.9</version>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash;xlsx(07) poi-ooxml:操作xlsx&ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.poi</groupId>-->
-            <!--<artifactId>poi-ooxml</artifactId>-->
-            <!--<version>3.9</version>-->
+            <!--<version>3.8</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>commons-codec</artifactId>-->
+                    <!--<groupId>commons-codec</groupId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
         <!--</dependency>-->
         <!--<dependency>-->
             <!--<groupId>org.apache.httpcomponents</groupId>-->
             <!--<artifactId>httpmime</artifactId>-->
             <!--<version>4.5.7</version>-->
         <!--</dependency>-->
+
+        <dependency>
+            <groupId>ch.ethz.ganymed</groupId>
+            <artifactId>ganymed-ssh2</artifactId>
+            <version>262</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.54</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+            <version>5.3.4</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+            <version>2.7.0</version>
+        </dependency>
 
     </dependencies>
 

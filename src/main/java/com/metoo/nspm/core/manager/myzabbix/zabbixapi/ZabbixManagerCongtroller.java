@@ -3,13 +3,12 @@ package com.metoo.nspm.core.manager.myzabbix.zabbixapi;
 import com.metoo.nspm.core.manager.myzabbix.utils.ItemUtil;
 import com.metoo.nspm.core.mapper.nspm.zabbix.ArpHistoryMapper;
 import com.metoo.nspm.core.mapper.nspm.zabbix.MacHistoryMapper;
-import com.metoo.nspm.core.mapper.nspm.zabbix.RoutHistoryMapper;
+import com.metoo.nspm.core.mapper.nspm.zabbix.RouteHistoryMapper;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixService;
 import com.metoo.nspm.core.service.nspm.IRoutService;
 import com.metoo.nspm.core.service.zabbix.IGatherService;
-import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.entity.nspm.Rout;
+import com.metoo.nspm.entity.nspm.Route;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -38,7 +37,7 @@ public class ZabbixManagerCongtroller {
     @Autowired
     private MacHistoryMapper macHistoryMapper;
     @Autowired
-    private RoutHistoryMapper routHistoryMapper;
+    private RouteHistoryMapper routHistoryMapper;
     @Autowired
     private IGatherService gatherArpItem;
 
@@ -257,7 +256,7 @@ public class ZabbixManagerCongtroller {
                 params.clear();
                 params.put("interfaceName", map.get("interface_name"));
                 try {
-                    Rout rout = new Rout();
+                    Route rout = new Route();
                     rout.setDestination(map.get("destination"));
                     rout.setMask(map.get("mask"));
                     rout.setCost(map.get("routemetric"));

@@ -36,6 +36,11 @@ public class ProjectServiceImpl implements IProjectService {
     }
 
     @Override
+    public Project selectObjByName(String name) {
+        return this.projectMapper.selectObjByName(name);
+    }
+
+    @Override
     public Page<Project> selectObjConditionQuery(ProjectDTO dto) {
         if(dto == null){
             dto = new ProjectDTO();
@@ -50,6 +55,8 @@ public class ProjectServiceImpl implements IProjectService {
 
     @Override
     public List<Project> selectObjByMap(Map params) {
+        User user = ShiroUserHolder.currentUser();
+        params.put("userId", user.getId());
         return this.projectMapper.selectObjByMap(params);
     }
 

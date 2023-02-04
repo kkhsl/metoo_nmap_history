@@ -12,7 +12,11 @@ public interface IGroupService {
 
     Group selectObjById(Long id);
 
+    Group selectObjByName(String name);
+
     Group getObjByLevel(String level);
+
+    List<Group> selectObjByMap(Map params);
 
     List<Group> queryChild(Long id);
 

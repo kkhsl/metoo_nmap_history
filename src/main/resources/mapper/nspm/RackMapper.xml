@@ -27,6 +27,12 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </select>
 
+    <select id="selectObjByName" parameterType="java.lang.String" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM rsms_rack
+        WHERE name = #{name}
+    </select>
+
     <select id="findBySelect" parameterType="com.metoo.nspm.dto.RackDTO" resultMap="Base_Result_Map">
         SELECT <include refid="Base_Column_List"/>
         FROM rsms_rack
@@ -172,6 +178,22 @@
                 #{change_reasons},
             </if>
         </trim>
+    </insert>
+    
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO  rsms_rack(addTime, `name`, asset_number, plant_room_id, plant_room_name, `size`, user_id)
+        VALUES
+        <foreach collection ="list" item="item" separator ="," >
+            (
+                #{item.addTime},
+                #{item.name},
+                #{item.asset_number},
+                #{item.plantRoomId},
+                #{item.plantRoomName},
+                #{item.size},
+                #{item.userId}
+            )
+        </foreach>
     </insert>
 
     <update id="update" parameterType="com.metoo.nspm.entity.nspm.Rack">

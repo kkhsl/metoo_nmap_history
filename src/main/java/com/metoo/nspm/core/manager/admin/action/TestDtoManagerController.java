@@ -4,6 +4,10 @@ import com.metoo.nspm.dto.GradeDto;
 import com.metoo.nspm.dto.UserDto;
 import com.metoo.nspm.entity.nspm.Accessory;
 import com.metoo.nspm.entity.nspm.Grade;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +18,8 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/test")
 public class TestDtoManagerController {
+
+    Logger log = LoggerFactory.getLogger(TestDtoManagerController.class);
 
     @RequestMapping("/dto")
     public Object dto(@Valid UserDto dto){
@@ -69,4 +75,5 @@ public class TestDtoManagerController {
         System.out.println(grade.toString());
         return grade.toString();
     }
+
 }

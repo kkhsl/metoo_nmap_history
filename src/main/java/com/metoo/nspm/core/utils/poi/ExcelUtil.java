@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
+import com.metoo.nspm.core.utils.StringUtils;
 import com.metoo.nspm.entity.nspm.NetworkElement;
 import lombok.val;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -166,7 +167,7 @@ public class ExcelUtil {
             return kvMap;
         }
         for (String each : kvs) {
-            String[] eachKv = getString(each).split("-");
+            String[] eachKv = StringUtils.getStr(each).split("-");
             if (eachKv.length != 2) {
                 continue;
             }
@@ -187,7 +188,7 @@ public class ExcelUtil {
             String fileName;
             try {
                 in = mFile.getInputStream();
-                fileName = getString(mFile.getOriginalFilename()).toLowerCase();
+                fileName = StringUtils.getStr(mFile.getOriginalFilename()).toLowerCase();
                 Workbook book;
                 if (fileName.endsWith(XLSX)) {
                     book = new XSSFWorkbook(in);
@@ -298,15 +299,6 @@ public class ExcelUtil {
         return cell.getCellFormula();
     }
 
-    private static String getString(String s) {
-        if (s == null) {
-            return "";
-        }
-        if (s.isEmpty()) {
-            return s;
-        }
-        return s.trim();
-    }
 
 
 }

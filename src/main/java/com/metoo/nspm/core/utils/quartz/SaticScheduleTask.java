@@ -8,8 +8,10 @@ import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.entity.nspm.Arp;
 import com.metoo.nspm.entity.nspm.IpAddress;
 import com.metoo.nspm.entity.nspm.Mac;
-import com.metoo.nspm.entity.nspm.Rout;
+import com.metoo.nspm.entity.nspm.Route;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +35,8 @@ import java.util.*;
 @Configuration // 用于标记配置类，兼备Component
 public class SaticScheduleTask {
 
+    Logger log = LoggerFactory.getLogger(SaticScheduleTask.class);
+
     @Value("${task.switch.is-open}")
     private boolean flag;
     @Autowired
@@ -49,8 +53,6 @@ public class SaticScheduleTask {
     private IIPAddressHistoryService iipAddressHistoryService;
     @Autowired
     private IGatherService gatherService;
-
-    private static int number;
 
     static DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
 
@@ -144,24 +146,38 @@ public class SaticScheduleTask {
         }
     }
 
-    // 采集 zabbix problem
+//     采集 zabbix problem
 //    @Scheduled(cron = "0 */1 * * * ?")
-    @Scheduled(cron = "*/30 * * * * ?")
-    public void gatherProblem(){
+    @Scheduled(cron = "*/10 * * * * ?")
+//    public void gatherProblem(){
+////        ThreadContext.bind(manager);
+//        //下面正常使用业务代码即可
+//        if(flag) {
+//            // 采集时间
+//            Calendar cal = Calendar.getInstance();
+//            cal.clear(Calendar.SECOND);
+//            cal.clear(Calendar.MILLISECOND);
+//            Date date = cal.getTime();
+//            this.zabbixService.gatherProblem();
+////            try {
+////                this.zabbixService.gatherProblem();
+////            } catch (Exception e) {
+////                e.printStackTrace();
+////            }
+//        }
+//    }
+
+    @Scheduled(cron = "*/10 * * * * ?")
+    public void gatherThreadProblem(){
 //        ThreadContext.bind(manager);
         //下面正常使用业务代码即可
         if(flag) {
             // 采集时间
-            Calendar cal = Calendar.getInstance();
-            cal.clear(Calendar.SECOND);
-            cal.clear(Calendar.MILLISECOND);
-            Date date = cal.getTime();
+            Long begin = System.currentTimeMillis();
+//            this.zabbixService.gatherThreadProblem();
             this.zabbixService.gatherProblem();
-//            try {
-//                this.zabbixService.gatherProblem();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+            Long end = System.currentTimeMillis();
+            log.info("执行时间：" + (end - begin));
         }
     }
 
@@ -228,7 +244,7 @@ public class SaticScheduleTask {
             }
 
             try {
-                List<Rout> routList = this.routHistoryService.selectObjByMap(params);
+                List<Route> routList = this.routHistoryService.selectObjByMap(params);
                 if(routList.size() > 0){
                     this.routHistoryService.batchDelete(routList);
                 }

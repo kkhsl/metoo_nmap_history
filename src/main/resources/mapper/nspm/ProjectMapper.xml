@@ -27,6 +27,14 @@
         WHERE id=#{id}
     </select>
 
+    <select id="selectObjByName" parameterType="java.lang.String" resultMap="Base_Result_Map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        metoo_project
+        WHERE name = #{name}
+    </select>
+
     <select id="selectConditionQuery" parameterType="com.metoo.nspm.dto.ProjectDTO" resultMap="Base_Result_Map">
         SELECT
           <include refid="Base_Column_List" />

@@ -38,7 +38,7 @@ public class IpAddressTemp extends IdEntity {
     private Integer index;
     @ApiModelProperty("接口序号")
     private String cidr;
-    private List<Rout> routs;
+    private List<Route> routs;
     private boolean isError;
     private int status;// 路由状态 0：正常 1：没有下一跳 2：路由环路
 }

@@ -1,22 +1,25 @@
 package com.metoo.nspm.core.service.nspm.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
 import com.metoo.nspm.core.mapper.nspm.TopologyHistoryMapper;
 import com.metoo.nspm.core.mapper.nspm.TopologyMapper;
+import com.metoo.nspm.core.service.nspm.ILinkService;
 import com.metoo.nspm.core.service.nspm.ITopologyService;
 import com.metoo.nspm.dto.TopologyDTO;
+import com.metoo.nspm.entity.nspm.Link;
 import com.metoo.nspm.entity.nspm.Topology;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.metoo.nspm.entity.nspm.User;
+import org.nutz.json.Json;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -26,6 +29,8 @@ public class TopologyServiceImpl implements ITopologyService {
     private TopologyMapper topologyMapper;
     @Autowired
     private TopologyHistoryMapper topologyHistoryMapper;
+    @Autowired
+    private ILinkService linkService;
 
     @Override
     public Topology selectObjById(Long id) {
@@ -65,6 +70,12 @@ public class TopologyServiceImpl implements ITopologyService {
         }else{
             instance.setUpdateTime(new Date());
         }
+        if(instance.getContent() != null && !instance.getContent().equals("")){
+            // 解析content 并写入uuid
+            Object content = this.writerUuid(instance.getContent());
+            instance.setContent(content);
+            this.syncLinkManager(instance.getContent());
+        }
         if(instance.getId() == null){
             try {
                int i = this.topologyMapper.save(instance);
@@ -100,6 +111,91 @@ public class TopologyServiceImpl implements ITopologyService {
                 return 0;
             }
         }
+    }
+
+    // 为拓扑图连线增加Uuid
+    public Object writerUuid(Object param){
+        if (param != null) {
+            Map content = JSONObject.parseObject(param.toString(), Map.class);
+            JSONArray links = this.getLinks(content);
+            if(links.size() > 0){
+                List list = this.setUuid(links);
+                content.put("links", list);
+                return JSON.toJSONString(content);
+            }
+        }
+        return param;
+    }
+
+    // 同步到链路管理
+    public Object syncLinkManager(Object param){
+        if (param != null) {
+            Map content = JSONObject.parseObject(param.toString(), Map.class);
+            JSONArray links = this.getLinks(content);
+            if(links.size() > 0){
+                List<Link> linkList = new ArrayList();
+                for (Object object : links) {
+                    Map link = JSONObject.parseObject(object.toString(), Map.class);
+                    Map params = new HashMap();
+                    if(link.get("fromNode") == null || link.get("toNode") == null){
+                        continue;
+                    }
+                    Map fromNode = JSONObject.parseObject(link.get("fromNode").toString(), Map.class);
+                    params.put("startIp", fromNode.get("ip"));
+                    Map toNode = JSONObject.parseObject(link.get("toNode").toString(), Map.class);
+                    params.put("endIp", toNode.get("ip"));
+                    List<Link> linkList1 = this.linkService.selectObjByMap(params);
+                    if(linkList1.size() == 0){
+                        Link link1 = new Link();
+                        link1.setAddTime(new Date());
+                        link1.setStartDevice(fromNode.get("name").toString());
+                        link1.setStartInterface(link.get("fromPort").toString());
+                        link1.setStartIp(fromNode.get("ip").toString());
+                        link1.setEndDevice(toNode.get("name").toString());
+                        link1.setEndInterface(link.get("toPort").toString());
+                        link1.setEndIp(toNode.get("ip").toString());
+                        User user = ShiroUserHolder.currentUser();
+                        if(link1.getGroupId() == null){
+                            link1.setGroupId(user.getGroupId());
+                        }
+                        linkList.add(link1);
+                    }
+
+                }
+                if(linkList.size() > 0){
+                    try {
+                        this.linkService.batchesInsert(linkList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return param;
+    }
+
+    public JSONArray getLinks(Map content){
+        if (content != null) {
+            if (content.get("links") != null) {
+                JSONArray links = JSONArray.parseArray(content.get("links").toString());
+                if (links.size() > 0) {
+                    return links;
+                }
+            }
+        }
+        return new JSONArray();
+    }
+
+    public List setUuid(JSONArray links){
+        List list = new ArrayList();
+        for (Object object : links) {
+            Map link = JSONObject.parseObject(object.toString(), Map.class);
+            if(link.get("uuid") == null || link.get("uuid").equals("")){
+                link.put("uuid", UUID.randomUUID());
+            }
+            list.add(link);
+        }
+        return list;
     }
 
     @Override

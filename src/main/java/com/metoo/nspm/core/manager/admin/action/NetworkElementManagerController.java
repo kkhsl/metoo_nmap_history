@@ -14,6 +14,7 @@ import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.file.DownLoadFileUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.core.utils.poi.ExcelUtil;
+import com.metoo.nspm.core.utils.poi.ExcelUtils;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.DeviceConfigDTO;
 import com.metoo.nspm.dto.NetworkElementDto;
@@ -21,11 +22,13 @@ import com.github.pagehelper.Page;
 import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.entity.zabbix.Interface;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.crypto.hash.Hash;
 import org.aspectj.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,9 +71,13 @@ public class NetworkElementManagerController {
     private InterfaceService interfaceService;
     @Autowired
     private ITopologyService topologyService;
+    @Autowired
+    private ICredentialService credentialService;
 
-    @Value("${batchImportNodeFileName}")
-    private String batchImportNodeFileName;
+    @Value("${batchImportNeFileName}")
+    private String batchImportNeFileName;
+    @Value("${batchImportFilePath}")
+    private String batchImportFilePath;
 
 
     public static void main(String[] args) {
@@ -89,7 +96,7 @@ public class NetworkElementManagerController {
             dto = new NetworkElementDto();
         }
         User user = ShiroUserHolder.currentUser();
-        dto.setUserId(user.getId());
+//        dto.setUserId(user.getId()); 相同分组下，网元可见
         if(dto.getGroupId() != null){
             Group group = this.groupService.selectObjById(dto.getGroupId());
             if(group != null){
@@ -106,6 +113,12 @@ public class NetworkElementManagerController {
                     if(obj != null){
                         ne.setAvailable(obj.getAvailable());
                         ne.setError(obj.getError());
+                    }
+                }
+                if(ne.getCredentialId() != null){
+                    Credential credential = this.credentialService.getObjById(ne.getCredentialId());
+                    if(credential != null){
+                        ne.setCredentialName(credential.getName());
                     }
                 }
             }
@@ -167,6 +180,9 @@ public class NetworkElementManagerController {
 //        map.put("device", deviceTypeList);
         List<DeviceType> deviceTypeList = this.deviceTypeService.selectConditionQuery();
         map.put("device", deviceTypeList);
+        // 凭据列表
+        List<Credential> credentials = this.credentialService.getAll();
+        map.put("credential", credentials);
         return ResponseUtil.ok(map);
     }
 
@@ -194,6 +210,9 @@ public class NetworkElementManagerController {
         map.put("vendor", vendors);
         NetworkElement networkElement = this.networkElementService.selectObjById(id);
         map.put("networkElement", networkElement);
+        // 凭据列表
+        List<Credential> credentials = this.credentialService.getAll();
+        map.put("credential", credentials);
         return ResponseUtil.ok(map);
     }
 
@@ -293,6 +312,23 @@ public class NetworkElementManagerController {
         Vendor vendor = this.vendorService.selectObjById(instance.getVendorId());
         if(vendor != null){
             instance.setVendorName(vendor.getName());
+        }
+
+        // 验证是否允许远程连接
+        if(instance.isPermitConnect()){
+            if(instance.getPort() == null || instance.getPort().equals("")){
+                return ResponseUtil.badArgument("端口不能为空");
+            }
+            if(instance.getCredentialId() == null || instance.getCredentialId().equals("")){
+                return ResponseUtil.badArgument("请选择凭据");
+            }
+            // 验证是否选择凭据
+            Credential credential = this.credentialService.getObjById(instance.getCredentialId());
+            if(credential == null){
+                return ResponseUtil.badArgument("凭据不存在");
+            }
+        }else{
+            instance.setCredentialId(null);
         }
 
         if(this.networkElementService.save(instance) >= 1 ? true : false){
@@ -666,6 +702,209 @@ public class NetworkElementManagerController {
         return null;
     }
 
+
+    @ApiOperation("Excel导入")
+    @PostMapping("/import2")
+    public Object importExcel2(@RequestPart("file")MultipartFile file) throws Exception {
+        if(!file.isEmpty()){
+            String fileName = file.getOriginalFilename().toLowerCase();
+            String suffix = fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+            if (suffix.equals("xlsx") || suffix.equals("xls")) {
+                List<NetworkElement> nes = ExcelUtil.readMultipartFile(file, NetworkElement.class);
+                if(nes.size() > 0){
+                    String msg = "";
+                    Map params = new HashMap();
+                    List<NetworkElement> neList = new ArrayList<>();
+                    for (int i = 0; i < nes.size(); i++) {
+                        NetworkElement ne = nes.get(i);
+                        if(ne.getDeviceName()  == null || ne.getDeviceName().equals("")){
+                            msg = "第" + (i + 2) + "行,设备名不能为空";
+                            break;
+                        }else{
+                            params.clear();
+                            params.put("deviceName", ne.getDeviceName());
+                            List<NetworkElement> networkElements = this.networkElementService.selectObjByMap(params);
+                            if(networkElements.size() > 0){
+                                msg = "第" + (i + 2) + "行, 设备已存在";
+                                break;
+                            }
+                        }
+                        // 增加外联设备，ip必填校验删除
+//                        if(ne.getIp()  == null || ne.getIp().equals("")){
+//                            ne.setIp("");
+//                            msg = "第" + (i + 2) + "行,IP不能为空";
+//                            break;
+//                        }
+                        if(ne.getIp() != null && !ne.getIp().equals("")){
+                            boolean flag = IpUtil.verifyIp(ne.getIp());
+                            if(flag){
+                                params.clear();
+                                params.put("ip", ne.getIp());
+                                List<NetworkElement> networkElements = this.networkElementService.selectObjByMap(params);
+                                if(networkElements.size() > 0){
+                                    msg = "第" + (i + 2) + "行, IP已存在";
+                                    break;
+                                }
+                            }else{
+                                msg = "第" + (i + 2) + "行, IP格式错误";
+                                break;
+                            }
+                        }
+                        if(ne.getVendorName() != null ||ne.getVendorName().equals("")){
+                            params.clear();
+                            params.put("name", ne.getVendorName());
+                            Vendor vendor = this.vendorService.selectObjByName(ne.getVendorName());
+                            if(vendor == null){
+                                msg = "第" + (i + 2) + "行,品牌不存在";
+                                break;
+                            }else{
+                                ne.setVendorId(vendor.getId());
+                            }
+                        }
+                        if(ne.getDeviceTypeName() != null || ne.getDeviceTypeName().equals("")){
+                            params.clear();
+                            params.put("name", ne.getDeviceTypeName());
+                            DeviceType deviceType = this.deviceTypeService.selectObjByName(ne.getDeviceTypeName());
+                            if(deviceType == null){
+                                msg = "第" + (i + 2) + "行,设备类型不存在";
+                                break;
+                            }else{
+                                ne.setDeviceTypeId(deviceType.getId());
+                                if(deviceType.getType() == 10){
+                                    ne.setInterfaceName("Port0");
+                                }
+                            }
+                        }
+                        neList.add(ne);
+                    }
+                    if(msg.isEmpty()){
+                        // 批量插入NE
+                        int i = this.networkElementService.batchInsert(neList);
+                        if(i > 0){
+                            return ResponseUtil.ok();
+                        }else{
+                            return ResponseUtil.error();
+                        }
+                    }else{
+                        return ResponseUtil.badArgument(msg);
+                    }
+                }else{
+                    return ResponseUtil.badArgument("文件无数据");
+                }
+            }else{
+                return ResponseUtil.badArgument("文件格式错误，请使用标准模板上传");
+            }
+        }
+        return ResponseUtil.badArgument("文件不存在");
+    }
+
+
+    @PostMapping("/import")
+    public Object importExcel(@RequestPart("file")MultipartFile file) throws Exception {
+        if(!file.isEmpty()){
+            String fileName = file.getOriginalFilename().toLowerCase();
+            String suffix = fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+            if (suffix.equals("xlsx") || suffix.equals("xls")) {
+                List<NetworkElement> nes = ExcelUtils.readMultipartFile(file, NetworkElement.class);
+                // 校验表格数据是否符号要求
+                String tips = "";
+                for (NetworkElement ne : nes) {
+                    if(!ne.getRowTips().isEmpty()){
+                        tips = ne.getRowTips();
+                        break;
+                    }
+                }
+                if(!tips.isEmpty()){
+                    return ResponseUtil.badArgument(tips);
+                }
+                if(nes.size() > 0){
+                    String msg = "";
+                    Map params = new HashMap();
+                    List<NetworkElement> neList = new ArrayList<>();
+                    for (int i = 0; i < nes.size(); i++) {
+                        NetworkElement ne = nes.get(i);
+                        if(ne.getDeviceName()  == null || ne.getDeviceName().equals("")){
+                            msg = "第" + (i + 2) + "行,设备名不能为空";
+                            break;
+                        }else{
+                            params.clear();
+                            params.put("deviceName", ne.getDeviceName());
+                            List<NetworkElement> networkElements = this.networkElementService.selectObjByMap(params);
+                            if(networkElements.size() > 0){
+                                msg = "第" + (i + 2) + "行, 设备已存在";
+                                break;
+                            }
+                        }
+                        // 增加外联设备，ip必填校验删除
+//                        if(ne.getIp()  == null || ne.getIp().equals("")){
+//                            ne.setIp("");
+//                            msg = "第" + (i + 2) + "行,IP不能为空";
+//                            break;
+//                        }
+                        if(ne.getIp() != null && !ne.getIp().equals("")){
+                            boolean flag = IpUtil.verifyIp(ne.getIp());
+                            if(flag){
+                                params.clear();
+                                params.put("ip", ne.getIp());
+                                List<NetworkElement> networkElements = this.networkElementService.selectObjByMap(params);
+                                if(networkElements.size() > 0){
+                                    msg = "第" + (i + 2) + "行, IP已存在";
+                                    break;
+                                }
+                            }else{
+                                msg = "第" + (i + 2) + "行, IP格式错误";
+                                break;
+                            }
+                        }
+                        if(ne.getVendorName() != null ||ne.getVendorName().equals("")){
+                            params.clear();
+                            params.put("name", ne.getVendorName());
+                            Vendor vendor = this.vendorService.selectObjByName(ne.getVendorName());
+                            if(vendor == null){
+                                msg = "第" + (i + 2) + "行,品牌不存在";
+                                break;
+                            }else{
+                                ne.setVendorId(vendor.getId());
+                            }
+                        }
+                        if(ne.getDeviceTypeName() != null || ne.getDeviceTypeName().equals("")){
+                            params.clear();
+                            params.put("name", ne.getDeviceTypeName());
+                            DeviceType deviceType = this.deviceTypeService.selectObjByName(ne.getDeviceTypeName());
+                            if(deviceType == null){
+                                msg = "第" + (i + 2) + "行,设备类型不存在";
+                                break;
+                            }else{
+                                ne.setDeviceTypeId(deviceType.getId());
+                                if(deviceType.getType() == 10){
+                                    ne.setInterfaceName("Port0");
+                                }
+                            }
+                        }
+                        neList.add(ne);
+                    }
+                    if(msg.isEmpty()){
+                        // 批量插入NE
+                        int i = this.networkElementService.batchInsert(neList);
+                        if(i > 0){
+                            return ResponseUtil.ok();
+                        }else{
+                            return ResponseUtil.error();
+                        }
+                    }else{
+                        return ResponseUtil.badArgument(msg);
+                    }
+                }else{
+                    return ResponseUtil.badArgument("文件无数据");
+                }
+            }else{
+                return ResponseUtil.badArgument("文件格式错误，请使用标准模板上传");
+            }
+        }
+        return ResponseUtil.badArgument("文件不存在");
+    }
+
+    @ApiOperation("导出")
     @GetMapping("/device/export")
     public void exportExcel(HttpServletResponse response){
         List<NetworkElement> networkElements = new ArrayList<NetworkElement>();
@@ -755,99 +994,7 @@ public class NetworkElementManagerController {
 //        }
     }
 
-    @PostMapping("/import")
-    public Object importUser(@RequestPart("file")MultipartFile file) throws Exception {
-        if(!file.isEmpty()){
-            String fileName = file.getOriginalFilename().toLowerCase();
-            String suffix2 = fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
-            if (suffix2.equals("xlsx") || suffix2.equals("xls")) {
-                List<NetworkElement> nes = ExcelUtil.readMultipartFile(file, NetworkElement.class);
-                if(nes.size() > 0){
-                    String msg = "";
-                    Map params = new HashMap();
-                    List<NetworkElement> neList = new ArrayList<>();
-                    for (int i = 0; i < nes.size(); i++) {
-                        NetworkElement ne = nes.get(i);
-                        if(ne.getDeviceName()  == null || ne.getDeviceName().equals("")){
-                            msg = "第" + (i + 2) + "行,设备名不能为空";
-                            break;
-                        }else{
-                            params.clear();
-                            params.put("deviceName", ne.getDeviceName());
-                            List<NetworkElement> networkElements = this.networkElementService.selectObjByMap(params);
-                            if(networkElements.size() > 0){
-                                msg = "第" + (i + 2) + "行, 设备已存在";
-                                break;
-                            }
-                        }
-//                        if(ne.getIp()  == null || ne.getIp().equals("")){
-//                            ne.setIp("");
-//                            msg = "第" + (i + 2) + "行,IP不能为空";
-//                            break;
-//                        }
-                        if(ne.getIp() != null && !ne.getIp().equals("")){
-                            boolean flag = IpUtil.verifyIp(ne.getIp());
-                            if(flag){
-                                params.clear();
-                                params.put("ip", ne.getIp());
-                                List<NetworkElement> networkElements = this.networkElementService.selectObjByMap(params);
-                                if(networkElements.size() > 0){
-                                    msg = "第" + (i + 2) + "行, IP已存在";
-                                    break;
-                                }
-                            }else{
-                                msg = "第" + (i + 2) + "行, IP格式错误";
-                                break;
-                            }
-                        }
-                        if(ne.getVendorName() != null ||ne.getVendorName().equals("")){
-                            params.clear();
-                            params.put("name", ne.getVendorName());
-                            Vendor vendor = this.vendorService.selectObjByName(ne.getVendorName());
-                            if(vendor == null){
-                                msg = "第" + (i + 2) + "行,品牌不存在";
-                                break;
-                            }else{
-                                ne.setVendorId(vendor.getId());
-                            }
-                        }
-                        if(ne.getDeviceTypeName() != null || ne.getDeviceTypeName().equals("")){
-                            params.clear();
-                            params.put("name", ne.getDeviceTypeName());
-                            DeviceType deviceType = this.deviceTypeService.selectObjByName(ne.getDeviceTypeName());
-                            if(deviceType == null){
-                                msg = "第" + (i + 2) + "行,设备类型不存在";
-                                break;
-                            }else{
-                                ne.setDeviceTypeId(deviceType.getId());
-                                if(deviceType.getType() == 10){
-                                    ne.setInterfaceName("Port0");
-                                }
-                            }
-                        }
-                        neList.add(ne);
-                    }
-                    if(msg.isEmpty()){
-                        // 批量插入NE
-                        int i = this.networkElementService.batchInsert(neList);
-                        if(i > 0){
-                            return ResponseUtil.ok();
-                        }else{
-                            return ResponseUtil.error();
-                        }
-                    }else{
-                        return ResponseUtil.badArgument(msg);
-                    }
-                }else{
-                    return ResponseUtil.badArgument("文件无数据");
-                }
-            }else{
-                return ResponseUtil.badArgument("文件格式错误，请使用标准模板上传");
-            }
-        }
-        return ResponseUtil.ok();
-    }
-
+    @ApiOperation("模板下载")
     @GetMapping("/downTemp")
     public Object downTemplate(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 //        InputStream inputStream = FileUtil.class.getClassLoader().getResourceAsStream(\"/templates/excel/\" + this.batchImportNodeFileName);\n" +
@@ -859,15 +1006,35 @@ public class NetworkElementManagerController {
 //        String realPath = "src/main/resources/templates/excel/" + this.batchImportNodeFileName;
 //        File file = new File(realPath);
 //        boolean flag = DownLoadFileUtil.downloadZip(file, response);
-        String name = java.net.URLEncoder.encode(this.batchImportNodeFileName, "UTF-8");
-        InputStream in = FileUtil.class.getClassLoader().getResourceAsStream("static/excel/" + "aaa.xlsx");
-
-        boolean flag = DownLoadFileUtil.downloadZip(in, this.batchImportNodeFileName, response);
+//        String name = java.net.URLEncoder.encode(this.batchImportNodeFileName, "UTF-8");
+//        InputStream in = FileUtil.class.getClassLoader().getResourceAsStream("static/excel/" + this.batchImportNodeFileName);
+//        boolean flag = DownLoadFileUtil.downloadZip(in, this.batchImportNodeFileName, response);
+        boolean flag = DownLoadFileUtil.downloadTemplate(this.batchImportFilePath, this.batchImportNeFileName, response);
         if(flag){
             return ResponseUtil.ok();
         }else{
             return ResponseUtil.error();
         }
+    }
+
+    @ApiOperation("是否开启凭证")
+    @GetMapping("/isCredential")
+    public Object isCredential(@RequestParam(value = "uuid") String uuid){
+        NetworkElement networkElement = this.networkElementService.selectObjByUuid(uuid);
+        if(networkElement != null){
+//            // 验证凭据是否存在
+//            Credential credential = this.credentialService.getObjById(networkElement.getCredentialId());
+//            if(credential != null){
+//                return ResponseUtil.ok(1);
+//            }else{
+//                return ResponseUtil.ok(0);
+
+            Map map = new HashMap();
+            map.put("permitConnect", networkElement.isPermitConnect());
+            map.put("webUrl", networkElement.getWebUrl());
+            return ResponseUtil.ok(map);
+        }
+        return ResponseUtil.badArgument("Uuid不存在");
     }
 
 }

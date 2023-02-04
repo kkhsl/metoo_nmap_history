@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.websocket.api;
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.config.socket.NoticeWebsocketResp;
+import com.metoo.nspm.core.config.websocket.demo.NoticeWebsocketResp;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixService;
 import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.entity.zabbix.Item;

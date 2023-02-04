@@ -122,7 +122,7 @@ public class PlantRoomManagerController {
           Map params = new HashMap();
           params.put("name", instance.getName());
           params.put("plantRoomId", instance.getId());
-          List<PlantRoom> plantRooms = this.plantRoomService.selectObjByMap(params);
+          List<PlantRoomVO> plantRooms = this.plantRoomService.selectVoByMap(params);
           if(plantRooms.size() > 0){
               return ResponseUtil.badArgumentRepeatedName();
           }

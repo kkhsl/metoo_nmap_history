@@ -42,7 +42,7 @@ public interface ZabbixService {
     List getItemArp(String ip,  String deviceName, String uuid, String deviceType);
     // Mac
     Object getItemMac(String ip, String deviceName, String uuid, String deviceType);
-    // Rout
+    // Route
     List<Map<String, String>> getItemRoutByIp(String ip);
 
     void createRoutTable(String ip);
@@ -61,6 +61,8 @@ public interface ZabbixService {
 
     // 采集Problem
     void gatherProblem();
+
+    void gatherThreadProblem();
 
     void updateProblemStatus();
 

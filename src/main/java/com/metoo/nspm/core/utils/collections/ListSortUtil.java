@@ -16,7 +16,6 @@ public class ListSortUtil {
                 return key2.compareTo(key1);
             }
         });
-
     }
 
     public static void sort(List<Map<String, Double>> list){

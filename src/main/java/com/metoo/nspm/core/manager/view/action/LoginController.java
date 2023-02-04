@@ -4,12 +4,14 @@ import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.service.zabbix.IGatherService;
 import com.metoo.nspm.core.utils.CaptchaUtil;
+import com.metoo.nspm.core.utils.CookieUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.entity.nspm.User;
 import com.metoo.nspm.vo.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
@@ -19,7 +21,6 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,8 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -59,7 +58,16 @@ public class LoginController{
         Session session = SecurityUtils.getSubject().getSession();
         String sessionCaptcha = (String) session.getAttribute("captcha");
         session.getStartTimestamp();
-        if(captcha != null && !org.springframework.util.StringUtils.isEmpty(captcha) && !StringUtils.isEmpty(sessionCaptcha)){
+        if(StringUtils.isEmpty(username)){
+            return ResponseUtil.badArgument("用户名必填");
+        }
+        if(StringUtils.isEmpty(password)){
+            return ResponseUtil.badArgument("密码必填");
+        }
+        if(StringUtils.isEmpty(captcha)){
+            return ResponseUtil.badArgument("验证码必填");
+        }
+        if(!org.springframework.util.StringUtils.isEmpty(captcha) && !StringUtils.isEmpty(sessionCaptcha)){
             if(sessionCaptcha.toUpperCase().equals(captcha.toUpperCase())){
                 boolean flag = true;// 当前用户是否已登录
                 if(subject.getPrincipal() != null && subject.isAuthenticated()){
@@ -81,7 +89,8 @@ public class LoginController{
                             session.removeAttribute("captcha");
                             Cookie cookie = new Cookie("access_token", this.sysConfigService.select().getNspmToken().trim());
                             cookie.setMaxAge(43200);
-                            cookie.setPath("/");
+//                            cookie.setPath("/");
+//                            cookie.setDomain("192.168.5.101");
                             response.addCookie(cookie);
                             User user = this.userService.findByUserName(username);
                             return ResponseUtil.ok(user.getId());
@@ -155,15 +164,18 @@ public class LoginController{
     }
 
     @RequestMapping("/logout")
-    public Object logout(HttpServletRequest request){
+    public Object logout(HttpServletRequest request, HttpServletResponse response){
         Subject subject = SecurityUtils.getSubject();
         if(subject.getPrincipal() != null){
             // 清除cookie
             subject.logout(); // 退出登录
+            CookieUtil.removeCookie(request, response, "access_token");
+            CookieUtil.removeCookie(request, response, "JSESSIONID");
             return ResponseUtil.ok();
         }else{
             return new Result(401,"log in");
         }
     }
+
 }
 

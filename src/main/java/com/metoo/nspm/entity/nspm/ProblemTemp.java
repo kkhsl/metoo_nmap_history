@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.Objects;
 
 @Data
 @AllArgsConstructor
@@ -24,7 +26,6 @@ public class ProblemTemp extends IdEntity {
     private String event;
     private Integer suppressed;
     private Integer status;
-
-
+    private Date restoreTime;
 
 }

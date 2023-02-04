@@ -8,12 +8,15 @@ import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.file.DownLoadFileUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
+import com.metoo.nspm.core.utils.network.IpV4Util;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.TopologyDTO;
 import com.github.pagehelper.Page;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
 import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
+import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -49,21 +52,21 @@ public class TopologyManagerController {
     @Autowired
     private IArpHistoryService arpHistoryService;
     @Autowired
-    private IMacService macService;
-    @Autowired
     private IIPAddressService ipAddressServie;
     @Autowired
     private IIPAddressHistoryService ipAddressHistoryServie;
     @Autowired
     private IRoutTableService routTableService;
     @Autowired
+    private IRoutHistoryService routHistoryService;
+    @Autowired
     private ZabbixSubnetService zabbixSubnetService;
+    @Autowired
+    private INetworkElementService networkElementService;
     @Autowired
     private SubnetTool subnetTool;
     @Autowired
     private RoutTool routTool;
-    @Autowired
-    private IRoutHistoryService routHistoryService;
 
     @RequestMapping("/list")
     public Object list(@RequestBody(required = false) TopologyDTO dto){
@@ -283,7 +286,6 @@ public class TopologyManagerController {
         return ResponseUtil.badArgument();
     }
 
-
     @DeleteMapping("/delete")
     public Object delete(String ids){
         if(ids != null && !ids.equals("")){
@@ -490,9 +492,134 @@ public class TopologyManagerController {
         return null;
     }
 
+//    @ApiOperation("设备路由列表")
+//    @PostMapping("/device/rout")
+//    public Object deviceRoutList(@RequestBody RoutDTO dto){
+//        if(StringUtil.isEmpty(dto.getDeviceUuid())){
+//            return ResponseUtil.badArgument();
+//        }else{
+//            if(dto.getDestination() != null && !dto.getDestination().equals("")){
+//                dto.setDestination(IpUtil.ipConvertDec(dto.getDestination()));
+//            }
+//        }
+//        Page<Route> page = null;
+//        if(dto.getTime() == null){
+//            page = this.routService.selectConditionQuery(dto);
+//        }else{
+//            page = this.routHistoryService.selectConditionQuery(dto);
+//        }
+//        if(page != null && page.getResult().size() > 0) {
+//            return ResponseUtil.ok(new PageInfo<Route>(page));
+//        }
+//        return ResponseUtil.ok();
+//    }
+
     @ApiOperation("设备路由列表")
     @PostMapping("/device/rout")
     public Object deviceRoutList(@RequestBody RoutDTO dto){
+        NetworkElement networkElement = null;
+        String ip = "";
+        Integer maskBit = 0;
+        if(StringUtil.isEmpty(dto.getDeviceUuid())){
+            return ResponseUtil.badArgument("请选择设备");
+        }else{
+            networkElement = this.networkElementService.selectObjByUuid(dto.getDeviceUuid());
+            if(networkElement == null){
+                return ResponseUtil.badArgument("设备不存在");
+            }
+            String destination = dto.getDestination();
+            if(destination != null && !destination.equals("")){
+                boolean cidr = IpV4Util.verifyCidr(destination);
+                if(cidr){
+                    maskBit = Integer.parseInt(destination.replaceAll(".*/",""));
+                    ip = destination.replaceAll("/.*","");
+                    dto.setDestination(ip);
+                }else{
+                    boolean flag = IpV4Util.verifyIp(destination);
+                    if(flag){
+                        ip = destination;
+                        maskBit = 32;
+                    }else{
+                        return ResponseUtil.badArgument();
+                    }
+                }
+                dto.setDestination(IpUtil.ipConvertDec(dto.getDestination()));
+            }
+        }
+        Page<Route> page = null;
+        dto.setOrderBy("destination");
+        dto.setOrderType("asc");
+        if(dto.getTime() == null){
+            page = this.routService.selectConditionQuery(dto);
+        }else{
+            page = this.routHistoryService.selectConditionQuery(dto);
+        }
+        if(page != null && page.getResult().size() > 0) {
+            return ResponseUtil.ok(new PageInfo<Route>(page));
+        }
+            else {
+            // 根据Ip未查询到数据（查询相同网段ip地址）
+//            String mask = IpV4Util.getMaskByMaskBit(maskBit);
+//            String network = IpV4Util.getNetwork(ip, mask);
+//            String broadcast = IpV4Util.getBroadcast(ip, mask);
+//            if(!StringUtil.isEmpty(network) && !StringUtils.isEmpty(broadcast)){
+//                dto.setNetwork(network);
+//                dto.setBroadcast(broadcast);
+//                page = this.routService.selectConditionQuery(dto);
+//                return ResponseUtil.ok(new PageInfo<Route>(page));
+//            }
+            dto.setDestination(null);
+            page = this.routService.selectConditionQuery(dto);
+            List<Route> routes = page.getResult();
+            if(routes.size() > 0){
+                List<Route> routList = new ArrayList<>();
+                for (Route rout : routes) {
+                    boolean flag = IpUtil.ipIsInNet(ip, rout.getCidr());
+                    if (flag) {
+                        routList.add(rout);
+                    }
+                }
+
+                if(routList.size() > 0){
+                    this.sort(routList);
+                    int maskBitMax = routList.get(0).getMaskBit();
+                    List<Route> routList2 = new ArrayList<>();
+                    for (Route rout : routList) {
+                        if (rout.getMaskBit() == maskBitMax) {
+                            routList2.add(rout);
+                        }
+                    }
+                    Page<Route> page1 = new Page<>();
+                    page1.setPageNum(1);
+                    page1.setPageSize(routList2.size());
+                    page1.setPageSize(routList2.size());
+                    page1.getResult().clear();
+                    page1.getResult().addAll(routList2);
+                    return ResponseUtil.ok(new PageInfo<Route>(page1));
+                }else{
+                    dto.setDestination("0");
+                    page = this.routService.selectConditionQuery(dto);
+                    return ResponseUtil.ok(new PageInfo<Route>(page));
+                }
+            }
+            return ResponseUtil.ok();
+        }
+    }
+
+    public static void sort(List<Route> list){
+        Collections.sort(list, new Comparator<Route>() {
+            @Override
+            public int compare(Route o1, Route o2) {
+                int key1 = o1.getMaskBit();
+                int key2 = o2.getMaskBit();
+                return key1 < key2 ? 1 : -1; // 降序
+            }
+        });
+    }
+
+    @ApiOperation("设备路由列表（历史）")
+    @PostMapping("/device/rout/history")
+    public Object deviceRoutListHistory(@RequestBody RoutDTO dto){
         if(StringUtil.isEmpty(dto.getDeviceUuid())){
             return ResponseUtil.badArgument();
         }else{
@@ -500,14 +627,10 @@ public class TopologyManagerController {
                 dto.setDestination(IpUtil.ipConvertDec(dto.getDestination()));
             }
         }
-        Page<Rout> page = null;
-        if(dto.getTime() == null){
-            page = this.routService.selectConditionQuery(dto);
-        }else{
-            page = this.routHistoryService.selectConditionQuery(dto);
-        }
+        Page<Route> page = null;
+        page = this.routHistoryService.selectConditionQuery(dto);
         if(page != null && page.getResult().size() > 0) {
-            return ResponseUtil.ok(new PageInfo<Rout>(page));
+            return ResponseUtil.ok(new PageInfo<Route>(page));
         }
         return ResponseUtil.ok();
     }
@@ -660,12 +783,12 @@ public class TopologyManagerController {
 //            params.put("deviceName", srcIpAddress.getDeviceName());
 //            params.put("interfaceName", srcIpAddress.getInterfaceName());
 //            params.put("mac", srcIpAddress.getMac());
-//            List<RoutTable> routTables = this.routTableService.selectObjByMap(params);
-//            RoutTable routTable = null;
+//            List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
+//            RouteTable routTable = null;
 //            if(routTables.size() > 0){
 //                routTable = routTables.get(0);
 //            }else{
-//                routTable = new RoutTable();
+//                routTable = new RouteTable();
 //            }
 //            String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
 //            BeanUtils.copyProperties(srcIpAddress, routTable, IGNORE_ISOLATOR_PROPERTIES);
@@ -673,7 +796,7 @@ public class TopologyManagerController {
 //
 //            // 路由查询
 //            this.routTool.generatorRout(srcIpAddress, destIp, destIpAddress.getMask());
-//            List<RoutTable> routTableList = this.routTableService.selectObjByMap(null);
+//            List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
 //            map.put("routTable", routTableList);
 //            // 二层路径
 //            if(true){
@@ -717,11 +840,11 @@ public class TopologyManagerController {
 //
 //                // 查询终点二层路径
 //                if(routTableList.size() > 0){
-//                    List<RoutTable> destToutTables = routTableList.stream().filter(item -> item.getStatus() == 1 || item.getStatus() == 3).collect(Collectors.toList());
+//                    List<RouteTable> destToutTables = routTableList.stream().filter(item -> item.getStatus() == 1 || item.getStatus() == 3).collect(Collectors.toList());
 //                    Map routTableMap = new HashMap();
 //                    List list = new ArrayList();
 //                    List destRemoteList = new ArrayList();
-//                    for(RoutTable item : destToutTables){
+//                    for(RouteTable item : destToutTables){
 //                        List<Mac> dest_layer_2_device = this.routTool.generetorSrcLayer_2_device(destArp.getMac(), item.getDeviceName());
 //                        int number1 = dest_layer_2_device.size();
 //                        boolean flag1 = true;
@@ -875,12 +998,12 @@ public class TopologyManagerController {
         params.put("deviceName", srcIpAddress.getDeviceName());
         params.put("interfaceName", srcIpAddress.getInterfaceName());
         params.put("mac", srcIpAddress.getMac());
-        List<RoutTable> routTables = this.routTableService.selectObjByMap(params);
-        RoutTable routTable = null;
+        List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
+        RouteTable routTable = null;
         if(routTables.size() > 0){
             routTable = routTables.get(0);
         }else{
-            routTable = new RoutTable();
+            routTable = new RouteTable();
         }
         String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
         BeanUtils.copyProperties(srcIpAddress, routTable, IGNORE_ISOLATOR_PROPERTIES);
@@ -888,7 +1011,7 @@ public class TopologyManagerController {
 
         // 路由查询
         this.routTool.generatorRout(srcIpAddress, destIp, destIpAddress.getMask(), time);
-        List<RoutTable> routTableList = this.routTableService.selectObjByMap(null);
+        List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
         map.put("routTable", routTableList);
 
         // 二层路径
@@ -935,11 +1058,11 @@ public class TopologyManagerController {
 
             // 查询终点二层路径
             if(routTableList.size() > 0){
-                List<RoutTable> destToutTables = routTableList.stream().filter(item -> item.getStatus() == 1 || item.getStatus() == 3).collect(Collectors.toList());
+                List<RouteTable> destToutTables = routTableList.stream().filter(item -> item.getStatus() == 1 || item.getStatus() == 3).collect(Collectors.toList());
                 Map routTableMap = new HashMap();
                 List list = new ArrayList();
                 List destRemoteList = new ArrayList();
-                for(RoutTable item : destToutTables){
+                for(RouteTable item : destToutTables){
                     List<Mac> dest_layer_2_device = this.routTool.generetorSrcLayer_2_device(destArp.getMac(), item.getDeviceName(), time);
                     int number1 = dest_layer_2_device.size();
                     boolean flag1 = true;

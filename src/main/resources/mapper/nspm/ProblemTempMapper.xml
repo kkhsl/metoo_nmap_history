@@ -19,7 +19,18 @@
     <select id="selectObjByObjectId" parameterType="java.lang.Integer" resultMap="Base_Result_Map">
             SELECT * FROM rsms_problem_temp where objectid = #{objectid}
     </select>
-    
+
+
+    <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+            SELECT * FROM rsms_problem_temp
+            <where>
+                <if test="objectid != -1">
+                    and objectid = #{objectid}
+                </if>
+            </where>
+    </select>
+
+
     <insert id="batchInsert" parameterType="com.metoo.nspm.entity.nspm.ProblemTemp">
         INSERT INTO rsms_problem_temp (addTime, name, device_name, interface_name, uuid, clock, ip, severity, event,
         suppressed, objectid)
@@ -33,9 +44,16 @@
     <update id="update" parameterType="com.metoo.nspm.entity.nspm.ProblemTemp">
         UPDATE rsms_problem_temp
         <set>
-            <if test="status != null">
-                status = #{status}
+            <if test="addTime != null">
+                addTime = #{addTime},
             </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="clock != null">
+                clock = #{clock},
+            </if>
+            restoreTime = #{restoreTime},
         </set>
         where id = #{id}
     </update>

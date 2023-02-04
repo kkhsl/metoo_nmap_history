@@ -2,25 +2,25 @@ package com.metoo.nspm.core.service.nspm;
 
 import com.github.pagehelper.Page;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
-import com.metoo.nspm.entity.nspm.Rout;
+import com.metoo.nspm.entity.nspm.Route;
 
 import java.util.List;
 import java.util.Map;
 
 public interface IRoutService {
 
-    Rout selectObjById(Long id);
-    Page<Rout> selectConditionQuery(RoutDTO instance);
-    List<Rout> selectObjByMap(Map params);
-    int save(Rout instance);
-    int update(Rout instance);
+    Route selectObjById(Long id);
+    Page<Route> selectConditionQuery(RoutDTO instance);
+    List<Route> selectObjByMap(Map params);
+    int save(Route instance);
+    int update(Route instance);
     int delete(Long id);
     void truncateTable();
-    List<Rout> queryDestDevice(Map params);
+    List<Route> queryDestDevice(Map params);
 
-    Rout selectDestDevice(Map params);
+    Route selectDestDevice(Map params);
 
-    List<Rout> selectNextHopDevice(Map params);
+    List<Route> selectNextHopDevice(Map params);
 
     void copyRoutTemp();
 }

@@ -54,6 +54,13 @@
         WHERE id = #{id}
     </select>
 
+    <select id="selectObjByName" parameterType="java.lang.String" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM rsms_plant_room
+        WHERE name = #{name}
+    </select>
+
+
     <select id="query" parameterType="com.metoo.nspm.entity.nspm.PlantRoom" resultMap="Plant_Result_Map">
         SELECT id, name
         FROM rsms_plant_room
@@ -124,7 +131,26 @@
     </select>
 
 
-    <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Plant_Result_Map">
+    <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM rsms_plant_room
+        <where>
+            <if test="deleteStatus != null and deleteStatus != ''">
+                AND deleteStatus = #{deleteStatus}
+            </if>
+            <if test="name != null and userId != ''">
+                AND `name` = #{name}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND user_id = #{userId}
+            </if>
+            <if test="plantRootId != null and plantRootId != ''">
+                AND id != #{plantRootId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectVoByMap" parameterType="java.util.Map" resultMap="Plant_Result_Map">
         SELECT id
         FROM rsms_plant_room
         <where>

@@ -14,4 +14,14 @@ public class StringUtils {
         }
     }
 
+    public static String getStr(String s) {
+        if (s == null) {
+            return "";
+        }
+        if (s.isEmpty()) {
+            return s;
+        }
+        return s.trim();
+    }
+
 }

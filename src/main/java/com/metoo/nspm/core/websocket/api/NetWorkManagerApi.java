@@ -1,16 +1,14 @@
 package com.metoo.nspm.core.websocket.api;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.core.config.socket.NoticeWebsocketResp;
+import com.metoo.nspm.core.config.websocket.demo.NoticeWebsocketResp;
 import com.metoo.nspm.core.manager.admin.tools.GroupTools;
 import com.metoo.nspm.core.manager.zabbix.tools.InterfaceUtil;
 import com.metoo.nspm.core.service.nspm.IGroupService;
 import com.metoo.nspm.core.service.nspm.INetworkElementService;
 import com.metoo.nspm.core.service.zabbix.IProblemService;
 import com.metoo.nspm.core.service.zabbix.InterfaceService;
-import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.collections.ListSortUtil;
 import com.metoo.nspm.dto.NetworkElementDto;
 import com.metoo.nspm.entity.nspm.Group;
@@ -110,6 +108,7 @@ public class NetWorkManagerApi {
                             params.put("ip", ip);
                             params.put("interfaceName", interfaceName);
                             params.put("event", "is not null");
+                            params.put("objectid", "is not null");
                             List<Problem> problemList = this.problemService.selectObjByMap(params);
                             if(problemList.size() > 0){
                                 List events = new ArrayList();
@@ -271,23 +270,56 @@ public class NetWorkManagerApi {
 //        return rep;
 //    }
 
+//    @ApiOperation("拓扑设备状态")
+//    @GetMapping("/snmp/status")
+//    public Object snmapStatus(String ips){
+//        Map map = new HashMap();
+//        if(ips != null && !ips.equals("")){
+//            String[] iparray = ips.split(",");
+//            for (String ip : iparray){
+//                // 获取端口snmp可用性
+//                String avaliable = this.interfaceUtil.getInterfaceAvaliable(ip);
+//                map.put(ip, avaliable);
+//            }
+//        }
+//        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+//        if (!map.isEmpty()) {
+//            rep.setNoticeStatus(1);
+//            rep.setNoticeType("2");
+//            rep.setNoticeInfo(map);
+//        }else{
+//            rep.setNoticeType("2");
+//            rep.setNoticeStatus(0);
+//        }
+//        return rep;
+//    }
+
     @ApiOperation("拓扑设备状态")
     @GetMapping("/snmp/status")
-    public Object snmapStatus(String ips){
-        Map map = new HashMap();
-        if(ips != null && !ips.equals("")){
-            String[] iparray = ips.split(",");
-            for (String ip : iparray){
-                // 获取端口snmp可用性
-                String avaliable = this.interfaceUtil.getInterfaceAvaliable(ip);
-                map.put(ip, avaliable);
+    public Object status(@RequestParam(value = "requestParams") String param){
+        List list = new ArrayList();
+        if(param != null && !param.equals("")){
+            List<Object> requestParams = JSONObject.parseObject(param, List.class);
+            for (Object ip : requestParams){
+                try {
+                    Map map = new HashMap();
+                    String[] str = ip.toString().split("&");
+                    // 获取端口snmp可用性
+                    String avaliable = this.interfaceUtil.getInterfaceAvaliable(str[0]);
+                    map.put("snmp", avaliable);
+                    map.put("uuid", str[1]);
+                    list.add(map);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    continue;
+                }
             }
         }
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
-        if (!map.isEmpty()) {
+        if (list.size() > 0) {
             rep.setNoticeStatus(1);
             rep.setNoticeType("2");
-            rep.setNoticeInfo(map);
+            rep.setNoticeInfo(list);
         }else{
             rep.setNoticeType("2");
             rep.setNoticeStatus(0);

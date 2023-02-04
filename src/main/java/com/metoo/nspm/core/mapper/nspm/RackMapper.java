@@ -12,6 +12,8 @@ public interface RackMapper {
 
     Rack getObjById(Long id);
 
+    Rack selectObjByName(String name);
+
     List<Rack> findBySelect(RackDTO instance);
 
     List<Rack> selectObjByMap(Map params);
@@ -19,6 +21,8 @@ public interface RackMapper {
     List<Rack> query(Rack rack);
 
     int save(Rack instance);
+
+    int batchInsert(List<Rack> rackList);
 
     int update(Rack instance);
 

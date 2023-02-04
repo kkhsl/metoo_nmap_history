@@ -34,6 +34,16 @@ public class ThresholdManagerController {
         double i = 0.5;
         Double cpu = i / 100;
         System.out.println(BasicDataConvertUtil.bigDecimalSetScale(cpu));
+
+
+        BigDecimal num1 = new BigDecimal(0.04);
+        BigDecimal num2 = new BigDecimal("100");
+        BigDecimal num3 = new BigDecimal("0");
+
+        int compare1 = num1.compareTo(num2);
+        int compare2 = num1.compareTo(num3);
+        System.out.println(compare1);
+        System.out.println(compare2);
     }
 
     @ApiOperation("zabbix 全局阈值")
@@ -90,9 +100,12 @@ public class ThresholdManagerController {
         if(dtos.size() > 0){
             List list = new ArrayList();
             for (UserMacroDTO dto : dtos) {
-                String value = dto.getValue();
-                double v = Double.parseDouble(value);
-                if (v < 0 || v > 100) {
+                BigDecimal num1 = new BigDecimal(dto.getValue());
+                BigDecimal num2 = new BigDecimal("100");
+                BigDecimal num3 = new BigDecimal("0");
+                int compare1 = num1.compareTo(num2);
+                int compare2 = num1.compareTo(num3);
+                if (compare1 == 1 || compare2 == -1) {
                     return ResponseUtil.badArgument("阈值不符合规范");
                 }
             }

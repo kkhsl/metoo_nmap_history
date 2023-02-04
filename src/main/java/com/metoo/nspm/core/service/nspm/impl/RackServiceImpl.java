@@ -34,6 +34,11 @@ public class RackServiceImpl implements IRackService {
     }
 
     @Override
+    public Rack selectObjByName(String name) {
+        return this.rackMapper.selectObjByName(name);
+    }
+
+    @Override
     public Page<Rack> findBySelect(RackDTO instance) {
         User user = ShiroUserHolder.currentUser();
         instance.setUserId(user.getId());
@@ -69,6 +74,21 @@ public class RackServiceImpl implements IRackService {
             return this.rackMapper.save(instance);
         }else{
             return  this.rackMapper.update(instance);
+        }
+    }
+
+    @Override
+    public int batchInsert(List<Rack> rackList) {
+        try {
+            for (Rack instance : rackList) {
+                instance.setAddTime(new Date());
+                User user = ShiroUserHolder.currentUser();
+                instance.setUserId(user.getId());
+            }
+            return this.rackMapper.batchInsert(rackList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 

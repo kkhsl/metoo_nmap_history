@@ -1,5 +1,6 @@
 package com.metoo.nspm.core.service.api.zabbix.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
@@ -19,7 +20,6 @@ import com.metoo.nspm.dto.zabbix.HostDTO;
 import com.metoo.nspm.dto.zabbix.ItemDTO;
 import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.entity.zabbix.History;
-import com.metoo.nspm.entity.zabbix.ItemTag;
 import com.metoo.nspm.vo.ItemTagBoardVO;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
@@ -93,9 +93,23 @@ public class ZabbixServiceImpl implements ZabbixService {
     private IAddressService addressService;
 
     public static void main(String[] args) {
-        String a = "0:0:5e:0:1:c8";
-        String b = "0:0:5e:0";
-        System.out.println(a.contains(b));
+        ProblemTemp temp1 = new ProblemTemp();
+        ProblemTemp temp2 = new ProblemTemp();
+        ProblemTemp temp3 = new ProblemTemp();
+        temp1.setObjectid(1);
+         temp2.setObjectid(1);
+        temp3.setObjectid(2);
+        List<ProblemTemp> list = new ArrayList();
+        list.add(temp1);
+        list.add(temp2);
+        list.add(temp3);
+        List list2 = new ArrayList();
+        for (ProblemTemp penBean : list) {
+            if(!list2.contains(penBean)){
+                list2.add(penBean);
+            }
+        }
+        System.out.println(JSON.toJSON(list2));
     }
 
     public JSONObject getItem(String ip){
@@ -601,7 +615,7 @@ public class ZabbixServiceImpl implements ZabbixService {
         List<Map<String, String>> maps = this.itemUtil.getRoutItems(ip);
         if(maps != null && maps.size() > 0){
             for (Map<String, String> map : maps){
-                RoutTemp routTemp = new RoutTemp();
+                RouteTemp routTemp = new RouteTemp();
                 routTemp.setDestination(map.get("destination"));
                 routTemp.setMask(IpUtil.getBitMask(map.get("mask")));
                 routTemp.setCost(map.get("routemetric"));
@@ -669,7 +683,7 @@ public class ZabbixServiceImpl implements ZabbixService {
 //            List<Map<String, String>> maps = this.itemUtil.getRoutItems(ip);
 //            if(maps != null && maps.size() > 0){
 //                for (Map<String, String> map : maps){
-//                    Rout rout = new Rout();
+//                    Route rout = new Route();
 //                    rout.setDestination(map.get("destination"));
 //                    rout.setMask(IpUtil.getBitMask(map.get("mask")));
 //                    rout.setCost(map.get("routemetric"));
@@ -2767,7 +2781,7 @@ public class ZabbixServiceImpl implements ZabbixService {
         List<Map<String, String>> maps = this.itemUtil.getRoutItems(ip);
         if(maps != null && maps.size() > 0){
             for (Map<String, String> map : maps){
-                RoutTemp routTemp = new RoutTemp();
+                RouteTemp routTemp = new RouteTemp();
                 routTemp.setDestination(map.get("destination"));
                 routTemp.setMask(IpUtil.getBitMask(map.get("mask")));
                 routTemp.setCost(map.get("routemetric"));
@@ -2871,6 +2885,25 @@ public class ZabbixServiceImpl implements ZabbixService {
         List<Map> ipList = this.topoNodeService.queryNetworkElement();
         if(ipList != null && ipList.size() > 0) {
 //            this.problemTempService.truncateTable();
+            for (Map map : ipList) {
+                gatherProblem(map.get("ip").toString(),
+                        map.get("deviceName").toString(),
+                        String.valueOf(map.get("uuid")),
+                        null);
+           }
+            // 同步problemTemp
+            this.problemService.truncateTable();
+            Map params = new HashMap();
+//                    params.put("addTime", date);
+            this.problemService.copyProblemTemp(params);
+        }
+    }
+
+    @Override
+    public void gatherThreadProblem() {
+        List<Map> ipList = this.topoNodeService.queryNetworkElement();
+        if(ipList != null && ipList.size() > 0) {
+//            this.problemTempService.truncateTable();
             ExecutorService exe = Executors.newFixedThreadPool(ipList.size());
 //            Calendar calendar = Calendar.getInstance();
 //            calendar.add(Calendar.MINUTE, -1);// -1分钟之前的时间
@@ -2887,7 +2920,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                                 null);
                     }
                 }));
-           }
+            }
             if(exe != null){
                 exe.shutdown();
             }
@@ -2906,35 +2939,41 @@ public class ZabbixServiceImpl implements ZabbixService {
 
     public void gatherProblem(String ip, String deviceName, String uuid, Long time ){
         // 获取Problem
-        JSONArray problems = this.zabbixProblemService.getProblemByIp(ip, time, true);
-        if(problems.size() > 0){
-            List list = new ArrayList();
-            for(Object obj : problems){
-                JSONObject problem = JSONObject.parseObject(obj.toString());
-                ProblemTemp problemTemp = problemTempService.selectObjByObjectId(Integer.parseInt(problem.getString("objectid")));
+        JSONArray jsonArray = this.zabbixProblemService.getProblemByIp(ip, time, true);
+        if(jsonArray.size() > 0){
+            List<ProblemTemp> list = new ArrayList();
+            Map<String, ProblemTemp> map = new HashMap();
+            for(Object obj : jsonArray){
+                JSONObject jsonObject = JSONObject.parseObject(obj.toString());
+                ProblemTemp problemTemp = problemTempService.selectObjByObjectId(Integer.parseInt(jsonObject.getString("objectid")));
                 if(problemTemp != null){
+                    problemTemp.setClock(jsonObject.getLong("clock"));
+                    problemTemp.setAddTime(new Date(jsonObject.getLong("clock") * 1000));
                     // 已存在不在新增，更新状态
-                    if(!problem.getString("r_clock").equals("0")){
+                    if(!jsonObject.getString("r_clock").equals("0")){
                         problemTemp.setStatus(1);
+                        problemTemp.setRestoreTime(new Date(Long.parseLong(jsonObject.getString("r_clock")) * 1000));
+                        problemTemp.setAddTime(new Date(jsonObject.getLong("clock") * 1000));
                     }else{
                         problemTemp.setStatus(0);
+                        problemTemp.setRestoreTime(null);
                     }
                     problemTempService.update(problemTemp);
                 }else {
                   ProblemTemp instance = new ProblemTemp();
-                  Calendar cal = Calendar.getInstance();
+//                  Calendar cal = Calendar.getInstance();
 //                cal.clear(Calendar.SECOND);
-                  instance.setAddTime(cal.getTime());
-                  instance.setName(problem.getString("name"));
-                  instance.setClock(problem.getLong("clock"));
+                  instance.setAddTime(new Date(jsonObject.getLong("clock") * 1000));
+                  instance.setName(jsonObject.getString("name"));
+                  instance.setClock(jsonObject.getLong("clock"));
                   instance.setDeviceName(deviceName);
                   instance.setIp(ip);
                   instance.setUuid(uuid);
-                  instance.setSeverity(problem.getString("severity"));
-                  instance.setSuppressed(problem.getInteger("suppressed"));
-                  instance.setObjectid(problem.getInteger("objectid"));
+                  instance.setSeverity(jsonObject.getString("severity"));
+                  instance.setSuppressed(jsonObject.getInteger("suppressed"));
+                  instance.setObjectid(jsonObject.getInteger("objectid"));
                   // 记录端口信息
-                  JSONArray tags = JSONArray.parseArray(problem.getString("tags"));
+                  JSONArray tags = JSONArray.parseArray(jsonObject.getString("tags"));
                   if(tags != null && tags.size() > 0) {
                       for (Object t : tags) {
                           JSONObject tag = JSONObject.parseObject(t.toString());
@@ -2948,12 +2987,17 @@ public class ZabbixServiceImpl implements ZabbixService {
                           }
                       }
                   }
+                  map.put(jsonObject.getString("objectid"), instance);
                   list.add(instance);
-
               }
             }
-            if(list.size() > 0){
-                this.problemTempService.batchInsert(list);
+            if(map.size() > 0){
+                List<ProblemTemp> list2 = new ArrayList();
+                Set<Map.Entry<String, ProblemTemp>> entrySet = map.entrySet();
+                for(Map.Entry<String, ProblemTemp> entry : entrySet){
+                    list2.add(entry.getValue());
+                }
+                this.problemTempService.batchInsert(list2);
             }
         }
     }

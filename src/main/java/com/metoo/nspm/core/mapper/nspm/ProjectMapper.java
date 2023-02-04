@@ -12,6 +12,8 @@ public interface ProjectMapper {
 
     Project selectObjById(Long id);
 
+    Project selectObjByName(String name);
+
     List<Project> selectConditionQuery(ProjectDTO dto);
 
     List<Project> selectObjByMap(Map params);

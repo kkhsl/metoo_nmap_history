@@ -11,7 +11,7 @@ import com.metoo.nspm.core.service.nspm.ZabbixSubnetService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
-import com.metoo.nspm.entity.nspm.Rout;
+import com.metoo.nspm.entity.nspm.Route;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -112,19 +112,19 @@ public class RoutManagerController {
 //        params.put("deviceName", srcIpAddress.getDeviceName());
 //        params.put("interfaceName", srcIpAddress.getInterfaceName());
 //        params.put("mac", srcIpAddress.getMac());
-//        List<RoutTable> routTables = this.routTableService.selectObjByMap(params);
-//        RoutTable routTable = null;
+//        List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
+//        RouteTable routTable = null;
 //        if(routTables.size() > 0){
 //            routTable = routTables.get(0);
 //        }else{
-//            routTable = new RoutTable();
+//            routTable = new RouteTable();
 //        }
 //        String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
 //        BeanUtils.copyProperties(srcIpAddress, routTable, IGNORE_ISOLATOR_PROPERTIES);
 //        this.routTableService.save(routTable);
 //        /*List<IpAddress> ipAddresses = */
 //        this.routTool.generatorRout(srcIpAddress, destIp, destIpAddress.getMask());
-//        List<RoutTable> routTableList = this.routTableService.selectObjByMap(null);
+//        List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
 //        map.put("destinationDevice", destIpAddress);
 //        map.put("routTable", routTableList);
 //        return ResponseUtil.ok(map);
@@ -136,9 +136,9 @@ public class RoutManagerController {
         if(StringUtil.isEmpty(dto.getDeviceUuid())){
             return ResponseUtil.badArgument();
         }
-        Page<Rout> page = this.routService.selectConditionQuery(dto);
+        Page<Route> page = this.routService.selectConditionQuery(dto);
         if(page.getResult().size() > 0) {
-            return ResponseUtil.ok(new PageInfo<Rout>(page));
+            return ResponseUtil.ok(new PageInfo<Route>(page));
         }
         return ResponseUtil.ok();
     }

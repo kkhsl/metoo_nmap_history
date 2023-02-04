@@ -44,10 +44,10 @@
         FROM metoo_res mp
         <where>
             <if test = "parentId != null">
-                mp.parentId = #{parentId, jdbcType=BIGINT}
+                AND mp.parentId = #{parentId, jdbcType=BIGINT}
             </if>
             <if test = "level != null">
-                mp.level = #{level}
+                AND  mp.level = #{level}
             </if>
         </where>
         ORDER BY mp.level
@@ -59,11 +59,12 @@
         FROM metoo_res mp
         <where>
             <if test = "parentId != null">
-                mp.parentId = #{parentId, jdbcType=BIGINT}
+                AND  mp.parentId = #{parentId, jdbcType=BIGINT}
             </if>
             <if test = "level != null">
-                mp.level = #{level}
+                AND  mp.level = #{level}
             </if>
+          AND mp.deleteStatus = 0
         </where>
         ORDER BY mp.sequence
         ASC

@@ -2,7 +2,7 @@ package com.metoo.nspm.core.manager.myzabbix.zabbixapi;
 
 import com.metoo.nspm.core.service.nspm.IRoutService;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.entity.nspm.Rout;
+import com.metoo.nspm.entity.nspm.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +19,7 @@ public class ZabbixRoutManagerController {
     }
 
     @PostMapping
-    public Object save(@RequestBody Rout instance){
+    public Object save(@RequestBody Route instance){
         return ResponseUtil.ok(this.zabbixRoutService.save(instance));
     }
 }

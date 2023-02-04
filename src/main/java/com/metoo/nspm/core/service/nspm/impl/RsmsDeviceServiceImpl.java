@@ -7,12 +7,10 @@ import com.metoo.nspm.core.mapper.nspm.RackMapper;
 import com.metoo.nspm.core.mapper.nspm.RsmsDeviceMapper;
 import com.metoo.nspm.core.service.nspm.IRsmsDeviceService;
 import com.metoo.nspm.dto.RsmsDeviceDTO;
+import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.vo.RsmsDeviceVo;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.metoo.nspm.entity.nspm.DeviceType;
-import com.metoo.nspm.entity.nspm.RsmsDevice;
-import com.metoo.nspm.entity.nspm.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -91,6 +90,7 @@ public class RsmsDeviceServiceImpl implements IRsmsDeviceService {
             instance.setUserId(user.getId());
         }
         if(instance.getId() == null){
+            instance.setUuid(UUID.randomUUID().toString());
             instance.setAddTime(new Date());
             return this.rsmsDeviceMapper.save(instance);
         }else{
@@ -116,5 +116,22 @@ public class RsmsDeviceServiceImpl implements IRsmsDeviceService {
     @Override
     public int batchDel(String ids) {
         return this.rsmsDeviceMapper.batchDel(ids);
+    }
+
+    @Override
+    public int batchInsert(List<RsmsDevice> instances) {
+        for (RsmsDevice instance : instances) {
+            instance.setAddTime(new Date());
+            instance.setUuid(UUID.randomUUID().toString());
+            User user = ShiroUserHolder.currentUser();
+            instance.setUserId(user.getId());
+        }
+        try {
+            int i = this.rsmsDeviceMapper.batchInsert(instances);
+            return i;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }

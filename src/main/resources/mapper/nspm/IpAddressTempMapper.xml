@@ -38,6 +38,9 @@
             <if test="ipSegment != null">
                 AND ip_segment = #{ipSegment}
             </if>
+            <if test="ip != null and ip != ''">
+                AND ip = #{ip}
+            </if>
             <if test="ipSelf != null">
                 AND ip != #{ipSelf}
             </if>
@@ -175,6 +178,7 @@
                 ipAddress = #{ipAddress},
             </if>
         </set>
+        where id = #{id}
     </update>
 
     <update id="truncateTable">

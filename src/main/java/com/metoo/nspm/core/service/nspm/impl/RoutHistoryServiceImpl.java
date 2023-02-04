@@ -2,10 +2,10 @@ package com.metoo.nspm.core.service.nspm.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.metoo.nspm.core.mapper.nspm.zabbix.RoutHistoryMapper;
+import com.metoo.nspm.core.mapper.nspm.zabbix.RouteHistoryMapper;
 import com.metoo.nspm.core.service.nspm.IRoutHistoryService;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
-import com.metoo.nspm.entity.nspm.Rout;
+import com.metoo.nspm.entity.nspm.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,35 +16,35 @@ import java.util.Map;
 public class RoutHistoryServiceImpl implements IRoutHistoryService {
 
     @Autowired
-    private RoutHistoryMapper routHistoryMapper;
+    private RouteHistoryMapper routHistoryMapper;
 
     @Override
-    public Rout selectObjById(Long id) {
+    public Route selectObjById(Long id) {
         return this.routHistoryMapper.selectObjById(id);
     }
 
     @Override
-    public Page<Rout> selectConditionQuery(RoutDTO instance) {
+    public Page<Route> selectConditionQuery(RoutDTO instance) {
         if(instance == null){
             instance = new RoutDTO();
         }
-        Page<Rout> page = PageHelper.startPage(instance.getCurrentPage(), instance.getPageSize());
+        Page<Route> page = PageHelper.startPage(instance.getCurrentPage(), instance.getPageSize());
         this.routHistoryMapper.selectConditionQuery(instance);
         return page;
     }
 
     @Override
-    public Rout selectDestDevice(Map params) {
+    public Route selectDestDevice(Map params) {
         return this.routHistoryMapper.selectDestDevice(params);
     }
 
     @Override
-    public int batchDelete(List<Rout> routs) {
+    public int batchDelete(List<Route> routs) {
         return this.routHistoryMapper.batchDelete(routs);
     }
 
     @Override
-    public List<Rout> selectObjByMap(Map params) {
+    public List<Route> selectObjByMap(Map params) {
         return this.routHistoryMapper.selectObjByMap(params);
     }
 

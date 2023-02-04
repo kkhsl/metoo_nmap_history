@@ -305,7 +305,6 @@
                     IN('{#IFMASK}', '{#IFNAME}', '{#IFMAC}', '{#IFINDEX}', '{#IPADDR}','{#IPARP}', '{#IFOPERSTATUS}', '{#IFALIAS}', '{#IFRECEIVED}', '{#IFSPEED}', '{#RTIF}', '{#RTPROTO}','{#RTDEST}', '{#RTMETRIC}','{#RTNH}',
                 '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}')
                 )
-
     </select>
 
     <select id="gatherItemByTagAndIndex" parameterType="java.util.Map" resultMap="ItemArp_Result_Map">

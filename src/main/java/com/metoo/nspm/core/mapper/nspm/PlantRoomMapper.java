@@ -14,15 +14,19 @@ public interface PlantRoomMapper {
 
     PlantRoom getObjById(Long id);
 
+    PlantRoom selectObjByName(String name);
+
     List<PlantRoomVO> query(PlantRoom instance);
 
     List<PlantRoom> selectConditionQuery(PlantRoomDTO instance);
 
-    Page<PlantRoom> findBySelectAndRack(PlantRoomDTO instance);
+    List<PlantRoom> findBySelectAndRack(PlantRoomDTO instance);
 
-    Page<PlantRoom> selectObjByCard(Map params);
+    List<PlantRoom> selectObjByCard(Map params);
 
     List<PlantRoom> selectObjByMap(Map params);
+
+    List<PlantRoomVO> selectVoByMap(Map params);
 
     int save(PlantRoom instance);
 

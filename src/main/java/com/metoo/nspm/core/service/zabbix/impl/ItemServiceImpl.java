@@ -8,20 +8,17 @@ import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.service.topo.ITopoNodeService;
 import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.core.utils.network.IpUtil;
+import com.metoo.nspm.core.utils.network.IpV4Util;
 import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.ItemTag;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Service
-@Transactional
+//@Transactional
 public class ItemServiceImpl implements ItemService {
 
     @Autowired
@@ -47,32 +44,32 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private IIPAddressTempService ipAddressTempService;
 
-    public static void main(String[] args) {
-        String value = "4.10.25.65.162.32.2.0.0.1.4.10.25.248.18";
-        String[] str = value.split("\\.");
-        StringBuffer dest = new StringBuffer();
-        String mask = "";
-        StringBuffer nexthop = new StringBuffer();
-        Scanner sc = new Scanner(value).useDelimiter("\\.");
-        for(int i = 1; i<= str.length; i ++){
-            if(2 <= i && i <= 4){
-                dest.append(sc.next()).append(".");
-            }else if(i == 5){
-                dest.append(sc.next());
-            }else if(i == 6){
-                mask  = sc.next();
-            }else if(12 <= i && i <= 14){
-                nexthop.append(sc.next()).append(".");
-            }else if(i == 15){
-                nexthop.append(sc.next());
-            }else{
-                sc.next();
-            }
-        }
-        System.out.println(dest.toString());
-        System.out.println(mask);
-        System.out.println(nexthop.toString());
-    }
+//    public static void main(String[] args) {
+//        String value = "4.10.25.65.162.32.2.0.0.1.4.10.25.248.18";
+//        String[] str = value.split("\\.");
+//        StringBuffer dest = new StringBuffer();
+//        String mask = "";
+//        StringBuffer nexthop = new StringBuffer();
+//        Scanner sc = new Scanner(value).useDelimiter("\\.");
+//        for(int i = 1; i<= str.length; i ++){
+//            if(2 <= i && i <= 4){
+//                dest.append(sc.next()).append(".");
+//            }else if(i == 5){
+//                dest.append(sc.next());
+//            }else if(i == 6){
+//                mask  = sc.next();
+//            }else if(12 <= i && i <= 14){
+//                nexthop.append(sc.next()).append(".");
+//            }else if(i == 15){
+//                nexthop.append(sc.next());
+//            }else{
+//                sc.next();
+//            }
+//        }
+//        System.out.println(dest.toString());
+//        System.out.println(mask);
+//        System.out.println(nexthop.toString());
+//    }
 
     @Override
     public void gatherArpItem(Date time) {
@@ -340,7 +337,6 @@ public class ItemServiceImpl implements ItemService {
         if (ipList != null && ipList.size() > 0) {
             Map params = new HashMap();
             this.macTempService.truncateTable();
-            ExecutorService exe = Executors.newFixedThreadPool(ipList.size());
             for (Map map : ipList) {
                 String deviveName = map.get("deviceName").toString();
                 String deviceType = map.get("deviceType").toString();
@@ -433,6 +429,10 @@ public class ItemServiceImpl implements ItemService {
                             for (ItemTag tag : tags) {
                                 String value = tag.getValue();
                                 if (tag.getTag().equals("mac")) {
+//                                    格式化mac
+                                    if(!value.contains(":")){
+                                        value = value.trim().replaceAll(" ", ":");
+                                    }
                                     macTemp.setMac(value);
                                     params.clear();
                                     params.put("mac", value);
@@ -497,11 +497,12 @@ public class ItemServiceImpl implements ItemService {
                 if(itemRouteciscoTagList.size() > 0){
                     for (Item item : itemRouteciscoTagList) {
                         List<ItemTag> tags = item.getItemTags();
-                        RoutTemp routTemp = new RoutTemp();
+                        RouteTemp routTemp = new RouteTemp();
                         routTemp.setDeviceName(deviceName);
                         routTemp.setDeviceUuid(uuid);
                         routTemp.setAddTime(time);
                         if (tags != null && tags.size() > 0) {
+                            String routedest = "";
                             for (ItemTag tag : tags) {
                                 String value = tag.getValue();
                                 if(tag.getTag().equals("route")){
@@ -525,14 +526,37 @@ public class ItemServiceImpl implements ItemService {
                                             sc.next();
                                         }
                                     }
+                                    routedest = dest.toString();
                                     routTemp.setDestination(IpUtil.ipConvertDec(dest.toString()));
                                     routTemp.setMask(mask);
+                                    routTemp.setMaskBit(IpV4Util.getMaskBitByMask(mask));
                                     routTemp.setNextHop(IpUtil.ipConvertDec(nexthop.toString()));
                                 }
                                 if(tag.getTag().equals("routemetric")){
                                     routTemp.setCost(value);
                                 }
                                 if(tag.getTag().equals("routeproto")){
+                                    String v = "";
+                                    switch (value){
+                                        case "2":
+                                            v = "direct";
+                                            break;
+                                        case "3":
+                                            v = "static";
+                                            break;
+                                        case "8":
+                                            v = "rip";
+                                            break;
+                                        case "9":
+                                            v = "isis";
+                                            break;
+                                        case "13":
+                                            v = "ospf";
+                                            break;
+                                        case "14":
+                                            v = "bgp";
+                                            break;
+                                    }
                                     routTemp.setProto(value);
                                 }
                                 if(tag.getTag().equals("routeifindex")){
@@ -543,7 +567,8 @@ public class ItemServiceImpl implements ItemService {
                                 map.put("nextHop", "");
                                 map.put("flags", "D");
                             }
-                            if(!routTemp.getCost().equals("{#RTMETRIC}")){
+                            if(!routTemp.getCost().equals("{#RTMETRIC}") && !routTemp.getProto().equals("0")
+                                    && !routedest.equals("127.0.0.1")){
                                 this.routTempService.save(routTemp);
                             }
                         }
@@ -561,18 +586,21 @@ public class ItemServiceImpl implements ItemService {
                     if (itemRouteTagList.size() > 0) {
                         for (Item item : itemRouteTagList) {
                             List<ItemTag> tags = item.getItemTags();
-                            RoutTemp routTemp = new RoutTemp();
+                            RouteTemp routTemp = new RouteTemp();
                             routTemp.setDeviceName(deviceName);
                             routTemp.setDeviceUuid(uuid);
                             routTemp.setAddTime(time);
+                            String routedest = "";
                            if (tags != null && tags.size() > 0) {
                                 for (ItemTag tag : tags) {
                                     String value = tag.getValue();
                                     if(tag.getTag().equals("routedest")){
+                                        routedest = value;
                                         routTemp.setDestination(IpUtil.ipConvertDec(value));
                                     }
                                     if(tag.getTag().equals("routemask")){
                                         routTemp.setMask(value);
+                                        routTemp.setMaskBit(IpV4Util.getMaskBitByMask(value));
                                     }
                                     if(tag.getTag().equals("routemetric")){
                                         routTemp.setCost(value);
@@ -581,7 +609,28 @@ public class ItemServiceImpl implements ItemService {
                                         routTemp.setNextHop(IpUtil.ipConvertDec(value));
                                     }
                                     if(tag.getTag().equals("routeproto")){
-                                        routTemp.setProto(value);
+                                        String v = "";
+                                        switch (value){
+                                            case "2":
+                                                v = "direct";
+                                                break;
+                                            case "3":
+                                                v = "static";
+                                                break;
+                                            case "8":
+                                                v = "rip";
+                                                break;
+                                            case "9":
+                                                v = "isis";
+                                                break;
+                                            case "13":
+                                                v = "ospf";
+                                                break;
+                                            case "14":
+                                                v = "bgp";
+                                                break;
+                                        }
+                                        routTemp.setProto(v);
                                     }
                                     if(tag.getTag().equals("routeifindex")){
                                         routTemp.setInterfaceName(tag.getName());
@@ -591,7 +640,8 @@ public class ItemServiceImpl implements ItemService {
                                     map.put("nextHop", "");
                                     map.put("flags", "D");
                                 }
-                                if(!routTemp.getCost().equals("{#RTMETRIC}")){
+                                if(!routTemp.getCost().equals("{#RTMETRIC}") && !routTemp.getProto().equals("0")
+                                        && !routedest.equals("127.0.0.1")){
                                     this.routTempService.save(routTemp);
                                 }
                             }

@@ -11,6 +11,8 @@ public interface IProjectService {
 
     Project selectObjById(Long id);
 
+    Project selectObjByName(String name);
+
     Page<Project> selectObjConditionQuery(ProjectDTO dto);
 
     List<Project> selectObjByMap(Map params);

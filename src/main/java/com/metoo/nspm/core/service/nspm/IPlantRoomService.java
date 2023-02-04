@@ -12,6 +12,8 @@ public interface IPlantRoomService {
 
     PlantRoom getObjById(Long id);
 
+    PlantRoom selectObjByName(String name);
+
     // 查询所有机房
     List<PlantRoomVO> query(PlantRoom instance);
 
@@ -22,6 +24,8 @@ public interface IPlantRoomService {
     List<PlantRoom> selectObjByCard();
 
     List<PlantRoom> selectObjByMap(Map params);
+
+    List<PlantRoomVO> selectVoByMap(Map params);
 
     int save(PlantRoom instance);
 

@@ -29,7 +29,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel("权限资源实体类")
-public class Res extends IdEntity {
+public class  Res extends IdEntity {
 
     @ApiModelProperty("资源名称")
     private String name;

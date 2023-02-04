@@ -1,33 +1,42 @@
 package com.metoo.nspm.core.manager.rsms;
 
+import com.metoo.nspm.core.config.website.Properties;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
 import com.metoo.nspm.core.mapper.nspm.PlantRoomMapper;
 import com.metoo.nspm.core.service.nspm.IPlantRoomService;
 import com.metoo.nspm.core.service.nspm.IRackService;
 import com.metoo.nspm.core.service.nspm.IRsmsDeviceService;
 import com.metoo.nspm.core.utils.ResponseUtil;
+import com.metoo.nspm.core.utils.file.DownLoadFileUtil;
+import com.metoo.nspm.core.utils.logger.Log4j2Loggers;
+import com.metoo.nspm.core.utils.poi.ExcelUtils;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.PlantRoomDTO;
+import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.vo.PlantRoomVO;
 import com.github.pagehelper.Page;
-import com.metoo.nspm.entity.nspm.PlantRoom;
-import com.metoo.nspm.entity.nspm.Rack;
-import com.metoo.nspm.entity.nspm.RsmsDevice;
-import com.metoo.nspm.entity.nspm.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 @Api("机柜")
 @RequestMapping("/admin/rack")
 @RestController
 public class RackManagerController {
+
+//    private static final Logger LOG = LogManager.getLogger(RackManagerController.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(Log4j2Loggers.class);
 
     @Autowired
     private IRackService rackService;
@@ -222,4 +231,115 @@ public class RackManagerController {
         }
         return ResponseUtil.error("机柜删除失败");
     }
+
+    @ApiOperation("设备批量导入")
+    @PostMapping("/import")
+    public Object importExcel(@RequestPart("file") MultipartFile file) throws Exception {
+        if(!file.isEmpty()){
+            String fileName = file.getOriginalFilename().toLowerCase();
+            String suffix = fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+            if (suffix.equals("xlsx") || suffix.equals("xls")) {
+                List<Rack> racks = ExcelUtils.readMultipartFile(file, Rack.class);
+                // 校验表格数据是否符号要求
+                String tips = "";
+                for (Rack rack : racks) {
+                    if(!rack.getRowTips().isEmpty()){
+                        tips = rack.getRowTips();
+                        break;
+                    }
+                }
+                if(!tips.isEmpty()){
+                    return ResponseUtil.badArgument(tips);
+                }
+                if(racks.size() > 0){
+                    String msg = "";
+                    Map params = new HashMap();
+                    List<Rack> rackList = new ArrayList<>();
+                    for (int i = 0; i < racks.size(); i++) {
+                        Rack obj = racks.get(i);
+                        if(obj.getName()  == null || obj.getName().equals("")){
+                            msg = "第" + (i + 2) + "行,机柜名不能为空";
+                            break;
+                        }else{
+                            params.clear();
+                            params.put("name", obj.getName());
+                            List<RsmsDevice> deviceList = this.rsmsDeviceService.selectObjByMap(params);
+                            if(deviceList.size() > 0){
+                                msg = "第" + (i + 2) + "行, 机柜已存在";
+                                break;
+                            }
+                        }
+                        if(obj.getSize() == null || obj.getSize().equals("")){
+                            msg = "第" + (i + 2) + "行,机柜大小不能为空";
+                            break;
+                        }else if(obj.getSize() <= 0){
+                            msg = "第" + (i + 2) + "行,机柜大小不能为小于1";
+                            break;
+                        }
+                        // 机房
+                        if(obj.getPlantRoomName()!= null && !obj.getPlantRoomName().equals("")){
+                            params.clear();
+                            params.put("name", obj.getPlantRoomName());
+                            List<PlantRoom> plantRooms = this.plantRoomService.selectObjByMap(params);
+                            if(plantRooms.size() >= 1){
+                                PlantRoom plantRoom = plantRooms.get(0);
+                                obj.setPlantRoomId(plantRoom.getId());
+                                obj.setPlantRoomName(plantRoom.getName());
+                            }else{
+                                msg = "第" + (i + 2) + "行,机房不存在";
+                                break;
+                            }
+                        }
+                        // 验证资产编号唯一性
+                        if(obj.getAsset_number() != null && !obj.getAsset_number().isEmpty()){
+                            params.clear();
+                            params.put("asset_number", obj.getAsset_number());
+                            params.put("rackId", obj.getId());
+                            List<Rack> rackList1 = this.rackService.selectObjByMap(params);
+                            if(rackList1.size() > 0){
+                                Rack rsmsDevice = rackList1.get(0);
+                                return ResponseUtil.badArgument("资产编号与(" + rsmsDevice.getName() + ")机柜重复");
+                            }
+                        }
+                        rackList.add(obj);
+                    }
+
+                    if(msg.isEmpty()){
+                        int i = this.rackService.batchInsert(rackList);
+                        if(i >= 0){
+                            return ResponseUtil.ok();
+                        }else{
+                            return ResponseUtil.error();
+                        }
+                    }else{
+                        return ResponseUtil.badArgument(msg);
+                    }
+                }else{
+                    return ResponseUtil.badArgument("文件无数据");
+                }
+            }else{
+                return ResponseUtil.badArgument("文件格式错误，请使用标准模板上传");
+            }
+        }
+        return ResponseUtil.badArgument("文件不存在");
+    }
+
+    @Value("${batchImportRackFileName}")
+    private String batchImportRackFileName;
+    @Value("${batchImportFilePath}")
+    private String batchImportFilePath;
+
+    @ApiOperation("下载机柜批量上传模板")
+    @GetMapping("/downTemp")
+    public Object downTemplate(HttpServletResponse response) throws UnsupportedEncodingException {
+        boolean flag = DownLoadFileUtil.downloadTemplate(this.batchImportFilePath, this.batchImportRackFileName, response);
+        if(flag){
+            LOG.info("模板下载成功");
+            return ResponseUtil.ok();
+        }else{
+            return ResponseUtil.error();
+        }
+    }
+
+
 }

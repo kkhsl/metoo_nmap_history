@@ -1,21 +1,21 @@
 package com.metoo.nspm.core.service.nspm;
 
-import com.metoo.nspm.entity.nspm.RoutTable;
+import com.metoo.nspm.entity.nspm.RouteTable;
 
 import java.util.List;
 import java.util.Map;
 
 public interface IRoutTableService {
 
-    List<RoutTable> selectObjByMap(Map params);
+    List<RouteTable> selectObjByMap(Map params);
 
-    RoutTable selectObjByMac(String mac);
+    RouteTable selectObjByMac(String mac);
 
-    RoutTable selectObjByIp(String ip);
+    RouteTable selectObjByIp(String ip);
 
-    int save(RoutTable instance);
+    int save(RouteTable instance);
 
-    int update(RoutTable instance);
+    int update(RouteTable instance);
 
     void truncateTable();
 }

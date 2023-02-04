@@ -1,8 +1,8 @@
 package com.metoo.nspm.core.service.nspm.impl;
 
-import com.metoo.nspm.core.mapper.nspm.zabbix.RoutTableMapper;
+import com.metoo.nspm.core.mapper.nspm.zabbix.RouteTableMapper;
 import com.metoo.nspm.core.service.nspm.IRoutTableService;
-import com.metoo.nspm.entity.nspm.RoutTable;
+import com.metoo.nspm.entity.nspm.RouteTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,25 +16,25 @@ import java.util.Map;
 public class RoutTableServiceImpl implements IRoutTableService {
 
     @Autowired
-    private RoutTableMapper routTableMapper;
+    private RouteTableMapper routTableMapper;
 
     @Override
-    public List<RoutTable> selectObjByMap(Map map) {
+    public List<RouteTable> selectObjByMap(Map map) {
         return this.routTableMapper.selectObjByMap(map);
     }
 
     @Override
-    public RoutTable selectObjByMac(String mac) {
+    public RouteTable selectObjByMac(String mac) {
         return this.routTableMapper.selectObjByMac(mac);
     }
 
     @Override
-    public RoutTable selectObjByIp(String ip) {
+    public RouteTable selectObjByIp(String ip) {
         return this.routTableMapper.selectObjByIp(ip);
     }
 
     @Override
-    public int save(RoutTable instance) {
+    public int save(RouteTable instance) {
         if(instance.getId() == null){
             instance.setAddTime(new Date());
             try {
@@ -55,7 +55,7 @@ public class RoutTableServiceImpl implements IRoutTableService {
     }
 
     @Override
-    public int update(RoutTable instance) {
+    public int update(RouteTable instance) {
         return this.routTableMapper.update(instance);
     }
 

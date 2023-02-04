@@ -53,7 +53,7 @@ public class ZabbixProblemServiceImpl implements ZabbixProblemService {
                 return itemArray;
             }
         }
-        return null;
+        return new JSONArray();
     }
 
 

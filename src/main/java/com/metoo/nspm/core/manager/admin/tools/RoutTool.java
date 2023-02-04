@@ -6,8 +6,8 @@ import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.IpAddress;
 import com.metoo.nspm.entity.nspm.Mac;
-import com.metoo.nspm.entity.nspm.Rout;
-import com.metoo.nspm.entity.nspm.RoutTable;
+import com.metoo.nspm.entity.nspm.Route;
+import com.metoo.nspm.entity.nspm.RouteTable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -53,24 +53,24 @@ public class RoutTool {
             params.put("deviceName", ipAddress.getDeviceName());
             params.put("interfaceName", ipAddress.getInterfaceName());
             params.put("mac", ipAddress.getMac());
-            List<RoutTable> ipaddressRouts = this.routTableService.selectObjByMap(params);
-            RoutTable ipaddressRoutTable = null;
+            List<RouteTable> ipaddressRouts = this.routTableService.selectObjByMap(params);
+            RouteTable ipaddressRoutTable = null;
             if(ipaddressRouts.size() > 0) {
                 ipaddressRoutTable = ipaddressRouts.get(0);
             }
-            Rout rout = this.queryRout(destIp, descMask, ipAddress.getDeviceName(), time);// 查询起点路由
+            Route rout = this.queryRout(destIp, descMask, ipAddress.getDeviceName(), time);// 查询起点路由
 //            Map params = IpUtil.getNetworkIp(destIp, descMask);
 //            params.put("deviceName", ipAddress.getDeviceName());
-//            Rout rout = this.routService.selectDestDevice(params);
+//            Route rout = this.routService.selectDestDevice(params);
             if(rout != null){
                 params.clear();
                 params.put("deviceName", ipAddress.getDeviceName());
                 params.put("destination", rout.getDestination());
                 params.put("mask", rout.getMask());
-                List<Rout> nexthops = this.routService.selectNextHopDevice(params);
-//              List<Rout> nexthops = this.routService.queryDestDevice(params);
+                List<Route> nexthops = this.routService.selectNextHopDevice(params);
+//              List<Route> nexthops = this.routService.queryDestDevice(params);
                 if (nexthops.size() > 0) {
-                    outCycle:for (Rout nextHop : nexthops) {
+                    outCycle:for (Route nextHop : nexthops) {
                         if(nextHop.getNextHop() != null && !nextHop.getNextHop().equals("")){
                             String nexeIp = nextHop.getNextHop();
                             // 这里使用continue，继续进行下一个nexthop
@@ -106,11 +106,11 @@ public class RoutTool {
                                         }
                                     }
                                 }
-//                                RoutTable ipaddressRoutTable = null;
+//                                RouteTable ipaddressRoutTable = null;
 //                                if(ipaddressRouts.size() > 0){
 //                                    ipaddressRoutTable = ipaddressRouts.get(0);
 //                                }else{
-//                                    ipaddressRoutTable = new RoutTable();
+//                                    ipaddressRoutTable = new RouteTable();
 //                                }
                                 List<Map> list = null;
                                 if(ipaddressRoutTable.getRemoteDevices() != null){
@@ -136,12 +136,12 @@ public class RoutTool {
                                 params.put("deviceName", nextIpaddress.getDeviceName());
                                 params.put("interfaceName", nextIpaddress.getInterfaceName());
                                 params.put("mac", nextIpaddress.getMac());
-                                List<RoutTable> nextIpaddressRoutTables = this.routTableService.selectObjByMap(params);
-                                RoutTable nextIpaddressRoutTable = null;
+                                List<RouteTable> nextIpaddressRoutTables = this.routTableService.selectObjByMap(params);
+                                RouteTable nextIpaddressRoutTable = null;
                                 if(nextIpaddressRoutTables.size() > 0){
                                     nextIpaddressRoutTable = nextIpaddressRoutTables.get(0);
                                 }else{
-                                    nextIpaddressRoutTable = new RoutTable();
+                                    nextIpaddressRoutTable = new RouteTable();
                                 }
                                 nextIpaddressRoutTable.setRemoteDevices(JSONArray.toJSONString(list));
                                 String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
@@ -168,7 +168,7 @@ public class RoutTool {
         return null;
     }
 
-    public Rout queryRout(String descIp, String descMask, String deviceName, Date time){
+    public Route queryRout(String descIp, String descMask, String deviceName, Date time){
 //        String dm = IpUtil.bitMaskConvertMask(Integer.parseInt(descMask));
 //        Map network = IpUtil.getNetworkIp(descIp, dm);
         Map params = new HashMap();
@@ -176,16 +176,16 @@ public class RoutTool {
         params.put("descMask", descMask);
         params.put("orderBy", "mask");
         params.put("orderType", "desc");
-        List<Rout> routs = null;
+        List<Route> routs = null;
         if(time == null){
             routs = this.routService.selectObjByMap(params);
         }else{
             params.put("time", time);
             routs = this.routHistoryService.selectObjByMap(params);
         }
-        List<Rout> sameRouts = new ArrayList<>();
+        List<Route> sameRouts = new ArrayList<>();
         if(routs != null){
-            for(Rout rout : routs){
+            for(Route rout : routs){
                 if(!StringUtil.isEmpty(rout.getDestination())
                         && !StringUtil.isEmpty(rout.getMask())){
                     boolean flag = isInRange(descIp,
@@ -198,7 +198,7 @@ public class RoutTool {
                 }
             }
         }
-        Rout rout = null;
+        Route rout = null;
         if(sameRouts.size() > 0){
             rout = sameRouts.get(0);
         }

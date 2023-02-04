@@ -197,6 +197,12 @@
             <if test="name != null and name != ''">
                 AND `name` = #{name}
             </if>
+            <if test="host_name != null and host_name != ''">
+                AND `host_name` = #{host_name}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND ip = #{ip}
+            </if>
             <if test="userId != null and userId != ''">
                 AND user_id = #{userId}
             </if>
@@ -529,4 +535,42 @@
         DELETE FROM rsms_device
         WHERE id in (${ids})
     </delete>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO  rsms_device(addTime, uuid, `name`, host_name, asset_number, status, ip,
+         device_type_id, device_type_name, group_id, group_name,  vendor_id, vendor_name,
+         model, project_id, project_name, plant_room_id, plant_room_name, rack_id, rack_name, start, `size`,
+         duty, user_id, purchase_time, warranty_time)
+        VALUES
+        <foreach collection ="list" item="item" separator ="," >
+            (
+                #{item.addTime},
+                #{item.uuid},
+                #{item.name},
+                #{item.host_name},
+                #{item.asset_number},
+                #{item.status},
+                #{item.ip},
+                #{item.deviceTypeId},
+                #{item.deviceTypeName},
+                #{item.groupId},
+                #{item.groupName},
+                #{item.vendorId},
+                #{item.vendorName},
+                #{item.model},
+                #{item.projectId},
+                #{item.projectName},
+                #{item.plantRoomId},
+                #{item.plantRoomName},
+                #{item.rackId},
+                #{item.rackName},
+                #{item.start},
+                #{item.size},
+                #{item.duty},
+                #{item.userId},
+                #{item.purchase_time},
+                #{item.warranty_time}
+            )
+        </foreach>
+    </insert>
 </mapper>

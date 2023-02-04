@@ -1,20 +1,15 @@
 package com.metoo.nspm.core.websocket.api;
 
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.config.socket.NoticeWebsocketResp;
-import com.metoo.nspm.core.manager.admin.tools.DateTools;
+import com.metoo.nspm.core.config.websocket.demo.NoticeWebsocketResp;
 import com.metoo.nspm.core.manager.admin.tools.MacUtil;
 import com.metoo.nspm.core.service.nspm.IMacService;
 import com.metoo.nspm.core.service.nspm.IMacVendorService;
-import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.entity.nspm.Mac;
-import com.metoo.nspm.entity.nspm.MacVendor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

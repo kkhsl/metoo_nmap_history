@@ -64,6 +64,14 @@ public class DateTools {
         return cal.getTime();
     }
 
+    /**
+     *
+     * @param timestamp 时间戳
+     * @param format 时间格式
+     * @return
+     */
+
+
    // 字符串转时间戳
     public static long strToLong(String data, String format){
         SimpleDateFormat sdf = new SimpleDateFormat(format);

@@ -13,8 +13,10 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class Credential extends IdEntity {
 
+    public static final String 通行认证是否开启 = "通行认证是否开启";
     private Integer currentPage = 1;// 当前页数
     private Integer pageSize = 15;// 每页条数
+
     @ApiModelProperty("凭据Uuid")
     private String uuid;
     @ApiModelProperty("凭据名")
@@ -33,6 +35,13 @@ public class Credential extends IdEntity {
     private String branchName;
     @ApiModelProperty("等级")
     private String branchLevel;
+    @ApiModelProperty("通行认证是否开启")
+    private boolean trafficPermit;
+    private Long userId;
+    private String userName;
+    private Long groupId;
+    private String groupName;
+
 
     private String credentialId;
 }

@@ -1,8 +1,8 @@
 package com.metoo.nspm.core.service.nspm.impl;
 
-import com.metoo.nspm.core.mapper.nspm.zabbix.RoutTempMapper;
+import com.metoo.nspm.core.mapper.nspm.zabbix.RouteTempMapper;
 import com.metoo.nspm.core.service.nspm.IRoutTempService;
-import com.metoo.nspm.entity.nspm.RoutTemp;
+import com.metoo.nspm.entity.nspm.RouteTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,20 +14,20 @@ import java.util.Map;
 public class RoutTempServiceImpl implements IRoutTempService {
 
     @Autowired
-    private RoutTempMapper routTempMapper;
+    private RouteTempMapper routTempMapper;
 
     @Override
-    public RoutTemp selectObjById(Long id) {
+    public RouteTemp selectObjById(Long id) {
         return this.routTempMapper.selectObjById(id);
     }
 
     @Override
-    public List<RoutTemp> selectObjByMap(Map params) {
+    public List<RouteTemp> selectObjByMap(Map params) {
         return this.routTempMapper.selectObjByMap(params);
     }
 
     @Override
-    public int save(RoutTemp instance) {
+    public int save(RouteTemp instance) {
         try {
             if(instance.getId() == null){
                 if(instance.getAddTime() == null){
@@ -42,7 +42,7 @@ public class RoutTempServiceImpl implements IRoutTempService {
     }
 
     @Override
-    public int update(RoutTemp instance) {
+    public int update(RouteTemp instance) {
         try {
             return this.routTempMapper.update(instance);
         } catch (Exception e) {
@@ -67,17 +67,17 @@ public class RoutTempServiceImpl implements IRoutTempService {
     }
 
     @Override
-    public List<RoutTemp> queryDestDevice(Map params) {
+    public List<RouteTemp> queryDestDevice(Map params) {
         return this.routTempMapper.queryDestDevice(params);
     }
 
     @Override
-    public RoutTemp selectDestDevice(Map params) {
+    public RouteTemp selectDestDevice(Map params) {
         return this.routTempMapper.selectDestDevice(params);
     }
 
     @Override
-    public List<RoutTemp> selectNextHopDevice(Map params) {
+    public List<RouteTemp> selectNextHopDevice(Map params) {
         return this.routTempMapper.selectNextHopDevice(params);
     }
 

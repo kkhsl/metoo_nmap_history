@@ -34,6 +34,11 @@ public class PlantRoomServiceImpl implements IPlantRoomService {
     }
 
     @Override
+    public PlantRoom selectObjByName(String name) {
+        return this.plantRoomMapper.selectObjByName(name);
+    }
+
+    @Override
     public List<PlantRoomVO> query(PlantRoom instance) {
         if(instance == null){
             instance = new PlantRoom();
@@ -69,10 +74,19 @@ public class PlantRoomServiceImpl implements IPlantRoomService {
         return this.plantRoomMapper.selectObjByCard(params);
     }
 
-
     @Override
     public List<PlantRoom> selectObjByMap(Map params) {
+        User user = ShiroUserHolder.currentUser();
+        params.put("userId", user.getId());
         return this.plantRoomMapper.selectObjByMap(params);
+    }
+
+
+    @Override
+    public List<PlantRoomVO> selectVoByMap(Map params) {
+        User user = ShiroUserHolder.currentUser();
+        params.put("userId", user.getId());
+        return this.plantRoomMapper.selectVoByMap(params);
     }
 
     @Override

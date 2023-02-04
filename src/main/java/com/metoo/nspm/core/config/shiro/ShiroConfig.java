@@ -77,6 +77,7 @@ public class ShiroConfig {
         // websocket
         filterChainDefinitionMap.put("/websocket/api/**", "anon");
         filterChainDefinitionMap.put("/notice/**", "anon");
+        filterChainDefinitionMap.put("/webssh", "anon");
 
         filterChainDefinitionMap.put("/user/register", "anon");
         filterChainDefinitionMap.put("/swagger-ui.html", "anon");

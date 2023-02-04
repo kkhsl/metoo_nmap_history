@@ -26,7 +26,7 @@ public class TopologyDataSourceConfig {
         SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(dataSource);
         sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().
-                getResources("classpath*:mapper/*.xml"));
+                getResources("classpath*:mapper/topology/*.xml"));
         return sqlSessionFactory.getObject();
     }
 

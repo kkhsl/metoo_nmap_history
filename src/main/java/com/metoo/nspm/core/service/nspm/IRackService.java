@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface IRackService {
+
     Rack getObjById(Long id);
+
+    Rack selectObjByName(String name);
 
     Page<Rack> findBySelect(RackDTO instance);
 
@@ -17,6 +20,8 @@ public interface IRackService {
     List<Rack> selectObjByMap(Map params);
 
     int save(Rack instance);
+
+    int batchInsert(List<Rack> rackList);
 
     int update(Rack instance);
 

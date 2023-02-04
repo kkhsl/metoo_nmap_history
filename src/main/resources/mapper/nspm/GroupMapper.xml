@@ -45,6 +45,13 @@
         id = #{id, jdbcType=BIGINT}
     </select>
 
+    <select id="selectObjByName" parameterType="java.lang.String" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_group obj
+        WHERE
+        branchName = #{name}
+    </select>
+
     <select id="queryChild" parameterType="long" resultMap="Base_Result_Map">
         SELECT <include refid="Base_Column_List"/>
         FROM metoo_group obj

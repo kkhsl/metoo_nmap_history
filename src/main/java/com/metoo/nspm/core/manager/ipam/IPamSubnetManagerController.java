@@ -51,13 +51,13 @@ public class IPamSubnetManagerController {
                     List<JSONObject> list = subnet.getObject("child", List.class);
                     for(JSONObject child : list){
                         List<JSONObject> childs = child.getObject("child", List.class);
-                        SortedSet set = this.sort(childs);
+                        SortedSet set = this.sortSubnet(childs);
                         child.put("child", set);
                     }
-                    SortedSet set = this.sort(list);
+                    SortedSet set = this.sortSubnet(list);
                     subnet.put("child", set);
                 }
-                SortedSet set = this.sort(subnets);
+                SortedSet set = this.sortSubnet(subnets);
                 return ResponseUtil.ok(set);
             }
             if(data instanceof JSONObject){
@@ -90,7 +90,7 @@ public class IPamSubnetManagerController {
         return l;
     }
 
-    public SortedSet sort(List<JSONObject> list){
+    public SortedSet sortSubnet(List<JSONObject> list){
         Comparator<JSONObject> ipComparator = new Comparator<JSONObject>() {
             @Override
             public int compare(JSONObject obj1, JSONObject obj2) {
@@ -103,7 +103,6 @@ public class IPamSubnetManagerController {
         for (JSONObject object : list){
             ips.add(object);
         }
-
         return ips;
     }
 

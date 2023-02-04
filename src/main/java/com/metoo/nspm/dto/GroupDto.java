@@ -17,7 +17,7 @@ import java.util.List;
 @Accessors
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupDto extends PageDto<GroupDto> {
+public class GroupDto extends PageDto<Group> {
 
     private Date addTime;
     private Long id;

@@ -149,7 +149,6 @@ public class TopoManagerController {
         String token = sysConfig.getNspmToken();
         if(token != null){
             User currentUser = ShiroUserHolder.currentUser();
-            User user = this.userService.findByUserName(currentUser.getUsername());
             String url = "/topology-layer/layerInfo/GET/listLayers";
 //            if(dto.getBranchLevel() == null || dto.getBranchLevel().equals("")){
 //                dto.setBranchLevel(user.getGroupLevel());
@@ -884,12 +883,28 @@ public class TopoManagerController {
                         map.put("index", tag.getValue());
                         StringBuffer ip_mask = new StringBuffer();
                         if(tag.getIp() != null && !tag.getIp().equals("")){
-                            ip_mask.append(tag.getIp());
+                            String[] ips = tag.getIp().split("/");
+                            String[] masks = tag.getMask().split("/");
+                            if(ips.length == 0){
+                                map.put("ip", "");
+                            }
+                            if(ips.length == 1){
+                                ip_mask.append(tag.getIp());
+                                if(tag.getMask() != null && !tag.getMask().equals("")){
+                                    ip_mask.append("/").append(tag.getMask());
+                                }
+                                map.put("ip", ip_mask);
+                            }
+                            if(ips.length > 1 && masks.length > 1){
+                                for(int i = 0; i < ips.length; i ++){
+                                    ip_mask.append(ips[i]).append("/").append(masks[i]);
+                                    if(i + 1 < ips.length){
+                                        ip_mask .append("\n");
+                                    }
+                                }
+                                map.put("ip", ip_mask);
+                            }
                         }
-                        if(tag.getMask() != null && !tag.getMask().equals("")){
-                            ip_mask.append("/").append(tag.getMask());
-                        }
-                        map.put("ip", ip_mask);
 //                        if(tag.getIp() != null){
 //                            if(tag.getIp().split("/").length > 1){
 //                                String ip = this.getIp(tag.getIp());
@@ -995,18 +1010,28 @@ public class TopoManagerController {
                         map.put("index", tag.getValue());
                         StringBuffer ip_mask = new StringBuffer();
                         if(tag.getIp() != null && !tag.getIp().equals("")){
-                            ip_mask.append(tag.getIp());
+                            String[] ips = tag.getIp().split("/");
+                            String[] masks = tag.getMask().split("/");
+                            if(ips.length == 0){
+                                map.put("ip", "");
+                            }
+                            if(ips.length == 1){
+                                ip_mask.append(tag.getIp());
+                                if(tag.getMask() != null && !tag.getMask().equals("")){
+                                    ip_mask.append("/").append(tag.getMask());
+                                }
+                                map.put("ip", ip_mask);
+                            }
+                            if(ips.length > 1 && masks.length > 1){
+                                for(int i = 0; i < ips.length; i ++){
+                                    ip_mask.append(ips[i]).append("/").append(masks[i]);
+                                    if(i + 1 < ips.length){
+                                        ip_mask .append("\n");
+                                    }
+                                }
+                                map.put("ip", ip_mask);
+                            }
                         }
-                        if(tag.getMask() != null && !tag.getMask().equals("")){
-                            ip_mask.append("/").append(tag.getMask());
-                        }
-                        map.put("ip", ip_mask);
-//                        if(tag.getIp() != null){
-//                            if(tag.getIp().split("/").length > 1){
-//                                String ip = this.getIp(tag.getIp());
-//                                map.put("ip", ip);
-//                            }
-//                        }
                     }
                     if (tag.getTag().equals("ifup")) {
                         String status = "";
@@ -1192,7 +1217,7 @@ public class TopoManagerController {
         }
         return sb.toString();
     }
-    @ApiOperation("告警信息")
+    @ApiOperation("")
     @PostMapping("/topology-layer/problem")
     public Object problem(@RequestBody ProblemDTO dto){
         String ip = dto.getIp();

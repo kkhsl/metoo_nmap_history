@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -34,6 +35,11 @@ public class ProblemTempServiceImpl implements IProblemTempService {
     @Override
     public ProblemTemp selectObjByObjectId(Integer objectid) {
         return this.problemTempMapper.selectObjByObjectId(objectid);
+    }
+
+    @Override
+    public List<ProblemTemp> selectObjByMap(Map params) {
+        return this.problemTempMapper.selectObjByMap(params);
     }
 
     @Override

@@ -36,8 +36,18 @@ public class GroupServiceImpl implements IGroupService {
     }
 
     @Override
+    public Group selectObjByName(String name) {
+        return this.groupMapper.selectObjByName(name);
+    }
+
+    @Override
     public Group getObjByLevel(String level) {
         return this.groupMapper.getObjByLevel(level);
+    }
+
+    @Override
+    public List<Group> selectObjByMap(Map map) {
+        return this.groupMapper.selectObjByMap(map);
     }
 
     @Override

@@ -25,7 +25,7 @@ public class ZabbixApiUtil {
         ZabbixApiUtil.BASE_URL= url;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         ZabbixApi zabbixApi = new DefaultZabbixApi(BASE_URL);
         zabbixApi.init();
