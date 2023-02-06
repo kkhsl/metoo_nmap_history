@@ -661,7 +661,8 @@ public class ZabbixItemManagerController {
     @GetMapping(value = {"/obj/arp"})
     public Object arp(@RequestParam(value = "uuid", required = false) String uuid,
                       @RequestParam(value="time", required = false)
-                      @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date time){
+                      @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date time,
+                      @RequestParam(value="filter", required = false) String filter){
         Map params = new HashMap();
         List<Arp> arps = null;
         if(time == null){
@@ -669,6 +670,7 @@ public class ZabbixItemManagerController {
                 params.clear();
                 params.put("uuid", uuid);
             }
+            params.put("filter", filter);
             arps = this.arpService.selectDistinctObjByMap(params);
         }else{
             params.clear();

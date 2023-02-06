@@ -1,0 +1,3 @@
+alter table rsms_arp_temp ADD COLUMN type varchar(30) comment '类型';
+alter table rsms_arp ADD COLUMN type varchar(30) comment '类型';
+alter table rsms_arp_history ADD COLUMN type varchar(30) comment '类型';

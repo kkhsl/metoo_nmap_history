@@ -114,6 +114,22 @@ public class ItemServiceImpl implements ItemService {
                                 if (tag.getTag().equals("mac")) {
                                     arpTemp.setMac(value);
                                     ipDetail.setMac(value);
+                                }if (tag.getTag().equals("type")) {
+                                    switch (value){
+                                        case "4":
+                                            value = "static";
+                                            break;
+                                        case "3":
+                                            value = "dynamic";
+                                            break;
+                                        case "1":
+                                            value = "other";
+                                            break;
+                                        default:
+                                            value = null;
+                                            break;
+                                    }
+                                    arpTemp.setType(value);
                                 }
                                 if (tag.getTag().equals("ifindex")) {
                                     // 1, 获取ifbasic最小minIndex, minIndex + (ifindex - 1)
@@ -186,6 +202,23 @@ public class ItemServiceImpl implements ItemService {
                                     if (tag.getTag().equals("mac")) {
                                         arpTemp.setMac(value);
                                         ipDetail.setMac(value);
+                                    }
+                                    if (tag.getTag().equals("type")) {
+                                        switch (value){
+                                            case "4":
+                                                value = "static";
+                                                break;
+                                            case "3":
+                                                value = "dynamic";
+                                                break;
+                                            case "1":
+                                                value = "other";
+                                                break;
+                                            default:
+                                                value = null;
+                                                break;
+                                        }
+                                        arpTemp.setType(value);
                                     }
                                     if (tag.getTag().equals("ifindex")) {
                                         if(value != null){

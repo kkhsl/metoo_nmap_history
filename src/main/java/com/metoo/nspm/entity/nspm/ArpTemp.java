@@ -31,6 +31,8 @@ public class ArpTemp extends IdEntity {
     private String ipAddress;
     @ApiModelProperty("MAC地址")
     private String mac;
+    @ApiModelProperty("类型")
+    private String type;
     @ApiModelProperty("厂商")
     private String macVendor;
     @ApiModelProperty("标记")

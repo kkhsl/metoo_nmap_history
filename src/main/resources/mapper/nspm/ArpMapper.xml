@@ -31,7 +31,7 @@
     <sql id="Ntoa_Column_List">
         id, addTime, device_name, interface_name, INET_NTOA(ip) AS ip, mac, mac_vendor, tag,
         remote_device, remote_interface, remote_device_type, remote_device_ip, INET_NTOA(remote_ip) as remote_ip,
-        mask, uuid, remote_uuid, ip_address, device_ip, device_type
+        mask, uuid, remote_uuid, ip_address, device_ip, device_type, type
     </sql>
 
 
@@ -385,6 +385,11 @@
         FROM
             rsms_arp
         <where>
+            <if test="filter != null and filter != ''">
+                AND ip = inet_aton(#{filter})
+                <bind name="pattern" value="'%' + filter + '%'"/>
+                or CONCAT(mac, interface_name) LIKE #{pattern}
+            </if>
             <if test="acquisitionTime != null">
                 AND addTime = #{acquisitionTime}
             </if>
@@ -535,6 +540,9 @@
             <if test="index != null">
                 `index`,
             </if>
+            <if test="type != ''">
+                type,
+            </if>
         </trim>
         <trim prefix="VALUES(" suffixOverrides="," suffix=")">
             <if test="addTime != null">
@@ -584,6 +592,9 @@
             </if>
             <if test="index != null">
                 #{index},
+            </if>
+            <if test="type != ''">
+                #{type},
             </if>
         </trim>
     </insert>
@@ -638,6 +649,9 @@
             </if>
             <if test="index != null">
                 `index` = #{index},
+            </if>
+            <if test="type != ''">
+                type = #{type},
             </if>
         </set>
         where id = #{id}

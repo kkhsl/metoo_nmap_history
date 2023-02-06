@@ -397,12 +397,11 @@
         </dependency>
 
         <dependency>
-            <groupId>com.network</groupId>
-            <artifactId>commons-lang3-3.11</artifactId>
-            <version>1.0</version>
-            <!--<scope>system</scope>-->
-            <!--<systemPath>${project.basedir}/src/main/resources/lib/sso.jar</systemPath>-->
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
         </dependency>
+
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
