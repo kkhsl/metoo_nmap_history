@@ -32,6 +32,8 @@ public class MacTemp extends IdEntity {
     private String index;
     @ApiModelProperty("索引")
     private String uuid;
+    @ApiModelProperty("类型")
+    private String type;
     @ApiModelProperty("接口索引")
     private String interfaceIndex;
     @ApiModelProperty("接口ip")

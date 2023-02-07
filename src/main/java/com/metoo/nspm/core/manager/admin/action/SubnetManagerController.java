@@ -327,20 +327,6 @@ public class SubnetManagerController {
         return ResponseUtil.ok();
     }
 
-    public List<Subnet> genericSubnet(Subnet subnet){
-        List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(subnet.getId());
-        if(subnets.size() > 0){
-            for(Subnet child : subnets){
-                List<Subnet> subnetList = genericSubnet(child);
-                if(subnetList.size() > 0){
-                    child.setSubnetList(subnetList);
-                }
-            }
-            subnet.setSubnetList(subnets);
-        }
-        return subnets;
-    }
-
     @GetMapping("/add")
     public Object add(){
         List<Domain> domains = this.domainService.selectDomainAndVlanByMap(null);
@@ -527,6 +513,20 @@ public class SubnetManagerController {
 //            this.zabbixSubnetService.delete(id);
         }
         return ResponseUtil.ok();
+    }
+
+    public List<Subnet> genericSubnet(Subnet subnet){
+        List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(subnet.getId());
+        if(subnets.size() > 0){
+            for(Subnet child : subnets){
+                List<Subnet> subnetList = genericSubnet(child);
+                if(subnetList.size() > 0){
+                    child.setSubnetList(subnetList);
+                }
+            }
+            subnet.setSubnetList(subnets);
+        }
+        return subnets;
     }
 
 

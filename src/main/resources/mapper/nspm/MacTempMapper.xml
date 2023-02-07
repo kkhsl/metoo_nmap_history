@@ -234,6 +234,9 @@
             <if test="vlan != null">
                 vlan,
             </if>
+            <if test="type != ''">
+                type,
+            </if>
         </trim>
         <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
             <if test="addTime != null">
@@ -289,6 +292,9 @@
             </if>
             <if test="vlan != null">
                 #{vlan},
+            </if>
+            <if test="type != ''">
+                #{type},
             </if>
         </trim>
     </insert>
@@ -346,6 +352,9 @@
             </if>
             <if test="vlan != null">
                 vlan = #{vlan},
+            </if>
+            <if test="type != ''">
+                type = #{type},
             </if>
         </set>
         WHERE id=#{id}

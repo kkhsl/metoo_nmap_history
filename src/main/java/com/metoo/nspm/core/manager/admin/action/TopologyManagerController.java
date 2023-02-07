@@ -547,17 +547,14 @@ public class TopologyManagerController {
             }
         }
         Page<Route> page = null;
-        dto.setOrderBy("destination");
-        dto.setOrderType("asc");
+//        dto.setOrderBy("destination + 0");
+//        dto.setOrderType("asc");
         if(dto.getTime() == null){
             page = this.routService.selectConditionQuery(dto);
         }else{
             page = this.routHistoryService.selectConditionQuery(dto);
         }
-        if(page != null && page.getResult().size() > 0) {
-            return ResponseUtil.ok(new PageInfo<Route>(page));
-        }
-            else {
+        if(page == null && page.getResult().size() <= 0) {
             // 根据Ip未查询到数据（查询相同网段ip地址）
 //            String mask = IpV4Util.getMaskByMaskBit(maskBit);
 //            String network = IpV4Util.getNetwork(ip, mask);
@@ -571,7 +568,7 @@ public class TopologyManagerController {
             dto.setDestination(null);
             page = this.routService.selectConditionQuery(dto);
             List<Route> routes = page.getResult();
-            if(routes.size() > 0){
+            if (routes.size() > 0) {
                 List<Route> routList = new ArrayList<>();
                 for (Route rout : routes) {
                     boolean flag = IpUtil.ipIsInNet(ip, rout.getCidr());
@@ -579,9 +576,7 @@ public class TopologyManagerController {
                         routList.add(rout);
                     }
                 }
-
-                if(routList.size() > 0){
-                    this.sort(routList);
+                if (routList.size() > 0) {
                     int maskBitMax = routList.get(0).getMaskBit();
                     List<Route> routList2 = new ArrayList<>();
                     for (Route rout : routList) {
@@ -589,30 +584,32 @@ public class TopologyManagerController {
                             routList2.add(rout);
                         }
                     }
-                    Page<Route> page1 = new Page<>();
-                    page1.setPageNum(1);
-                    page1.setPageSize(routList2.size());
-                    page1.setPageSize(routList2.size());
-                    page1.getResult().clear();
-                    page1.getResult().addAll(routList2);
-                    return ResponseUtil.ok(new PageInfo<Route>(page1));
-                }else{
+
+                    page.setPageNum(1);
+                    page.setPageSize(routList2.size());
+                    page.setPageSize(routList2.size());
+                    page.getResult().clear();
+                    page.getResult().addAll(routList2);
+                } else {
                     dto.setDestination("0");
                     page = this.routService.selectConditionQuery(dto);
-                    return ResponseUtil.ok(new PageInfo<Route>(page));
                 }
             }
-            return ResponseUtil.ok();
         }
+        // 排序
+        this.sort(page.getResult());
+        return ResponseUtil.ok(page.getResult());
     }
 
-    public static void sort(List<Route> list){
+    public void sort(List<Route> list){
         Collections.sort(list, new Comparator<Route>() {
             @Override
             public int compare(Route o1, Route o2) {
-                int key1 = o1.getMaskBit();
-                int key2 = o2.getMaskBit();
-                return key1 < key2 ? 1 : -1; // 降序
+                String key1 = IpUtil.ipConvertDec(o1.getDestination());
+                String key2 = IpUtil.ipConvertDec(o2.getDestination());
+                Long ikey1 = Long.parseLong(key1);
+                Long ikey2 = Long.parseLong(key2);
+                return ikey1 - (ikey2) > 0 ? 1 : -1; // 升序
             }
         });
     }

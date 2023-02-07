@@ -417,6 +417,29 @@ public class ItemServiceImpl implements ItemService {
                                 if (tag.getTag().equals("ifindex")) {
                                     macTemp.setIndex(value);
                                 }
+                                if (tag.getTag().equals("attr")) {
+                                    switch (value){
+                                        case "5":
+                                            value = "static";
+                                            break;
+                                        case "4":
+                                            value = "local";
+                                            break;
+                                        case "3":
+                                            value = "dynamic";
+                                            break;
+                                        case "2":
+                                            value = "invalid";
+                                            break;
+                                        case "1":
+                                            value = "other";
+                                            break;
+                                        default:
+                                            value = null;
+                                            break;
+                                    }
+                                    macTemp.setType(value);
+                                }
                             }
                             // 保存Mac条目
                             if (macTemp.getInterfaceName() != null && !macTemp.getInterfaceName().equals("")
@@ -482,6 +505,29 @@ public class ItemServiceImpl implements ItemService {
                                 }
                                 if (tag.getTag().equals("vlan")) {
                                     macTemp.setVlan(value);
+                                }
+                                if (tag.getTag().equals("attr")) {
+                                    switch (value){
+                                        case "5":
+                                            value = "static";
+                                            break;
+                                        case "4":
+                                            value = "local";
+                                            break;
+                                        case "3":
+                                            value = "dynamic";
+                                            break;
+                                        case "2":
+                                            value = "invalid";
+                                            break;
+                                        case "1":
+                                            value = "other";
+                                            break;
+                                        default:
+                                            value = null;
+                                            break;
+                                    }
+                                    macTemp.setType(value);
                                 }
                             }
                             // 保存Mac条目

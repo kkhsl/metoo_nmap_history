@@ -53,5 +53,6 @@ public class ArpDTO extends PageDto<Arp> {
     private String segment;
     private String mask;
     private String uuid;
+    private String filter;
 
 }

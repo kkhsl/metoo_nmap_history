@@ -47,5 +47,6 @@ public class MacDTO extends PageDto<Mac> {
     private String remoteUuid;
     private String vendor;
     private String vlan;
+    private String filter;
 
 }

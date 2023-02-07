@@ -38,8 +38,12 @@
         SELECT <include refid="Base_Column_List" />
         FROM rsms_mac
         <where>
+            <if test="filter != null and filter != ''">
+                <bind name="pattern" value="'%' + filter + '%'"/>
+                OR CONCAT(ip, mac, interface_name) LIKE #{pattern}
+            </if>
             <if test="interfaceName != null and interfaceName != ''">
-                `interface_name` = #{interfaceName}
+                AND `interface_name` = #{interfaceName}
             </if>
             <if test="mac != null and mac != ''">
                 AND mac != #{mac}

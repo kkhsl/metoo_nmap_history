@@ -361,6 +361,11 @@
         FROM
          rsms_arp
         <where>
+            <if test="filter != null and filter != ''">
+                AND ip = inet_aton(#{filter})
+                <bind name="pattern" value="'%' + filter + '%'"/>
+                or CONCAT(mac, interface_name) LIKE #{pattern}
+            </if>
             <if test="deviceName != null and deviceName != ''">
                 AND device_name = #{deviceName}
             </if>

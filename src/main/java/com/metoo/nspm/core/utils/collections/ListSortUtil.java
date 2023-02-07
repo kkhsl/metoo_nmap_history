@@ -30,7 +30,7 @@ public class ListSortUtil {
     }
 
     /**
-     * 英文数字组合排序
+     * 属性：（英文+数字） 组合排序
      * @param list
      */
     public static void sortStr(List<Map<String, Object>> list){
@@ -58,7 +58,6 @@ public class ListSortUtil {
                 key2 = key2.replaceAll("\\.", "");
                 String o2_str = key2.replaceAll("[0-9]", "");
 
-
                 int n = 0;
                 if(!o1_str.equals(o2_str)){
                     n = o1_str.compareTo(o2_str);
@@ -68,9 +67,8 @@ public class ListSortUtil {
                 }
                 double i = Double.parseDouble(o1_num);
                 double j = Double.parseDouble(o2_num);
-                int m = 0;
                 if(n == 0){
-                    m = i > j ? 1:-1;
+                    int m = i > j ? 1:-1;
                     return m;
                 }else{
                     return n;

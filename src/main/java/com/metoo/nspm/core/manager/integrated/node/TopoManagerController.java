@@ -18,6 +18,7 @@ import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.collections.ListSortUtil;
 import com.metoo.nspm.core.utils.httpclient.UrlConvertUtil;
+import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.dto.TopoNodeDto;
 import com.metoo.nspm.dto.zabbix.HostDTO;
 import com.metoo.nspm.dto.zabbix.ProblemDTO;
@@ -846,7 +847,7 @@ public class TopoManagerController {
                 }
             }
         }
-        List list = new ArrayList();
+        List<Map<String, Object>> list = new ArrayList();
         if(name.equals("")){
             List<Item> itemTagList = this.itemMapper.interfaceTable(params);
             for (Item item : itemTagList) {
