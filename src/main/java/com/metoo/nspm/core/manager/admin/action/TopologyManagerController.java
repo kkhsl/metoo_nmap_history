@@ -547,8 +547,8 @@ public class TopologyManagerController {
             }
         }
         Page<Route> page = null;
-//        dto.setOrderBy("destination + 0");
-//        dto.setOrderType("asc");
+        dto.setOrderBy("destination + 0");
+        dto.setOrderType("asc");
         if(dto.getTime() == null){
             page = this.routService.selectConditionQuery(dto);
         }else{
@@ -596,8 +596,8 @@ public class TopologyManagerController {
                 }
             }
         }
-        // 排序
-        this.sort(page.getResult());
+        // 排序 使用Mysql排序
+//        this.sort(page.getResult());
         return ResponseUtil.ok(page.getResult());
     }
 
