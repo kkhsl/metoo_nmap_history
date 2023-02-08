@@ -19,6 +19,7 @@ import com.github.pagehelper.Page;
 import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.util.FileUtil;
@@ -93,7 +94,7 @@ public class RsmsDeviceManagerController {
         Page<RsmsDevice> page = this.rsmsDeviceService.selectConditionQuery(dto);
             Map map = new HashMap();
             // 设备类型
-            List<DeviceType> deviceTypeList = this.deviceTypeService.selectConditionQuery();
+            List<DeviceType> deviceTypeList = this.deviceTypeService.selectObjByMap(null);
             map.put("deviceTypeList", deviceTypeList);
             // 分组
             Group parent = this.groupService.selectObjById(user.getGroupId());
@@ -156,7 +157,7 @@ public class RsmsDeviceManagerController {
         Map map = new HashMap();
         List<Rack> rackList = this.rackService.query(null);
         // 设备类型
-        List<DeviceType> deviceTypeList = this.deviceTypeService.selectConditionQuery();
+        List<DeviceType> deviceTypeList = this.deviceTypeService.selectObjByMap(null);
         map.put("deviceTypeList", deviceTypeList);
         PlantRoomDTO dto = new PlantRoomDTO();
         dto.setCurrentPage(1);
@@ -194,7 +195,7 @@ public class RsmsDeviceManagerController {
             Rack rack = this.rackService.getObjById(rsmsDevice.getRackId());
 //            List<Rack> rackList = this.rackService.query(null);
             // 设备类型
-            List<DeviceType> deviceTypeList = this.deviceTypeService.selectConditionQuery();
+            List<DeviceType> deviceTypeList = this.deviceTypeService.selectObjByMap(null);
             PlantRoomDTO dto = new PlantRoomDTO();
             dto.setCurrentPage(1);
             dto.setPageSize(100000);
@@ -252,6 +253,26 @@ public class RsmsDeviceManagerController {
 //        return ResponseUtil.badArgument("设备不存在");
 //    }
 
+    @GetMapping("/verify")
+    public Object verifyIp(@RequestParam(value = "ip", required = true) String ip){
+        // 校验Ip
+        if(!StringUtils.isEmpty(ip)){
+            boolean flag = IpUtil.verifyIp(ip);
+            if(flag){
+                Map params = new HashMap();
+                params.clear();
+                params.put("ip", ip);
+                List<RsmsDevice> deviceListIp = this.rsmsDeviceService.selectObjByMap(params);
+                if(deviceListIp.size() > 0){
+                    return ResponseUtil.badArgument("Ip已存在");
+                }return ResponseUtil.ok();
+            }else{
+                return ResponseUtil.badArgument("Ip格式错误");
+            }
+        }
+        return ResponseUtil.badArgument("Ip为空");
+    }
+
     @OperationLogAnno(operationType= OperationType.CREATE, name = "device")
     @RequestMapping("/save")
     public Object save(@RequestBody RsmsDevice instance){
@@ -291,6 +312,7 @@ public class RsmsDeviceManagerController {
                 return ResponseUtil.badArgument("主机名与(" + rsmsDevice.getName() + ")设备重复");
             }
         }
+
 //        if(instance.getPlantRoomId() != null || instance.getRackId() != null){
 //            if(instance.getStart() <= 0 || instance.getSize() <= 0){
 //                return ResponseUtil.badArgument("未选择设备位置");

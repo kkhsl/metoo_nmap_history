@@ -85,7 +85,8 @@ public class LinkManagerController {
     }
 
     @DeleteMapping
-    public Object delete(@RequestParam(required = false, value = "id") String id, @RequestParam(required = false, value = "ids") Long[] ids){
+    public Object delete(@RequestParam(required = false, value = "id") String id,
+                         @RequestParam(required = false, value = "ids") Long[] ids){
         if(ids != null && ids.length > 0){
             int i = this.linkService.batchesDel(ids);
             if(i >= 1){

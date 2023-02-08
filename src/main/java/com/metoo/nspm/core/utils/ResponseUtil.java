@@ -105,7 +105,7 @@ public class ResponseUtil {
 
     public static Object ok(Object data){return new Result(200, "Successfully", data);}
 
-    public static Object notFound(){return new Result(404, "请求的资源不存在");}
+    public static Object notFound(){return new Result(400, "请求异常");}
 
     public static Object missingparameter(){return new Result(400, "缺少必填参数");}
 

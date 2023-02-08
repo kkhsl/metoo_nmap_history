@@ -23,6 +23,7 @@ import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.entity.zabbix.Interface;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -178,7 +179,7 @@ public class NetworkElementManagerController {
 //        params.put("types", Arrays.asList(0,1,2,5));
 //        List<DeviceType> deviceTypeList = this.deviceTypeService.selectObjByMap(params);
 //        map.put("device", deviceTypeList);
-        List<DeviceType> deviceTypeList = this.deviceTypeService.selectConditionQuery();
+        List<DeviceType> deviceTypeList = this.deviceTypeService.selectObjByMap(null);
         map.put("device", deviceTypeList);
         // 凭据列表
         List<Credential> credentials = this.credentialService.getAll();
@@ -214,6 +215,28 @@ public class NetworkElementManagerController {
         List<Credential> credentials = this.credentialService.getAll();
         map.put("credential", credentials);
         return ResponseUtil.ok(map);
+    }
+
+
+    @ApiOperation("校验Ip格式")
+    @GetMapping("/verify")
+    public Object verify(@RequestParam(value = "ip") String ip){
+        if (!StringUtils.isEmpty(ip)) {
+            // 验证ip合法性
+            boolean flag =  IpUtil.verifyIp(ip);
+            if(!flag){
+                return ResponseUtil.badArgument("ip不合法");
+            }
+            Map params = new HashMap();
+            params.put("neId", ip);
+            params.put("ip", ip);
+            List<NetworkElement> nes = this.networkElementService.selectObjByMap(params);
+            if(nes.size() > 0){
+                return ResponseUtil.badArgument("IP重复");
+            }
+            return ResponseUtil.ok();
+        }
+        return ResponseUtil.badArgument("Ip为空");
     }
 
     @PostMapping("/save")
@@ -252,20 +275,7 @@ public class NetworkElementManagerController {
                 newIp = instance.getIp();
             }
         }
-        if (instance.getIp() != null || !instance.getIp().equals("")) {
-            // 验证ip合法性
-            boolean flag =  IpUtil.verifyIp(instance.getIp());
-            if(!flag){
-                return ResponseUtil.badArgument("ip不合法");
-            }
-            Map params = new HashMap();
-            params.put("neId", instance.getId());
-            params.put("ip", instance.getIp());
-            List<NetworkElement> nes = this.networkElementService.selectObjByMap(params);
-            if(nes.size() > 0){
-                return ResponseUtil.badArgument("IP重复");
-            }
-        }
+
         // 验证设备名唯一性
         Map params = new HashMap();
         if(instance.getDeviceName() == null || instance.getDeviceName().equals("")){

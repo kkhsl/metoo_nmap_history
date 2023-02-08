@@ -23,7 +23,7 @@ public class RsmsDevice extends IdEntity {
     @ExcelImport(value = "设备名称", required = true, unique = true)
     @ApiModelProperty("名称")
     private String name;
-    @ExcelImport("IP地址")
+    @ExcelImport("IP地址(可以为空，不为空校验唯一性)")
     @ApiModelProperty("ip")
     private String ip;
     @ApiModelProperty("设备类型")

@@ -598,7 +598,7 @@ public class TopologyManagerController {
         }
         // 排序 使用Mysql排序
 //        this.sort(page.getResult());
-        return ResponseUtil.ok(page.getResult());
+        return ResponseUtil.ok(new PageInfo<Route>(page));
     }
 
     public void sort(List<Route> list){

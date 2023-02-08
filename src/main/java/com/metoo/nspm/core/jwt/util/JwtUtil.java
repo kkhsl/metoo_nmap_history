@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +35,7 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    private Logger logger = LoggerFactory.getLogger(JwtUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     private static final String SING = "!WR$%^YGB#$FS";
 
@@ -148,6 +149,7 @@ public class JwtUtil {
 
         // 创建JWT Builder
         JWTCreator.Builder builder = JWT.create();
+//        JWTCreator.Builder builder = JWT.create().withHeader(new HashMap<>());
 
         // Payload
         map.forEach((k, v) -> {
@@ -161,6 +163,7 @@ public class JwtUtil {
                 .withExpiresAt(calendar.getTime())
                 .sign(Algorithm.HMAC256(SING));*/
         System.out.println("JWTToken: " + token);
+        logger.info("Jwt Token：" + token);
         return token;
     }
 

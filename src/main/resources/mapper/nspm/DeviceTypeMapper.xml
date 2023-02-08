@@ -46,8 +46,9 @@
         where name = #{name}
     </select>
 
-    <select id="selectConditionQuery" resultType="com.metoo.nspm.entity.nspm.DeviceType">
-        select * from rsms_device_type
+    <select id="selectConditionQuery" parameterType="com.metoo.nspm.dto.DeviceTypeDTO" resultType="com.metoo.nspm.entity.nspm.DeviceType">
+        SELECT *
+        FROM rsms_device_type
     </select>
 
     <select id="selectObjByMap" resultType="com.metoo.nspm.entity.nspm.DeviceType">
@@ -59,6 +60,12 @@
                 <foreach collection="types" index = "index" item="item" separator="," open="(" close=")">
                     #{item}
                 </foreach>
+            </if>
+            <if test="name != null and name != ''">
+                AND name = #{name}
+            </if>
+            <if test="deviceTypeId != null and deviceTypeId != ''">
+                AND id != #{deviceTypeId}
             </if>
         </where>
     </select>
@@ -139,5 +146,41 @@
             ON
             w.device_type_id = t.id
     </select>
+
+    <insert id="save" parameterType="com.metoo.nspm.entity.nspm.DeviceType">
+        INSERT INTO rsms_device_type
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="name != '' and name != null ">
+                `name`,
+            </if>
+        </trim>
+        <trim prefix="VALUES(" suffixOverrides="," suffix=")">
+            <if test="name != '' and name != null ">
+                #{name}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.metoo.nspm.entity.nspm.DeviceType">
+        UPDATE rsms_device_type
+        <set>
+            <if test="name != '' and name != null ">
+                `name` = #{name},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM rsms_device_type WHERE id = #{id}
+    </delete>
+
+    <delete id="batcheDel" parameterType="java.lang.Long">
+        DELETE FROM rsms_device_type
+        WHERE id in
+        <foreach collection="array" item="item"  separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
 
 </mapper>

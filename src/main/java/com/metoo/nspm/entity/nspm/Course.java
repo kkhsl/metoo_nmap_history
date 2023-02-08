@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel("科目管理类")
+@ApiModel("科目管理")
 public class Course extends IdEntity {
 
     @ApiModelProperty("科目名称")
