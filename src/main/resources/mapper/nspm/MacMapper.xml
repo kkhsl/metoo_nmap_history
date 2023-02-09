@@ -25,7 +25,7 @@
 
     <sql id="Base_Column_List">
         id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
-        remote_device_ip, remote_device_type, remote_uuid, interface_index, ip, device_ip, device_type, vlan
+        remote_device_ip, remote_device_type, remote_uuid, interface_index, ip, device_ip, device_type, vlan, type
     </sql>
 
     <sql id="Ntoa_Column_List">
@@ -42,14 +42,14 @@
                 <bind name="pattern" value="'%' + filter + '%'"/>
                 OR CONCAT(ip, mac, interface_name) LIKE #{pattern}
             </if>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid}
+            </if>
             <if test="interfaceName != null and interfaceName != ''">
                 AND `interface_name` = #{interfaceName}
             </if>
             <if test="mac != null and mac != ''">
-                AND mac != #{mac}
-            </if>
-            <if test="uuid != null and uuid != ''">
-                AND uuid != #{uuid}
+                AND mac = #{mac}
             </if>
         </where>
     </select>

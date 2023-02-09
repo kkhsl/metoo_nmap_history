@@ -12,6 +12,7 @@ import com.metoo.nspm.core.utils.network.IpV4Util;
 import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.ItemTag;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -398,17 +399,20 @@ public class ItemServiceImpl implements ItemService {
                                 String value = tag.getValue();
                                 if (tag.getTag().equals("ifmac")) {
 //                                    格式化mac
-                                    if(!value.contains(":")){
-                                        value = value.trim().replaceAll(" ", ":");
-                                    }
-                                    macTemp.setMac(value);
-                                    params.clear();
-                                    params.put("mac", value);
-                                    List<Arp> arps = arpService.selectObjByMap(params);
-                                    if (arps.size() > 0) {
-                                        Arp arp = arps.get(0);
-                                        macTemp.setIp(arp.getIp());
-                                        macTemp.setIpAddress(arp.getIpAddress());
+                                        if(!value.contains(":")){
+                                            value = value.trim().replaceAll(" ", ":");
+                                        }
+                                        macTemp.setMac(value);
+                                        params.clear();
+                                        params.put("mac", value);
+                                        List<Arp> arps = arpService.selectObjByMap(params);
+                                        if (arps.size() > 0) {
+                                            Arp arp = arps.get(0);
+                                            macTemp.setIp(arp.getIp());
+                                            macTemp.setIpAddress(arp.getIpAddress());
+                                        }
+                                        if(StringUtils.isNotEmpty(value)){
+                                        macTemp.setType("local");
                                     }
                                 }
                                 if (tag.getTag().equals("ifname")) {
@@ -416,29 +420,6 @@ public class ItemServiceImpl implements ItemService {
                                 }
                                 if (tag.getTag().equals("ifindex")) {
                                     macTemp.setIndex(value);
-                                }
-                                if (tag.getTag().equals("attr")) {
-                                    switch (value){
-                                        case "5":
-                                            value = "static";
-                                            break;
-                                        case "4":
-                                            value = "local";
-                                            break;
-                                        case "3":
-                                            value = "dynamic";
-                                            break;
-                                        case "2":
-                                            value = "invalid";
-                                            break;
-                                        case "1":
-                                            value = "other";
-                                            break;
-                                        default:
-                                            value = null;
-                                            break;
-                                    }
-                                    macTemp.setType(value);
                                 }
                             }
                             // 保存Mac条目
@@ -545,6 +526,12 @@ public class ItemServiceImpl implements ItemService {
                                     }
                                     macTemp.setAddTime(time);
                                     macTempService.save(macTemp);
+                                }else{
+                                    if(macs.size() > 0){
+                                        MacTemp mac = macs.get(0);
+                                        mac.setType(macTemp.getType());
+                                        this.macTempService.update(mac);
+                                    }
                                 }
                             }
                         }
@@ -646,7 +633,7 @@ public class ItemServiceImpl implements ItemService {
                                 map.put("nextHop", "");
                                 map.put("flags", "D");
                             }
-                            if(!routTemp.getCost().equals("{#RTMETRIC}") && !routTemp.getProto().equals("0")
+                            if(!routTemp.getCost().equals("{#RTMETRIC}")
                                     && !routedest.equals("127.0.0.1")){
                                 this.routTempService.save(routTemp);
                             }
@@ -719,7 +706,7 @@ public class ItemServiceImpl implements ItemService {
                                     map.put("nextHop", "");
                                     map.put("flags", "D");
                                 }
-                                if(!routTemp.getCost().equals("{#RTMETRIC}") && !routTemp.getProto().equals("0")
+                                if(!routTemp.getCost().equals("{#RTMETRIC}")
                                         && !routedest.equals("127.0.0.1")){
                                     this.routTempService.save(routTemp);
                                 }

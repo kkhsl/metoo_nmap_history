@@ -1,5 +1,6 @@
 package com.metoo.nspm.core.manager.admin.action;
 
+import com.metoo.nspm.core.service.zabbix.IGatherService;
 import com.metoo.nspm.dto.GradeDto;
 import com.metoo.nspm.dto.UserDto;
 import com.metoo.nspm.entity.nspm.Accessory;
@@ -9,11 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Calendar;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/test")
@@ -70,10 +74,33 @@ public class TestDtoManagerController {
 
     }
 
-    @RequestMapping("test")
-    public Object test(@RequestBody Grade grade){
-        System.out.println(grade.toString());
-        return grade.toString();
+    @Autowired
+    private IGatherService gatherService;
+
+    @RequestMapping("gatherMac")
+    public void test(){
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        Date date = cal.getTime();
+        try {
+            this.gatherService.gatherMacItem(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping("gatherArp")
+    public void gatherArp(){
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        Date date = cal.getTime();
+        try {
+            this.gatherService.gatherArpItem(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

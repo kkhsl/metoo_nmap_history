@@ -66,10 +66,9 @@ public class MyRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         String username = (String) authenticationToken.getPrincipal();
-//        String password = new String((char[]) authenticationToken.getCredentials());
-//        System.out.println("userName：" + username + " password：" + password);
+        String password = new String((char[]) authenticationToken.getCredentials());
+        System.out.println("userName：" + username + " password：" + password);
         IUserService userService = (IUserService) ApplicationContextUtils.getBean("userServiceImpl");
-
         User user = userService.findByUserName(username);
         if(!ObjectUtils.isEmpty(user)){
             if(username.equals(user.getUsername())){

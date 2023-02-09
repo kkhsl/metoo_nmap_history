@@ -23,12 +23,12 @@
 
     <sql id="Base_Column_List">
         id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
-         remote_uuid, interface_index, ip, device_ip, device_type, vlan
+         remote_uuid, interface_index, ip, device_ip, device_type, vlan, type
     </sql>
 
     <sql id="Ntoa_Column_List">
-        id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
-         remote_uuid, interface_index, INET_NTOA(ip) AS ip, device_ip, device_type, vlan
+         id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
+         remote_uuid, interface_index, INET_NTOA(ip) AS ip, device_ip, device_type, vlan, type
     </sql>
 
 
@@ -234,7 +234,7 @@
             <if test="vlan != null">
                 vlan,
             </if>
-            <if test="type != ''">
+            <if test="type != null and  type != ''">
                 type,
             </if>
         </trim>
@@ -293,7 +293,7 @@
             <if test="vlan != null">
                 #{vlan},
             </if>
-            <if test="type != ''">
+            <if test="type != null and  type != ''">
                 #{type},
             </if>
         </trim>
@@ -353,7 +353,7 @@
             <if test="vlan != null">
                 vlan = #{vlan},
             </if>
-            <if test="type != ''">
+            <if test="type != null and  type != ''">
                 type = #{type},
             </if>
         </set>

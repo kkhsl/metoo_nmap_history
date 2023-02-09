@@ -24,12 +24,14 @@
 
     <sql id="Base_Column_List">
         id, device_name, interface_name, mask, uuid, ip, mac, mac_vendor, tag,
-        remote_device, remote_interface, remote_device_type, remote_device_ip, remote_ip, remote_uuid, ip_address, device_ip, device_type
+        remote_device, remote_interface, remote_device_type, remote_device_ip, remote_ip, remote_uuid,
+        ip_address, device_ip, device_type, type
     </sql>
 
     <sql id="Ntoa_Column_List">
         id, device_name, interface_name, INET_NTOA(ip) AS ip, mac, mask, uuid, mac_vendor, tag,
-        remote_device, remote_interface, remote_device_type, remote_device_ip, remote_ip, remote_uuid, ip_address, device_ip, device_type
+        remote_device, remote_interface, remote_device_type, remote_device_ip, remote_ip, remote_uuid,
+        ip_address, device_ip, device_type, type
     </sql>
 
 
@@ -42,7 +44,7 @@
 
     <select id="selectOppositeByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
         SELECT
-          s.id id, l.device_name remote_device, l.interface_name remote_interface, l.uuid remote_uuid,
+          s.id id, s.type type, l.device_name remote_device, l.interface_name remote_interface, l.uuid remote_uuid,
           l.ip remote_ip, l.device_ip remote_device_ip, l.device_type remote_device_type
         FROM
           (
@@ -171,7 +173,7 @@
 
     <select id="selectObjByGroupMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
        SELECT
-          id, device_name,mac, interface_name, mask, ip, tag, uuid
+          id, device_name,mac, interface_name, mask, ip, tag, uuid, type
         FROM
           rsms_arp_temp
         WHERE
@@ -509,7 +511,7 @@
             <if test="index != null">
                 `index`,
             </if>
-            <if test="type != ''">
+            <if test="type != null and type != ''">
                 type,
             </if>
         </trim>
@@ -571,7 +573,7 @@
             <if test="index != null">
                 #{index},
             </if>
-            <if test="type != ''">
+            <if test="type != null and type != ''">
                 #{type},
             </if>
         </trim>
@@ -634,7 +636,7 @@
             <if test="index != null">
                 `index` = #{index},
             </if>
-            <if test="type != ''">
+            <if test="type != null and type != ''">
                 type = #{type},
             </if>
         </set>

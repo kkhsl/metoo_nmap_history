@@ -162,7 +162,7 @@ public class LiveRoomManagerController {
     }*/
 
 
-//    @RequiresPermissions("LK:ROOM")
+    @RequiresPermissions("LK:ROOM")
     @ApiOperation("直播间列表")
     @PostMapping(value = "/list")
     public Object list(@RequestBody LiveRoomDto dto) {
