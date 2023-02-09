@@ -10,6 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+import java.util.Map;
+
 @Data
 @Accessors
 @AllArgsConstructor
@@ -54,8 +57,12 @@ public class NetworkElement extends IdEntity {
     @ApiModelProperty("是否允许连接 默认 false：不允许 true：允许")
     private boolean permitConnect;
 
+    // Excel 导入导出
     private Integer rowNum;
     private String rowData;
     private String rowTips;
+
+    // 端口列表
+    private List<Map> interfaces;
 
 }

@@ -1,17 +1,20 @@
 package com.metoo.nspm.core.websocket.api;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.metoo.nspm.core.config.websocket.demo.NoticeWebsocketResp;
 import com.metoo.nspm.core.manager.admin.tools.GroupTools;
 import com.metoo.nspm.core.manager.zabbix.tools.InterfaceUtil;
 import com.metoo.nspm.core.service.nspm.IGroupService;
+import com.metoo.nspm.core.service.nspm.IMacService;
 import com.metoo.nspm.core.service.nspm.INetworkElementService;
 import com.metoo.nspm.core.service.zabbix.IProblemService;
 import com.metoo.nspm.core.service.zabbix.InterfaceService;
 import com.metoo.nspm.core.utils.collections.ListSortUtil;
 import com.metoo.nspm.dto.NetworkElementDto;
 import com.metoo.nspm.entity.nspm.Group;
+import com.metoo.nspm.entity.nspm.Mac;
 import com.metoo.nspm.entity.nspm.NetworkElement;
 import com.metoo.nspm.entity.zabbix.Interface;
 import com.metoo.nspm.entity.zabbix.Problem;
@@ -43,6 +46,8 @@ public class NetWorkManagerApi {
     private InterfaceUtil interfaceUtil;
     @Autowired
     private IProblemService problemService;
+    @Autowired
+    private IMacService macService;
 
     @RequestMapping("/list")
     public NoticeWebsocketResp testApi(@RequestParam(value = "requestParams") String param){
@@ -324,6 +329,46 @@ public class NetWorkManagerApi {
             rep.setNoticeType("2");
             rep.setNoticeStatus(0);
         }
+        return rep;
+    }
+
+    @ApiOperation("9：网元|端口列表")
+    @GetMapping("/ne/interface/all")
+    public NoticeWebsocketResp neInterfaces(@RequestParam(value = "requestParams", required = false) String requestParams){
+        List<Object> params = JSONObject.parseObject(requestParams, List.class);
+        if(params.size() > 0){
+            Map map = new HashMap();
+            for (Object param : params) {
+                JSONObject ele = JSONObject.parseObject(param.toString());
+                String uuid = ele.getString("uuid");
+                NetworkElement ne = this.networkElementService.selectObjByUuid(uuid);
+                if(ne != null){
+                    // 端口列表
+                    String interfaces = ele.getString("interface");
+                    JSONArray array = JSONArray.parseArray(interfaces);
+                    if(array.size() > 0){
+                        for(Object inf : array){
+                            Map interfaceMap = new HashMap();
+                            Map args = new HashMap();
+                            args.put("uuid", uuid);
+                            args.put("interfaceName", inf);
+                            args.put("tag", "DT");
+                            List<Mac> macs = this.macService.selectByMap(args);
+                            interfaceMap.put(inf, macs);
+                            map.put(uuid, interfaceMap);
+                        }
+                    }
+                }
+            }
+            NoticeWebsocketResp rep = new NoticeWebsocketResp();
+            rep.setNoticeType("9");
+            rep.setNoticeStatus(1);
+            rep.setNoticeInfo(map);
+            return rep;
+        }
+        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+        rep.setNoticeType("9");
+        rep.setNoticeStatus(0);
         return rep;
     }
 }
