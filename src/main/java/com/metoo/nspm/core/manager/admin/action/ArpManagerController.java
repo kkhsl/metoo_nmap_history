@@ -40,6 +40,7 @@ public class ArpManagerController {
             if(StringUtils.isNotEmpty(dto.getOrderType())){
                 dto.setOrderType("ASC");
             }
+            dto.setMacFilter("1");
             Page<Arp> page = this.arpService.selectObjConditionQuery(dto);
             if(page.getResult().size() > 0){
                 return ResponseUtil.ok(new PageInfo<Arp>(page));

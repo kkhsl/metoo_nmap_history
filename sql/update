@@ -1,0 +1,39 @@
+alter table rsms_arp_temp ADD COLUMN type varchar(30) comment '类型';
+alter table rsms_arp ADD COLUMN type varchar(30) comment '类型';
+alter table rsms_arp_history ADD COLUMN type varchar(30) comment '类型';
+alter table rsms_mac_temp ADD COLUMN type varchar(30) comment '类型';
+alter table rsms_mac ADD COLUMN type varchar(30) comment '类型';
+alter table rsms_mac_history ADD COLUMN type varchar(30) comment '类型';
+
+# ne增加凭据
+ALTER TABLE metoo_ne ADD COLUMN connectType INT(3) DEFAULT 0 COMMENT '连接类型 默认0：ssh 1：telnet';
+ALTER TABLE metoo_ne ADD COLUMN port INT(10) COMMENT '端口';
+ALTER TABLE metoo_ne ADD COLUMN credential_id BIGINT(11) COMMENT '凭据';
+ALTER TABLE metoo_ne ADD COLUMN web_url VARCHAR(255) COMMENT 'web登录链接';
+ALTER TABLE metoo_ne ADD COLUMN permit_connect BIT(1) COMMENT '是否允许远程连接';
+
+
+# 创建凭据表
+DROP TABLE IF EXISTS metoo_credential;
+CREATE TABLE IF NOT EXISTS  metoo_credential(
+	`id` BIGINT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '主键，自增',
+	`addTime` TIMESTAMP NULL DEFAULT NULL COMMENT '添加时间',
+	`deleteStatus` INT(3) DEFAULT 0 COMMENT '逻辑删除',
+ 	`name` VARCHAR(255) COMMENT '凭据名',
+	`loginName` VARCHAR(255) COMMENT '登录名',
+	`loginPassword` VARCHAR(255) COMMENT '登录密码',
+	`enableUserName`  VARCHAR(255) COMMENT '通行用户名',
+	`enablePassword`  VARCHAR(255) COMMENT '通行密码',
+	`traffic_permit` BIT(1) COMMENT '通行认证是否开启',
+	`user_id` BIGINT(11) COMMENT '用户Id',
+	`user_name` VARCHAR(255) COMMENT '用户名',
+	`group_id` BIGINT(11) COMMENT '分组Id',
+	`group_name` VARCHAR(255) COMMENT '分组名称',
+	`uuid` VARCHAR(50) COMMENT 'uuid'
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;
+
+
+# 路由表增加字段
+ALTER TABLE rsms_rout ADD COLUMN mask_bit INT(3) COMMENT '掩码位';
+ALTER TABLE rsms_rout_temp ADD COLUMN mask_bit INT(3) COMMENT '掩码位';
+ALTER TABLE rsms_rout_history ADD COLUMN mask_bit INT(3) COMMENT '掩码位';

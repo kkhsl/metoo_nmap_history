@@ -25,7 +25,7 @@
     <sql id="Base_Column_List">
         id, addTime, device_name, interface_name, ip, mac, mac_vendor, tag,
         remote_device, remote_interface, remote_device_type, remote_device_ip, remote_ip, mask, uuid,
-        remote_uuid, ip_address, device_ip, device_type
+        remote_uuid, ip_address, device_ip, device_type, type
     </sql>
 
     <sql id="Ntoa_Column_List">
@@ -374,6 +374,9 @@
             </if>
             <if test="ip != null and ip != ''">
                 AND ip = #{ip}
+            </if>
+            <if test="macFilter != null and macFilter != ''">
+                AND mac != ''
             </if>
         </where>
         <if test = "orderBy != null and orderBy != ''">

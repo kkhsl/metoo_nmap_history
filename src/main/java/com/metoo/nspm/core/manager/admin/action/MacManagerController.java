@@ -36,6 +36,7 @@ public class MacManagerController {
         NetworkElement networkElement = this.networkElementService.selectObjByUuid(dto.getUuid());
         if(networkElement != null){
             Map params = new HashMap();
+            dto.setMacFilter("1");
             Page<Mac> page = this.macService.selectObjConditionQuery(dto);
             if(page.getResult().size() > 0){
                 for(Mac mac : page.getResult()){

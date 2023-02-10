@@ -281,6 +281,7 @@ public class ItemServiceImpl implements ItemService {
                         arpTemp.setDeviceType(deviceType);
                         arpTemp.setUuid(uuid);
                         arpTemp.setDeviceIp(ip);
+                        arpTemp.setType("static");
                         if (tags != null && tags.size() > 0) {
                             for (ItemTag tag : tags) {
                                 String value = tag.getValue();
@@ -322,6 +323,7 @@ public class ItemServiceImpl implements ItemService {
                                     ArpTemp local = localArps.get(0);
                                     local.setTag("L");
                                     local.setMask(arpTemp.getMask());
+                                    local.setType(arpTemp.getType());
                                     arpTempService.update(local);
                                 }
                             }

@@ -15,10 +15,10 @@
         </collection>
     </resultMap>
 
-    <sql id="Base_Column_List">
+    <update id="Base_Column_List">
         mrg.id roleGroupId, mrg.`name` roleGroupName, mrg.icon roleGroupIcon,mrg.url roleGroupUrl,
         mr.id roleId, mr.name roleName, mr.url roleUrl, mr.component roleComponent
-    </sql>
+    </update>
 
     <select id="findMenu" parameterType="java.lang.Long" resultMap="Base_Menu_Map">
         SELECT

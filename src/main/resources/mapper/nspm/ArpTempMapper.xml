@@ -49,7 +49,7 @@
         FROM
           (
             SELECT
-              id, device_name,mac, tag, ip, device_ip
+              id, device_name,mac, tag, ip, device_ip, type
             FROM
              rsms_arp_temp
             WHERE
