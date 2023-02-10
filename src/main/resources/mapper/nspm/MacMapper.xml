@@ -30,7 +30,7 @@
 
     <sql id="Ntoa_Column_List">
         id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
-        remote_device_ip, remote_device_type, remote_uuid, interface_index, INET_NTOA(ip) AS ip,
+        remote_device_ip, remote_device_type, remote_uuid, interface_index, ip,
         device_ip, device_type, vlan
     </sql>
 
@@ -55,6 +55,12 @@
                 AND mac != ''
             </if>
         </where>
+        <if test = "orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test = "orderType != null and orderType != ''">
+            ${orderType}
+        </if>
     </select>
 
     <select id="getObjByInterfaceName" parameterType="java.lang.String" resultMap="Base_Result_Map">
