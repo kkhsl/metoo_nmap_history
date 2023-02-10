@@ -7,6 +7,8 @@ import java.util.Map;
 
 public interface IMacTempService {
 
+    List<MacTemp> selectTagByMap(Map params);
+
     List<MacTemp> selectByMap(Map params);
 
     MacTemp getObjByInterfaceName(String interfaceName);

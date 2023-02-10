@@ -335,36 +335,52 @@ public class NetWorkManagerApi {
     @ApiOperation("9：网元|端口列表")
     @GetMapping("/ne/interface/all")
     public NoticeWebsocketResp neInterfaces(@RequestParam(value = "requestParams", required = false) String requestParams){
-        List<Object> params = JSONObject.parseObject(requestParams, List.class);
-        if(params.size() > 0){
-            Map map = new HashMap();
-            for (Object param : params) {
-                JSONObject ele = JSONObject.parseObject(param.toString());
-                String uuid = ele.getString("uuid");
-                NetworkElement ne = this.networkElementService.selectObjByUuid(uuid);
-                if(ne != null){
-                    // 端口列表
-                    String interfaces = ele.getString("interface");
-                    JSONArray array = JSONArray.parseArray(interfaces);
-                    if(array.size() > 0){
-                        for(Object inf : array){
-                            Map interfaceMap = new HashMap();
-                            Map args = new HashMap();
-                            args.put("uuid", uuid);
-                            args.put("interfaceName", inf);
-                            args.put("tag", "DT");
-                            List<Mac> macs = this.macService.selectByMap(args);
-                            interfaceMap.put(inf, macs);
-                            map.put(uuid, interfaceMap);
+        Map params = JSONObject.parseObject(requestParams, Map.class);
+        if(!params.isEmpty()){
+            Map subarea = new HashMap();
+            for(Object key : params.keySet()){
+                String value = params.get(key).toString();
+                JSONArray ary = JSONArray.parseArray(value);
+                if(ary.size() > 0){
+                    Map map = new HashMap();
+                    for (Object param : ary) {
+                        JSONObject ele = JSONObject.parseObject(param.toString());
+                        String uuid = ele.getString("uuid");
+                        NetworkElement ne = this.networkElementService.selectObjByUuid(uuid);
+                        if(ne != null){
+                            // 端口列表
+                            String interfaces = ele.getString("interface");
+                            JSONArray array = JSONArray.parseArray(interfaces);
+                            if(array.size() > 0){
+                                Map interfaceMap = new HashMap();
+                                for(Object inf : array){
+                                    Map args = new HashMap();
+                                    args.put("uuid", uuid);
+                                    args.put("interfaceName", inf);
+                                    args.put("tag", "DT");
+                                    List<Mac> macs = this.macService.selectByMap(args);
+                                    if(macs.size() > 0){
+                                        interfaceMap.put(inf, macs);
+                                    }else{
+                                        List a = new ArrayList<>();
+                                        interfaceMap.put(inf, a);
+                                    }
+                                }
+                                map.put(uuid, interfaceMap);
+                            }
                         }
                     }
+                    subarea.put(key, map);
                 }
             }
+
             NoticeWebsocketResp rep = new NoticeWebsocketResp();
             rep.setNoticeType("9");
             rep.setNoticeStatus(1);
-            rep.setNoticeInfo(map);
+            rep.setNoticeInfo(subarea);
             return rep;
+
+
         }
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
         rep.setNoticeType("9");

@@ -13,6 +13,7 @@ import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.ItemTag;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -366,6 +367,63 @@ public class ItemServiceImpl implements ItemService {
 
     }
 
+    @Test
+    public void vlanTest(){
+        String vlan = "0.0.80.121.102.104.29";
+        int i = vlan.indexOf(".");
+        System.out.println(i);
+        System.out.println(vlan.substring(0, i));
+        System.out.println(vlan.substring(i+1));
+        String mac16 = vlan.substring(i+1);
+        System.out.println(mac16);
+        String mac = mac16ConvertMac10(mac16);
+        System.out.println(mac);
+    }
+
+    public String mac16ConvertMac10(String param){
+        String[] strs = param.split("\\.");
+        StringBuffer mac = new StringBuffer();
+        for (int i = 0; i < strs.length; i++) {
+            String str = strs[i];
+            String hex = this.toHex(Integer.parseInt(str));
+            if(i+1 <strs.length){
+                mac.append(hex).append(":");
+            }else if(i+1 == strs.length){
+                mac.append(hex);
+            }
+        }
+        return mac.toString();
+    }
+
+    public String toHex(Integer str){
+        String hex = Integer.toHexString(str);
+        return hex;
+    }
+
+
+    public Map<String, String> macVlan( List<Item> vlanMacList){
+        Map map = new HashMap();
+        if(vlanMacList.size() > 0) {
+            for (Item item : vlanMacList) {
+                List<ItemTag> tags = item.getItemTags();
+                if (tags != null && tags.size() > 0) {
+                    for (ItemTag tag : tags) {
+                        String vlanMac = tag.getValue();
+                        if (tag.getTag().equals("vlan")) {
+//                            String vlanMac = "0.80.121.102.104.29";
+                            int i = vlanMac.indexOf(".");
+                            String vlan = vlanMac.substring(0, i);
+                            String mac16 = vlanMac.substring(i + 1);
+                            String mac = mac16ConvertMac10(mac16);
+                            map.put(mac, vlan);
+                        }
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
 
     @Override
     public void gatherMacItem(Date time){
@@ -378,6 +436,16 @@ public class ItemServiceImpl implements ItemService {
                 String deviceType = map.get("deviceType").toString();
                 String ip = map.get("ip").toString();
                 String uuid = map.get("uuid").toString();
+
+                params.clear();
+                params.put("ip", ip);
+                params.put("tag", "macvlan");
+                List<Item> vlanMacList = itemMapper.gatherItemByTag(params);
+                Map<String, String> macMap = null;
+                if(vlanMacList.size() > 0){
+                    macMap = this.macVlan(vlanMacList);
+                }
+
 
                 // 采集 interface Mac
                 params.clear();
@@ -405,6 +473,11 @@ public class ItemServiceImpl implements ItemService {
                                             value = value.trim().replaceAll(" ", ":");
                                         }
                                         macTemp.setMac(value);
+                                        if(macMap != null && !macMap.isEmpty()){
+                                            String vlan = macMap.get(value);
+                                            macTemp.setVlan(vlan);
+                                        }
+
                                         params.clear();
                                         params.put("mac", value);
                                         List<Arp> arps = arpService.selectObjByMap(params);
@@ -446,6 +519,8 @@ public class ItemServiceImpl implements ItemService {
                     }
                 }
 
+
+
                 // 采集Mac(Zabbix)
                 params.clear();
                 params.put("ip", ip);
@@ -473,6 +548,11 @@ public class ItemServiceImpl implements ItemService {
                                         value = value.trim().replaceAll(" ", ":");
                                     }
                                     macTemp.setMac(value);
+                                    if(macMap != null && !macMap.isEmpty()){
+                                        String vlan = macMap.get(value);
+                                        macTemp.setVlan(vlan);
+                                    }
+
                                     params.clear();
                                     params.put("mac", value);
                                     List<Arp> arps = arpService.selectObjByMap(params);
@@ -485,9 +565,6 @@ public class ItemServiceImpl implements ItemService {
                                 if (tag.getTag().equals("portindex")) {
                                     macTemp.setInterfaceName(tag.getName());
                                     macTemp.setIndex(value);
-                                }
-                                if (tag.getTag().equals("vlan")) {
-                                    macTemp.setVlan(value);
                                 }
                                 if (tag.getTag().equals("attr")) {
                                     switch (value){

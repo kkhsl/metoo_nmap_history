@@ -877,7 +877,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         // 查询剩余S条目
         params.clear();
         params.put("tag", "S");
-        List<MacTemp> residueS = this.macTempService.selectByMap(params);
+        List<MacTemp> residueS = this.macTempService.selectTagByMap(params);
         for (MacTemp obj :  residueS){
             obj.setTag("RT");
             this.macTempService.update(obj);
@@ -924,14 +924,14 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         // 标记为E
         params.clear();
         params.put("tag", "E");
-        List<MacTemp> emacList = this.macTempService.selectByMap(params);
+        List<MacTemp> emacList = this.macTempService.selectTagByMap(params);
         if(emacList.size() > 0){
             for(MacTemp mac : emacList){
                 params.clear();
                 params.put("macId", mac.getId());
                 params.put("other", "L");
                 params.put("mac", mac.getMac());
-                List<MacTemp> macList = this.macTempService.selectByMap(params);
+                List<MacTemp> macList = this.macTempService.selectTagByMap(params);
                 if(macList.size() == 0){
                     mac.setTag("DE");
                     this.macTempService.update(mac);

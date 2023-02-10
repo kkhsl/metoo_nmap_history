@@ -8,6 +8,10 @@ import java.util.Map;
 
 @Mapper
 public interface MacTempMapper {
+
+
+    List<MacTemp> selectTagByMap(Map params);
+
     List<MacTemp> selectByMap(Map params);
 
     MacTemp getObjByInterfaceName(String interfaceName);

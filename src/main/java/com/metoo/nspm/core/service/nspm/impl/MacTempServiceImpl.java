@@ -20,6 +20,11 @@ public class MacTempServiceImpl implements IMacTempService {
     private MacTempMapper macTempMapper;
 
     @Override
+    public List<MacTemp> selectTagByMap(Map params) {
+        return this.macTempMapper.selectTagByMap(params);
+    }
+
+    @Override
     public List<MacTemp> selectByMap(Map map) {
         return this.macTempMapper.selectByMap(map);
     }
@@ -69,9 +74,6 @@ public class MacTempServiceImpl implements IMacTempService {
     @Override
     public int update(MacTemp instance) {
         if(instance.getId() != null){
-            if(instance.getIp() != null && instance.getIp().contains(".")){
-                instance.setIp(IpUtil.ipConvertDec(instance.getIp()));
-            }
             return this.macTempMapper.update(instance);
         }
         return 0;

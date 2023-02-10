@@ -7,11 +7,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="metoo_nspm" />
+        <module name="metoo_nmap" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="metoo_nspm" target="1.8" />
+      <module name="metoo_nmap" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

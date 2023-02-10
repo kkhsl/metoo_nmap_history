@@ -303,7 +303,7 @@
                     WHERE
                      item_tag.`value`
                     IN('{#IFMASK}', '{#IFNAME}', '{#IFMAC}', '{#IFINDEX}', '{#IPADDR}','{#IPARP}', '{#IFOPERSTATUS}', '{#IFALIAS}', '{#IFRECEIVED}', '{#IFSPEED}', '{#RTIF}', '{#RTPROTO}','{#RTDEST}', '{#RTMETRIC}','{#RTNH}',
-                '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}')
+                '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}', '{#SNMPINDEX}')
                 )
     </select>
 

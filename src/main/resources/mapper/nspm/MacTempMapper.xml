@@ -28,7 +28,7 @@
 
     <sql id="Ntoa_Column_List">
          id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
-         remote_uuid, interface_index, INET_NTOA(ip) AS ip, device_ip, device_type, vlan, type
+         remote_uuid, interface_index, ip, device_ip, device_type, vlan, type
     </sql>
 
 
@@ -132,9 +132,49 @@
         </where>
     </select>
 
+    <select id="selectTagByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+        SELECT *
+        FROM rsms_mac_temp
+        <where>
+            <if test="mac != null">
+                AND mac = #{mac}
+            </if>
+            <if test="deviceName != null">
+                AND device_name = #{deviceName}
+            </if>
+            <if test="interfaceName != null">
+                AND interface_name = #{interfaceName}
+            </if>
+            <if test="tag != null">
+                AND tag = #{tag}
+            </if>
+            <if test="other != null">
+                AND tag != #{other}
+            </if>
+            <if test="uuid != null">
+                AND uuid = #{uuid}
+            </if>
+            <if test="tags != null">
+                AND tag in
+                <foreach collection="tags" index = "index" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="ip != null">
+                AND ip = #{ip}
+            </if>
+            <if test="remoteDevice != null">
+                AND remote_device = #{remoteDevice}
+            </if>
+            <if test="macId != null and macId != ''">
+                AND id != #{macId}
+            </if>
+        </where>
+    </select>
+
     <select id="getMacUS" parameterType="java.util.Map" resultMap="Base_Result_Map">
        SELECT
-         *
+         id
         FROM
             rsms_mac_temp
         WHERE
@@ -162,7 +202,7 @@
 
     <select id="macJoinArp" parameterType="java.lang.String" resultMap="Base_Result_Map">
         SELECT
-            mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, arp.ip ip
+            mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, Inet_ntoa(arp.ip) ip
         FROM
             rsms_mac_temp mac
         JOIN
@@ -302,55 +342,55 @@
     <update id="update" parameterType="com.metoo.nspm.entity.nspm.MacTemp">
         UPDATE rsms_mac_temp
         <set>
-            <if test="deviceName != null">
+            <if test="deviceName != null and deviceName != ''">
                 device_name = #{deviceName},
             </if>
-            <if test="deviceIp != null">
+            <if test="deviceIp != null and deviceIp != ''">
                 device_ip = #{deviceIp},
             </if>
-            <if test="deviceType != null">
+            <if test="deviceType != null and deviceType != ''">
                 device_type = #{deviceType},
             </if>
-            <if test="interfaceName != null">
+            <if test="interfaceName != null and interfaceName != ''">
                 interface_name = #{interfaceName},
             </if>
-            <if test="mac != null">
+            <if test="mac != null and mac != ''">
                 mac = #{mac},
             </if>
             <if test="index != null">
                 `index` = #{index},
             </if>
-            <if test="tag != null">
+            <if test="tag != null and tag != ''">
                 tag = #{tag},
             </if>
-            <if test="uuid != null">
+            <if test="uuid != null and uuid != ''">
                 uuid = #{uuid},
             </if>
-            <if test="remoteDevice != null">
+            <if test="remoteDevice != null and remoteDevice != ''">
                 remote_device =  #{remoteDevice},
             </if>
-            <if test="remoteInterface != null">
+            <if test="remoteInterface != null and remoteInterface != ''">
                 remote_interface = #{remoteInterface},
             </if>
-            <if test="remoteDeviceIp != null">
+            <if test="remoteDeviceIp != null and remoteDeviceIp != ''">
                 remote_device_ip = #{remoteDeviceIp},
             </if>
-            <if test="remoteDeviceType != null">
+            <if test="remoteDeviceType != null and remoteDeviceType != ''">
                 remote_device_type = #{remoteDeviceType},
             </if>
-            <if test="remoteUuid != null">
+            <if test="remoteUuid != null and remoteUuid != ''">
                 remote_uuid = #{remoteUuid},
             </if>
-            <if test="interfaceIndex != null">
+            <if test="interfaceIndex != null and interfaceIndex != ''">
                 interface_index = #{interfaceIndex},
             </if>
-            <if test="ip != null">
+            <if test="ip != null and ip != ''">
                 ip = #{ip},
             </if>
-            <if test="ipAddress != null">
+            <if test="ipAddress != null and ipAddress != ''">
                 ip_address = #{ipAddress},
             </if>
-            <if test="vlan != null">
+            <if test="vlan != null and vlan != ''">
                 vlan = #{vlan},
             </if>
             <if test="type != null and  type != ''">

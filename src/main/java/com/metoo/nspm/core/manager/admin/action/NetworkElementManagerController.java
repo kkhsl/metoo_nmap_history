@@ -165,7 +165,7 @@ public class NetworkElementManagerController {
     }
 
     @ApiOperation("网元|端口列表")
-    @GetMapping("/ne/interface/all")
+    @GetMapping("/interface/all")
     public Object neInterfaceAll(){
         List<NetworkElement> networkElements = this.networkElementService.selectObjAll();
         for (NetworkElement networkElement : networkElements) {
