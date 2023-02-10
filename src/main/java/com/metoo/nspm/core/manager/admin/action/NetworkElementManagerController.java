@@ -7,10 +7,12 @@ import com.github.pagehelper.util.StringUtil;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.GroupTools;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
+import com.metoo.nspm.core.mapper.zabbix.ItemMapper;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixHostService;
 import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.service.zabbix.InterfaceService;
 import com.metoo.nspm.core.utils.ResponseUtil;
+import com.metoo.nspm.core.utils.collections.ListSortUtil;
 import com.metoo.nspm.core.utils.file.DownLoadFileUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.core.utils.poi.ExcelUtil;
@@ -21,6 +23,8 @@ import com.metoo.nspm.dto.NetworkElementDto;
 import com.github.pagehelper.Page;
 import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.entity.zabbix.Interface;
+import com.metoo.nspm.entity.zabbix.Item;
+import com.metoo.nspm.entity.zabbix.ItemTag;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -158,6 +162,126 @@ public class NetworkElementManagerController {
     public Object all(){
         List<NetworkElement> networkElements = this.networkElementService.selectObjAll();
         return ResponseUtil.ok(networkElements);
+    }
+
+    @ApiOperation("网元|端口列表")
+    @GetMapping("/ne/interface/all")
+    public Object neInterfaceAll(){
+        List<NetworkElement> networkElements = this.networkElementService.selectObjAll();
+        for (NetworkElement networkElement : networkElements) {
+            networkElement.setInterfaces(this.interfaceAll(networkElement));
+        }
+        return ResponseUtil.ok(networkElements);
+    }
+
+
+    @Autowired
+    private ItemMapper itemMapper;
+
+    public List<Map> interfaceAll(NetworkElement ne){
+        if(ne != null){
+            String ip = ne.getIp();
+            Map params = new HashMap();
+            Map<String, Integer> ports = new HashMap();
+            String names = ne.getInterfaceNames();
+            if(!StringUtil.isEmpty(names)){
+                ports = JSONObject.parseObject(names, Map.class);
+            }
+            params.clear();
+            params.put("ip", ip);
+            params.put("index", "ifindex");
+            String name = "";
+            if(ip != null){
+                params.clear();
+                params.put("ip", ip);
+                List<NetworkElement> networkElements = this.networkElementService.selectObjByMap(params);
+                if(networkElements.size() > 0){
+                    NetworkElement networkElement = networkElements.get(0);
+                    DeviceType deviceType = this.deviceTypeService.selectObjById(networkElement.getDeviceTypeId());
+                    if(deviceType.getType() == 10){
+                        name = networkElement.getInterfaceName();
+                    }
+                }
+            }
+            List list = new ArrayList();
+            if(name.equals("")){
+                List<com.metoo.nspm.entity.zabbix.Item> itemTagList = this.itemMapper.interfaceTable(params);
+                for (Item item : itemTagList) {
+                    List<ItemTag> tags = item.getItemTags();
+                    Map map = new HashMap();
+                    map.put("description", "");
+                    map.put("name", "");
+                    map.put("ip", "");
+                    map.put("mask", "");
+                    map.put("status", "");
+                    map.put("triggerid", "");
+                    for (ItemTag tag : tags) {
+                        if (tag.getTag().equals("ifname")) {
+                            map.put("name", StringUtil.isEmpty(tag.getValue()) ? "" : tag.getValue());
+                            for(Map.Entry<String, Integer> entry : ports.entrySet()){
+                                if(tag.getValue().equals(entry.getKey())){
+                                    map.put("triggerid", entry.getValue());
+                                    break;
+                                }
+                            }
+                        }
+                        if (tag.getTag().equals("ifindex")) {
+                            map.put("index", tag.getValue());
+                            StringBuffer ip_mask = new StringBuffer();
+                            if(tag.getIp() != null && !tag.getIp().equals("")){
+                                String[] ips = tag.getIp().split("/");
+                                String[] masks = tag.getMask().split("/");
+                                if(ips.length == 0){
+                                    map.put("ip", "");
+                                }
+                                if(ips.length == 1){
+                                    ip_mask.append(tag.getIp());
+                                    if(tag.getMask() != null && !tag.getMask().equals("")){
+                                        ip_mask.append("/").append(tag.getMask());
+                                    }
+                                    map.put("ip", ip_mask);
+                                }
+                                if(ips.length > 1 && masks.length > 1){
+                                    for(int i = 0; i < ips.length; i ++){
+                                        ip_mask.append(ips[i]).append("/").append(masks[i]);
+                                        if(i + 1 < ips.length){
+                                            ip_mask .append("\n");
+                                        }
+                                    }
+                                    map.put("ip", ip_mask);
+                                }
+                            }
+                        }
+                        if (tag.getTag().equals("ifup")) {
+                            String status = "";
+                            switch (tag.getValue()) {
+                                case "1":
+                                    status = "up";
+                                    break;
+                                case "2":
+                                    status = "down";
+                                    break;
+                                default:
+                                    status = "unknown";
+                            }
+                            map.put("status", status);
+                        }
+                    }
+                    list.add(map);
+                }
+            }else{
+                Map map = new HashMap();
+                map.put("name", name);
+                map.put("status", "up");
+                map.put("ip",ip);
+                list.add(map);
+            }
+            if(list != null && list.size() > 0){
+                ListSortUtil.sortStr(list);
+            }
+            return list;
+        }
+        return new ArrayList<>();
     }
 
     @GetMapping("/add")
