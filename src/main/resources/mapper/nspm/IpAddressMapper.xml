@@ -35,6 +35,9 @@
         SELECT <include refid="Base_Column_List"/>
         FROM rsms_ip
         <where>
+            <if test="ip != null">
+                AND ip = #{ip}
+            </if>
             <if test="ipSegment != null">
                 AND ip_segment = #{ipSegment}
             </if>
@@ -76,7 +79,6 @@
         ORDER BY
             mask
         DESC
-          LIMIT 1
     </select>
 
     <insert id="save" parameterType="com.metoo.nspm.entity.nspm.IpAddress">

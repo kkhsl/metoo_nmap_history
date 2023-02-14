@@ -33,7 +33,7 @@ public class IpAddressHistoryServiceImpl implements IIPAddressHistoryService {
     }
 
     @Override
-    public IpAddress querySrcDevice(Map params) {
+    public List<IpAddress> querySrcDevice(Map params) {
         return this.ipAddressHistoryMapper.querySrcDevice(params);
     }
 

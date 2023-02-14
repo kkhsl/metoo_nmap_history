@@ -5,18 +5,22 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.metoo.nspm.core.config.websocket.demo.NoticeWebsocketResp;
 import com.metoo.nspm.core.manager.admin.tools.GroupTools;
+import com.metoo.nspm.core.manager.admin.tools.MacUtil;
 import com.metoo.nspm.core.manager.zabbix.tools.InterfaceUtil;
+import com.metoo.nspm.core.service.api.zabbix.ZabbixService;
 import com.metoo.nspm.core.service.nspm.IGroupService;
 import com.metoo.nspm.core.service.nspm.IMacService;
 import com.metoo.nspm.core.service.nspm.INetworkElementService;
 import com.metoo.nspm.core.service.zabbix.IProblemService;
 import com.metoo.nspm.core.service.zabbix.InterfaceService;
+import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.core.utils.collections.ListSortUtil;
 import com.metoo.nspm.dto.NetworkElementDto;
 import com.metoo.nspm.entity.nspm.Group;
 import com.metoo.nspm.entity.nspm.Mac;
 import com.metoo.nspm.entity.nspm.NetworkElement;
 import com.metoo.nspm.entity.zabbix.Interface;
+import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.Problem;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +52,13 @@ public class NetWorkManagerApi {
     private IProblemService problemService;
     @Autowired
     private IMacService macService;
+    @Autowired
+    private ItemService itemService;
+    @Autowired
+    private ZabbixService zabbixService;
+    @Autowired
+    private MacUtil macUtil;
+
 
     @RequestMapping("/list")
     public NoticeWebsocketResp testApi(@RequestParam(value = "requestParams") String param){
@@ -354,17 +365,59 @@ public class NetWorkManagerApi {
                             if(array.size() > 0){
                                 Map interfaceMap = new HashMap();
                                 for(Object inf : array){
+                                    Map flux_terminal = new HashMap();
                                     Map args = new HashMap();
                                     args.put("uuid", uuid);
                                     args.put("interfaceName", inf);
                                     args.put("tag", "DT");
+                                    args.put("uuid", uuid);
+                                    args.put("orderBy", "ip");
+                                    args.put("orderType", "ASC");
                                     List<Mac> macs = this.macService.selectByMap(args);
                                     if(macs.size() > 0){
-                                        interfaceMap.put(inf, macs);
+                                        macUtil.macJoint(macs);
+                                        flux_terminal.put("terminal", macs);
                                     }else{
                                         List a = new ArrayList<>();
-                                        interfaceMap.put(inf, a);
+                                        flux_terminal.put("terminal", a);
                                     }
+
+
+                                    // 流量
+                                    Map flux = new HashMap();
+                                    args.clear();
+                                    args.put("ip", ne.getIp());
+                                    // 采集ifbasic,然后查询端口对应的历史流量
+                                    args.put("tag", "ifreceived");
+                                    args.put("available", 1);
+                                    List<Item> items = this.itemService.selectTagByMap(args);
+//                                Map ele = new HashMap();
+                                    if(items.size() > 0){
+                                        for (Item item : items) {
+                                            String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                                            flux.put("received", lastvalue);
+                                            break;
+                                        }
+                                    } else{
+                                        flux.put("received", "0");
+                                    }
+                                    args.clear();
+                                    args.put("ip", ne.getIp());
+                                    // 采集ifbasic,然后查询端口对应的历史流量
+                                    args.put("tag", "ifsent");
+                                    args.put("available", 1);
+                                    List<Item> ifsents = this.itemService.selectTagByMap(args);
+                                    if(ifsents.size() > 0){
+                                        for (Item item : ifsents) {
+                                            String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                                            flux.put("sent", lastvalue);
+                                            break;
+                                        }
+                                    }else{
+                                        flux.put("sent", "0");
+                                    }
+                                    flux_terminal.put("flux", flux);
+                                    interfaceMap.put(inf, flux_terminal);
                                 }
                                 map.put(uuid, interfaceMap);
                             }

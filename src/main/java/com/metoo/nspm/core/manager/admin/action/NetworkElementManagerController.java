@@ -276,9 +276,9 @@ public class NetworkElementManagerController {
                 map.put("ip",ip);
                 list.add(map);
             }
-            if(list != null && list.size() > 0){
-                ListSortUtil.sortStr(list);
-            }
+//            if(list != null && list.size() > 0){
+//                ListSortUtil.sortStr(list);
+//            }
             return list;
         }
         return new ArrayList<>();

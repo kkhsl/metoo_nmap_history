@@ -123,12 +123,12 @@ public class GlobalExceptionHandler {
         return ResponseUtil.badArgument();
     }
 
-    @ExceptionHandler(value = NumberFormatException.class)
-    @ResponseBody
-    public Object NumberFormatException(NumberFormatException e){
-        return ResponseUtil.badArgument("数据类型错误");
-    }
-
+//    @ExceptionHandler(value = NumberFormatException.class)
+//    @ResponseBody
+//    public Object NumberFormatException(NumberFormatException e){
+//        return ResponseUtil.badArgument("数据类型错误");
+//    }
+//
 
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     @ResponseBody

@@ -21,5 +21,5 @@ public interface IIPAddressService {
 
     void copyIpAddressTemp();
 
-    IpAddress querySrcDevice(Map params);
+    List<IpAddress> querySrcDevice(Map params);
 }

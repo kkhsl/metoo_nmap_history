@@ -58,7 +58,7 @@ public class IpAddressServiceImpl implements IIPAddressService {
     }
 
     @Override
-    public IpAddress querySrcDevice(Map params) {
+    public List<IpAddress> querySrcDevice(Map params) {
         return this.ipAddressMapper.querySrcDevice(params);
     }
 }

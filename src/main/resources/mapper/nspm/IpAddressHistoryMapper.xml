@@ -89,7 +89,6 @@
         ORDER BY
             mask
         DESC
-          LIMIT 1
     </select>
 
     <delete id="batchDelete" parameterType="com.metoo.nspm.entity.nspm.IpAddress">

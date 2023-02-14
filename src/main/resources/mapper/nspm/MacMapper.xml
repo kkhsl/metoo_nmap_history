@@ -167,6 +167,12 @@
                 AND id != #{macId}
             </if>
         </where>
+        <if test = "orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test = "orderType != null and orderType != ''">
+            ${orderType}
+        </if>
     </select>
 
     <select id="getMacUS" parameterType="java.util.Map" resultMap="Base_Result_Map">
@@ -207,11 +213,11 @@
         ON
             mac.mac=arp.mac
         WHERE
-            mac.tag = 'RT'
+            (mac.tag = 'RT'
         OR
-            mac.tag = 'UT'
+            mac.tag = 'UT')
+				and arp.ip is not null
         order by mac.device_name desc, mac.interface_name desc
-
     </select>
 
     <insert id="save" parameterType="com.metoo.nspm.entity.nspm.Mac">

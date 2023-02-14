@@ -794,7 +794,7 @@ public class ZabbixItemManagerController {
         String mask2 = IpUtil.bitMaskConvertMask(mask);
         Map params = IpUtil.getNetworkIp(ip, mask2);
         // 起点设备
-        IpAddress ipaddress = this.ipAddressServie.querySrcDevice(params);
+        List<IpAddress> ipaddress = this.ipAddressServie.querySrcDevice(params);
         return ResponseUtil.ok(ipaddress);
     }
 
@@ -811,7 +811,7 @@ public class ZabbixItemManagerController {
             // 根据下一跳查询ipaddress(设备)
             params = IpUtil.getNetworkIp(rout.getNextHop(), "255.255.255.255");
             // 起点设备
-            IpAddress ipaddress = this.ipAddressServie.querySrcDevice(params);
+            List<IpAddress> ipaddress = this.ipAddressServie.querySrcDevice(params);
         }
         return ResponseUtil.ok(nexthops);
     }
@@ -822,74 +822,74 @@ public class ZabbixItemManagerController {
      * @param destIp 终点Ip
      * @return
      */
-    @RequestMapping("/routTable")
-    public Object routTable(String srcIp, String destIp){
-        if(StringUtil.isEmpty(srcIp)){
-            return ResponseUtil.badArgument("起点Ip不能为空");
-        }
-        if(!IpUtil.verifyIp(srcIp)){
-            return ResponseUtil.badArgument("起点Ip格式错误");
-        }
-        if(StringUtil.isEmpty(destIp)){
-            return ResponseUtil.badArgument("终点Ip不能为空");
-        }
-        if(!IpUtil.verifyIp(destIp)){
-            return ResponseUtil.badArgument("终点Ip格式错误");
-        }
-        Map origin = this.subnetTool.verifyIpBelongSubnet(srcIp);
-        if(origin == null || origin.isEmpty()){
-            return ResponseUtil.badArgument("起点Ip不存在");
-        }
-        IpAddress srcIpAddress = this.ipAddressServie.querySrcDevice(origin);
-        if(srcIpAddress == null){
-            return ResponseUtil.badArgument("起点Ip不存在");
-        }
-        // 获取起点ip网络地址和广播地址
-        Map dest = this.subnetTool.verifyIpBelongSubnet(destIp);
-        if(dest == null || dest.isEmpty()){
-            return ResponseUtil.badArgument("终点Ip不存在");
-        }
-        // 终点设备
-        IpAddress destIpAddress = this.ipAddressServie.querySrcDevice(dest);
-        if(destIpAddress == null){
-            return ResponseUtil.badArgument("终点Ip不存在");
-        }
-        Map map = new HashMap();
-        map.put("destinationDevice", destIpAddress);
-        this.routTableService.truncateTable();
-        Map params = new HashMap();
-        // 保存起点设备
-        params.clear();
-        params.put("ip", srcIpAddress.getIp());
-        params.put("mask", srcIpAddress.getMask());
-        params.put("deviceName", srcIpAddress.getDeviceName());
-        params.put("interfaceName", srcIpAddress.getInterfaceName());
-        params.put("mac", srcIpAddress.getMac());
-        List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
-        RouteTable srcRoutTable = null;
-        if(routTables.size() > 0){
-            srcRoutTable = routTables.get(0);
-        }else{
-            srcRoutTable = new RouteTable();
-        }
-        String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
-        BeanUtils.copyProperties(srcIpAddress, srcRoutTable, IGNORE_ISOLATOR_PROPERTIES);
-        this.routTableService.save(srcRoutTable);
-        /*List<IpAddress> ipAddresses = */
-        List<RouteTable> routers = new ArrayList<>();
-        Map<String, RouteTable> routersMap = new HashMap();
-        this.generatorRout1(srcIpAddress, destIp, destIpAddress.getMask(), routersMap);
-        if(!routersMap.isEmpty()){
-            List<RouteTable> a = routersMap.entrySet().stream().map(m -> m.getValue()).collect(Collectors.toList());
-            routers.addAll(a);
-        }
-        routers.add(srcRoutTable);
-
-        List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
-        map.put("destinationDevice", destIpAddress);
-        map.put("routTable", routers);
-        return ResponseUtil.ok(map);
-    }
+//    @RequestMapping("/routTable")
+//    public Object routTable(String srcIp, String destIp){
+//        if(StringUtil.isEmpty(srcIp)){
+//            return ResponseUtil.badArgument("起点Ip不能为空");
+//        }
+//        if(!IpUtil.verifyIp(srcIp)){
+//            return ResponseUtil.badArgument("起点Ip格式错误");
+//        }
+//        if(StringUtil.isEmpty(destIp)){
+//            return ResponseUtil.badArgument("终点Ip不能为空");
+//        }
+//        if(!IpUtil.verifyIp(destIp)){
+//            return ResponseUtil.badArgument("终点Ip格式错误");
+//        }
+//        Map origin = this.subnetTool.verifyIpBelongSubnet(srcIp);
+//        if(origin == null || origin.isEmpty()){
+//            return ResponseUtil.badArgument("起点Ip不存在");
+//        }
+//        List<IpAddress> srcIpAddress = this.ipAddressServie.querySrcDevice(origin);
+//        if(srcIpAddress == null){
+//            return ResponseUtil.badArgument("起点Ip不存在");
+//        }
+//        // 获取起点ip网络地址和广播地址
+//        Map dest = this.subnetTool.verifyIpBelongSubnet(destIp);
+//        if(dest == null || dest.isEmpty()){
+//            return ResponseUtil.badArgument("终点Ip不存在");
+//        }
+//        // 终点设备
+//        List<IpAddress> destIpAddress = this.ipAddressServie.querySrcDevice(dest);
+//        if(destIpAddress == null){
+//            return ResponseUtil.badArgument("终点Ip不存在");
+//        }
+//        Map map = new HashMap();
+//        map.put("destinationDevice", destIpAddress);
+//        this.routTableService.truncateTable();
+//        Map params = new HashMap();
+//        // 保存起点设备
+//        params.clear();
+//        params.put("ip", srcIpAddress.getIp());
+//        params.put("mask", srcIpAddress.getMask());
+//        params.put("deviceName", srcIpAddress.getDeviceName());
+//        params.put("interfaceName", srcIpAddress.getInterfaceName());
+//        params.put("mac", srcIpAddress.getMac());
+//        List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
+//        RouteTable srcRoutTable = null;
+//        if(routTables.size() > 0){
+//            srcRoutTable = routTables.get(0);
+//        }else{
+//            srcRoutTable = new RouteTable();
+//        }
+//        String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
+//        BeanUtils.copyProperties(srcIpAddress, srcRoutTable, IGNORE_ISOLATOR_PROPERTIES);
+//        this.routTableService.save(srcRoutTable);
+//        /*List<IpAddress> ipAddresses = */
+//        List<RouteTable> routers = new ArrayList<>();
+//        Map<String, RouteTable> routersMap = new HashMap();
+//        this.generatorRout1(srcIpAddress, destIp, destIpAddress.getMask(), routersMap);
+//        if(!routersMap.isEmpty()){
+//            List<RouteTable> a = routersMap.entrySet().stream().map(m -> m.getValue()).collect(Collectors.toList());
+//            routers.addAll(a);
+//        }
+//        routers.add(srcRoutTable);
+//
+//        List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
+//        map.put("destinationDevice", destIpAddress);
+//        map.put("routTable", routers);
+//        return ResponseUtil.ok(map);
+//    }
 
     /**
      * 验证Ip是否属于子网
@@ -925,242 +925,242 @@ public class ZabbixItemManagerController {
      * @param descMask 终点Mask
      * @return
      */
-    public List<RouteTable> generatorRout1(IpAddress ipAddress, String destIp, String descMask, Map<String, RouteTable> routeMap) {
-        List<IpAddress> ipAddresses = new ArrayList<>();
-        if (ipAddress != null) {
-            ipAddress.setStatus(0);
-            Map params = new HashMap();
-            // 查询当前设备在路由表中是否已记录
-            RouteTable ipaddressRoutTable = new RouteTable();
-            RouteTable r = routeMap.get(ipAddress.getIp());
-            if(r != null){
-                if(r.getMask().equals(ipAddress.getMask()) &&
-                        r.getRemoteDevice().equals(ipAddress.getDeviceName()) &&
-                        r.getRemoteInterface().equals(ipAddress.getInterfaceName()) &&
-                        r.getMac().equals(ipAddress.getMac())){
-                    ipaddressRoutTable = r;
-                }
-            }
-            Route rout = this.querySrcRout(destIp, descMask, ipAddress.getDeviceName());// 查询起点路由
-            if(rout != null){
-                params.clear();
-                params.put("deviceName", ipAddress.getDeviceName());
-                params.put("destination", rout.getDestination());
-                params.put("mask", rout.getMask());
-                List<Route> nexthops = this.routService.selectNextHopDevice(params);
-                if (nexthops.size() > 0) {
-                    outCycle:for (Route nextHop : nexthops) {
-                        if(nextHop.getNextHop() != null && !nextHop.getNextHop().equals("")){
-                            String nexeIp = nextHop.getNextHop();
-                            // 这里使用continue，继续进行下一个nexthop
-                            if(nexeIp == null || nexeIp.equals("") || nexeIp.equals("127.0.0.1") || nexeIp.equals("0.0.0.0")){
-                                // 不在执行下一跳，为终端设备
-                                RouteTable routTable = routeMap.get(ipAddress.getIp());
-                                routTable.setStatus(3);
-                                routeMap.put(ipAddress.getIp(), routTable);
-                                continue;
-                            }
-                            Map srcmap = IpUtil.getNetworkIpDec(nextHop.getNextHop(), "255.255.255.255");
-                            IpAddress nextIpaddress = this.ipAddressServie.querySrcDevice(srcmap);
-                            if(nextIpaddress != null){
-                                nextHop.setIpAddress(nextIpaddress);
-                                // 保存下一跳路由
-                                if(ipaddressRoutTable != null){
-                                    if(ipaddressRoutTable.getRemoteDevices() != null){
-                                        // 校验下一跳的对端设备是否已存在（避免死循环）
-                                        List<Map> remoteDevices = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);// 对端设备信息集合
-                                        for (Map map : remoteDevices){
-                                            String remotDevice = map.get("remoteDevice").toString();
-                                            String remoteInterface = map.get("remoteInterface").toString();
-                                            String remoteUuid = map.get("remoteUuid").toString();
-                                            if(nextIpaddress.getDeviceName().equals(remotDevice)
-                                                    && nextIpaddress.getInterfaceName().equals(remoteInterface)
-                                                    && nextIpaddress.getDeviceUuid().equals(remoteUuid)){
-
-                                                RouteTable routTable = routeMap.get(ipAddress.getIp());
-                                                routTable.setStatus(2);
-                                                routeMap.put(ipAddress.getIp(), routTable);
-                                                continue outCycle;
-                                            }
-                                        }
-                                    }
-                                }
-                                List<Map> list = null;
-                                if(ipaddressRoutTable.getRemoteDevices() != null){
-                                    list = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);
-                                }else{
-                                    list = new ArrayList<>();
-                                }
-                                // 下一跳对端设备信息
-                                Map remote = new HashMap();
-                                remote.put("remoteDevice", ipAddress.getDeviceName());
-                                remote.put("remoteInterface", ipAddress.getInterfaceName());
-                                remote.put("remoteUuid", ipAddress.getDeviceUuid());
-                                list.add(remote);
-                                // 查询下一跳是否已存在
-                                RouteTable nextIpaddressRoutTable = new RouteTable();
-
-                                RouteTable r2 = routeMap.get(nextIpaddress.getIp());
-                                if(r2 != null){
-                                    if(r2.getMask().equals(nextIpaddress.getMask()) &&
-                                            r2.getRemoteDevice().equals(nextIpaddress.getDeviceName()) &&
-                                            r2.getRemoteInterface().equals(nextIpaddress.getInterfaceName()) &&
-                                            r2.getMac().equals(nextIpaddress.getMac())){
-                                        nextIpaddressRoutTable = r2;
-                                    }
-                                }
-                                nextIpaddressRoutTable.setRemoteDevices(JSONArray.toJSONString(list));
-                                String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
-                                BeanUtils.copyProperties(nextIpaddress,nextIpaddressRoutTable,IGNORE_ISOLATOR_PROPERTIES);
-                                nextIpaddressRoutTable.setRemoteDevice(ipAddress.getDeviceName());
-                                nextIpaddressRoutTable.setRemoteInterface(ipAddress.getInterfaceName());
-                                nextIpaddressRoutTable.setRemoteUuid(ipAddress.getDeviceUuid());
-                                routeMap.put(nextIpaddressRoutTable.getIp(), nextIpaddressRoutTable);
-                                generatorRout1(nextIpaddress, destIp, descMask, routeMap);
-                            }
-                        }
-                    }
-                    ipAddress.setRouts(nexthops);
-                }else{
-                    // 修改集合数据，
-                    RouteTable routTable = routeMap.get(ipAddress.getIp());
-                    routTable.setStatus(1);
-                    routeMap.put(ipAddress.getIp(), routTable);
-                }
-                ipAddresses.add(ipAddress);
-                return null;
-            }
-        }
-        return null;
-    }
-
-    public List<IpAddress> generatorRout(IpAddress ipAddress, String destIp, String descMask) {
-        List<IpAddress> ipAddresses = new ArrayList<>();
-        if (ipAddress != null) {
-            ipAddress.setStatus(0);
-            Map params = new HashMap();
-            // 查询当前设备在路由表中是否已记录
-            params.clear();
-            params.put("ip", ipAddress.getIp());
-            params.put("mask", ipAddress.getMask());
-            params.put("deviceName", ipAddress.getDeviceName());
-            params.put("interfaceName", ipAddress.getInterfaceName());
-            params.put("mac", ipAddress.getMac());
-            List<RouteTable> ipaddressRouts = this.routTableService.selectObjByMap(params);
-            RouteTable ipaddressRoutTable = new RouteTable();
-            if(ipaddressRouts.size() > 0) {
-                ipaddressRoutTable = ipaddressRouts.get(0);
-
-            }
-            Route rout = this.querySrcRout(destIp, descMask, ipAddress.getDeviceName());// 查询起点路由
-//            Map params = IpUtil.getNetworkIp(destIp, descMask);
-//            params.put("deviceName", ipAddress.getDeviceName());
-//            Route rout = this.routService.selectDestDevice(params);
-            if(rout != null){
-                params.clear();
-                params.put("deviceName", ipAddress.getDeviceName());
-                params.put("destination", rout.getDestination());
-                params.put("mask", rout.getMask());
-                List<Route> nexthops = this.routService.selectNextHopDevice(params);
-//              List<Route> nexthops = this.routService.queryDestDevice(params);
-                if (nexthops.size() > 0) {
-                    outCycle:for (Route nextHop : nexthops) {
-                        if(nextHop.getNextHop() != null && !nextHop.getNextHop().equals("")){
-                            String nexeIp = nextHop.getNextHop();
-                            // 这里使用continue，继续进行下一个nexthop
-                            if(nexeIp == null || nexeIp.equals("") || nexeIp.equals("127.0.0.1") || nexeIp.equals("0.0.0.0")){
-                                // 不在执行下一跳，为终端设备
-                                ipaddressRoutTable.setStatus(3);
-                                this.routTableService.update(ipaddressRoutTable);
-                                continue;
-                            }
-
-                            Map srcmap = IpUtil.getNetworkIpDec(nextHop.getNextHop(), "255.255.255.255");
-                            IpAddress nextIpaddress = this.ipAddressServie.querySrcDevice(srcmap);
-                            if(nextIpaddress != null){
-                                nextHop.setIpAddress(nextIpaddress);
-
-                                // 保存下一跳路由
-                                if(ipaddressRoutTable != null){
-                                    if(ipaddressRoutTable.getRemoteDevices() != null){
-                                        // 校验下一跳的对端设备是否已存在（避免死循环）
-                                        List<Map> remoteDevices = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);// 对端设备信息集合
-                                        for (Map map : remoteDevices){
-                                            String remotDevice = map.get("remoteDevice").toString();
-                                            String remoteInterface = map.get("remoteInterface").toString();
-                                            String remoteUuid = map.get("remoteUuid").toString();
-                                            if(nextIpaddress.getDeviceName().equals(remotDevice)
-                                                    && nextIpaddress.getInterfaceName().equals(remoteInterface)
-                                                    && nextIpaddress.getDeviceUuid().equals(remoteUuid)){
-                                                ipAddress.setStatus(2);
-                                                ipaddressRoutTable.setStatus(2);
-                                                this.routTableService.update(ipaddressRoutTable);
-                                                continue outCycle;
-                                            }
-                                        }
-                                    }
-                                }
-//                                RouteTable ipaddressRoutTable = null;
-//                                if(ipaddressRouts.size() > 0){
-//                                    ipaddressRoutTable = ipaddressRouts.get(0);
-//                                }else{
-//                                    ipaddressRoutTable = new RouteTable();
-//                                }
-                                List<Map> list = null;
-                                if(ipaddressRoutTable.getRemoteDevices() != null){
-                                    list = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);
-                                }else{
-                                    list = new ArrayList<>();
-                                }
-                                // 下一跳对端设备信息
-                                Map remote = new HashMap();
-                                remote.put("remoteDevice", ipAddress.getDeviceName());
-                                remote.put("remoteInterface", ipAddress.getInterfaceName());
-                                remote.put("remoteUuid", ipAddress.getDeviceUuid());
-                                list.add(remote);
-                                // 保存所有连接路径
-//                            List ipaddressList = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);
-//                            if(ipaddressList != null){
-//                                list.addAll(ipaddressList);
+//    public List<RouteTable> generatorRout1(IpAddress ipAddress, String destIp, String descMask, Map<String, RouteTable> routeMap) {
+//        List<IpAddress> ipAddresses = new ArrayList<>();
+//        if (ipAddress != null) {
+//            ipAddress.setStatus(0);
+//            Map params = new HashMap();
+//            // 查询当前设备在路由表中是否已记录
+//            RouteTable ipaddressRoutTable = new RouteTable();
+//            RouteTable r = routeMap.get(ipAddress.getIp());
+//            if(r != null){
+//                if(r.getMask().equals(ipAddress.getMask()) &&
+//                        r.getRemoteDevice().equals(ipAddress.getDeviceName()) &&
+//                        r.getRemoteInterface().equals(ipAddress.getInterfaceName()) &&
+//                        r.getMac().equals(ipAddress.getMac())){
+//                    ipaddressRoutTable = r;
+//                }
+//            }
+//            Route rout = this.querySrcRout(destIp, descMask, ipAddress.getDeviceName());// 查询起点路由
+//            if(rout != null){
+//                params.clear();
+//                params.put("deviceName", ipAddress.getDeviceName());
+//                params.put("destination", rout.getDestination());
+//                params.put("mask", rout.getMask());
+//                List<Route> nexthops = this.routService.selectNextHopDevice(params);
+//                if (nexthops.size() > 0) {
+//                    outCycle:for (Route nextHop : nexthops) {
+//                        if(nextHop.getNextHop() != null && !nextHop.getNextHop().equals("")){
+//                            String nexeIp = nextHop.getNextHop();
+//                            // 这里使用continue，继续进行下一个nexthop
+//                            if(nexeIp == null || nexeIp.equals("") || nexeIp.equals("127.0.0.1") || nexeIp.equals("0.0.0.0")){
+//                                // 不在执行下一跳，为终端设备
+//                                RouteTable routTable = routeMap.get(ipAddress.getIp());
+//                                routTable.setStatus(3);
+//                                routeMap.put(ipAddress.getIp(), routTable);
+//                                continue;
 //                            }
-                                // 查询下一跳是否已存在
-                                params.clear();
-                                params.put("ip", nextIpaddress.getIp());
-                                params.put("mask", nextIpaddress.getMask());
-                                params.put("deviceName", nextIpaddress.getDeviceName());
-                                params.put("interfaceName", nextIpaddress.getInterfaceName());
-                                params.put("mac", nextIpaddress.getMac());
-                                List<RouteTable> nextIpaddressRoutTables = this.routTableService.selectObjByMap(params);
-                                RouteTable nextIpaddressRoutTable = null;
-                                if(nextIpaddressRoutTables.size() > 0){
-                                    nextIpaddressRoutTable = nextIpaddressRoutTables.get(0);
-                                }else{
-                                    nextIpaddressRoutTable = new RouteTable();
-                                }
-                                nextIpaddressRoutTable.setRemoteDevices(JSONArray.toJSONString(list));
-                                String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
-                                BeanUtils.copyProperties(nextIpaddress,nextIpaddressRoutTable,IGNORE_ISOLATOR_PROPERTIES);
+//                            Map srcmap = IpUtil.getNetworkIpDec(nextHop.getNextHop(), "255.255.255.255");
+//                            IpAddress nextIpaddress = this.ipAddressServie.querySrcDevice(srcmap);
+//                            if(nextIpaddress != null){
+//                                nextHop.setIpAddress(nextIpaddress);
+//                                // 保存下一跳路由
+//                                if(ipaddressRoutTable != null){
+//                                    if(ipaddressRoutTable.getRemoteDevices() != null){
+//                                        // 校验下一跳的对端设备是否已存在（避免死循环）
+//                                        List<Map> remoteDevices = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);// 对端设备信息集合
+//                                        for (Map map : remoteDevices){
+//                                            String remotDevice = map.get("remoteDevice").toString();
+//                                            String remoteInterface = map.get("remoteInterface").toString();
+//                                            String remoteUuid = map.get("remoteUuid").toString();
+//                                            if(nextIpaddress.getDeviceName().equals(remotDevice)
+//                                                    && nextIpaddress.getInterfaceName().equals(remoteInterface)
+//                                                    && nextIpaddress.getDeviceUuid().equals(remoteUuid)){
+//
+//                                                RouteTable routTable = routeMap.get(ipAddress.getIp());
+//                                                routTable.setStatus(2);
+//                                                routeMap.put(ipAddress.getIp(), routTable);
+//                                                continue outCycle;
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                                List<Map> list = null;
+//                                if(ipaddressRoutTable.getRemoteDevices() != null){
+//                                    list = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);
+//                                }else{
+//                                    list = new ArrayList<>();
+//                                }
+//                                // 下一跳对端设备信息
+//                                Map remote = new HashMap();
+//                                remote.put("remoteDevice", ipAddress.getDeviceName());
+//                                remote.put("remoteInterface", ipAddress.getInterfaceName());
+//                                remote.put("remoteUuid", ipAddress.getDeviceUuid());
+//                                list.add(remote);
+//                                // 查询下一跳是否已存在
+//                                RouteTable nextIpaddressRoutTable = new RouteTable();
+//
+//                                RouteTable r2 = routeMap.get(nextIpaddress.getIp());
+//                                if(r2 != null){
+//                                    if(r2.getMask().equals(nextIpaddress.getMask()) &&
+//                                            r2.getRemoteDevice().equals(nextIpaddress.getDeviceName()) &&
+//                                            r2.getRemoteInterface().equals(nextIpaddress.getInterfaceName()) &&
+//                                            r2.getMac().equals(nextIpaddress.getMac())){
+//                                        nextIpaddressRoutTable = r2;
+//                                    }
+//                                }
+//                                nextIpaddressRoutTable.setRemoteDevices(JSONArray.toJSONString(list));
+//                                String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
+//                                BeanUtils.copyProperties(nextIpaddress,nextIpaddressRoutTable,IGNORE_ISOLATOR_PROPERTIES);
+//                                nextIpaddressRoutTable.setRemoteDevice(ipAddress.getDeviceName());
+//                                nextIpaddressRoutTable.setRemoteInterface(ipAddress.getInterfaceName());
+//                                nextIpaddressRoutTable.setRemoteUuid(ipAddress.getDeviceUuid());
+//                                routeMap.put(nextIpaddressRoutTable.getIp(), nextIpaddressRoutTable);
+//                                generatorRout1(nextIpaddress, destIp, descMask, routeMap);
+//                            }
+//                        }
+//                    }
+//                    ipAddress.setRouts(nexthops);
+//                }else{
+//                    // 修改集合数据，
+//                    RouteTable routTable = routeMap.get(ipAddress.getIp());
+//                    routTable.setStatus(1);
+//                    routeMap.put(ipAddress.getIp(), routTable);
+//                }
+//                ipAddresses.add(ipAddress);
+//                return null;
+//            }
+//        }
+//        return null;
+//    }
 
-                                nextIpaddressRoutTable.setRemoteDevice(ipAddress.getDeviceName());
-                                nextIpaddressRoutTable.setRemoteInterface(ipAddress.getInterfaceName());
-                                nextIpaddressRoutTable.setRemoteUuid(ipAddress.getDeviceUuid());
-                                this.routTableService.save(nextIpaddressRoutTable);
-                                generatorRout(nextIpaddress, destIp, descMask);
-                            }
-                        }
-                    }
-                    ipAddress.setRouts(nexthops);
-                }else{
-                    ipAddress.setStatus(1);
-                    ipaddressRoutTable.setStatus(1);
-                    this.routTableService.update(ipaddressRoutTable);
-                }
-                ipAddresses.add(ipAddress);
-                return ipAddresses;
-            }
-        }
-        return null;
-    }
+//    public List<IpAddress> generatorRout(IpAddress ipAddress, String destIp, String descMask) {
+//        List<IpAddress> ipAddresses = new ArrayList<>();
+//        if (ipAddress != null) {
+//            ipAddress.setStatus(0);
+//            Map params = new HashMap();
+//            // 查询当前设备在路由表中是否已记录
+//            params.clear();
+//            params.put("ip", ipAddress.getIp());
+//            params.put("mask", ipAddress.getMask());
+//            params.put("deviceName", ipAddress.getDeviceName());
+//            params.put("interfaceName", ipAddress.getInterfaceName());
+//            params.put("mac", ipAddress.getMac());
+//            List<RouteTable> ipaddressRouts = this.routTableService.selectObjByMap(params);
+//            RouteTable ipaddressRoutTable = new RouteTable();
+//            if(ipaddressRouts.size() > 0) {
+//                ipaddressRoutTable = ipaddressRouts.get(0);
+//
+//            }
+//            Route rout = this.querySrcRout(destIp, descMask, ipAddress.getDeviceName());// 查询起点路由
+////            Map params = IpUtil.getNetworkIp(destIp, descMask);
+////            params.put("deviceName", ipAddress.getDeviceName());
+////            Route rout = this.routService.selectDestDevice(params);
+//            if(rout != null){
+//                params.clear();
+//                params.put("deviceName", ipAddress.getDeviceName());
+//                params.put("destination", rout.getDestination());
+//                params.put("mask", rout.getMask());
+//                List<Route> nexthops = this.routService.selectNextHopDevice(params);
+////              List<Route> nexthops = this.routService.queryDestDevice(params);
+//                if (nexthops.size() > 0) {
+//                    outCycle:for (Route nextHop : nexthops) {
+//                        if(nextHop.getNextHop() != null && !nextHop.getNextHop().equals("")){
+//                            String nexeIp = nextHop.getNextHop();
+//                            // 这里使用continue，继续进行下一个nexthop
+//                            if(nexeIp == null || nexeIp.equals("") || nexeIp.equals("127.0.0.1") || nexeIp.equals("0.0.0.0")){
+//                                // 不在执行下一跳，为终端设备
+//                                ipaddressRoutTable.setStatus(3);
+//                                this.routTableService.update(ipaddressRoutTable);
+//                                continue;
+//                            }
+//
+//                            Map srcmap = IpUtil.getNetworkIpDec(nextHop.getNextHop(), "255.255.255.255");
+//                            IpAddress nextIpaddress = this.ipAddressServie.querySrcDevice(srcmap);
+//                            if(nextIpaddress != null){
+//                                nextHop.setIpAddress(nextIpaddress);
+//
+//                                // 保存下一跳路由
+//                                if(ipaddressRoutTable != null){
+//                                    if(ipaddressRoutTable.getRemoteDevices() != null){
+//                                        // 校验下一跳的对端设备是否已存在（避免死循环）
+//                                        List<Map> remoteDevices = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);// 对端设备信息集合
+//                                        for (Map map : remoteDevices){
+//                                            String remotDevice = map.get("remoteDevice").toString();
+//                                            String remoteInterface = map.get("remoteInterface").toString();
+//                                            String remoteUuid = map.get("remoteUuid").toString();
+//                                            if(nextIpaddress.getDeviceName().equals(remotDevice)
+//                                                    && nextIpaddress.getInterfaceName().equals(remoteInterface)
+//                                                    && nextIpaddress.getDeviceUuid().equals(remoteUuid)){
+//                                                ipAddress.setStatus(2);
+//                                                ipaddressRoutTable.setStatus(2);
+//                                                this.routTableService.update(ipaddressRoutTable);
+//                                                continue outCycle;
+//                                            }
+//                                        }
+//                                    }
+//                                }
+////                                RouteTable ipaddressRoutTable = null;
+////                                if(ipaddressRouts.size() > 0){
+////                                    ipaddressRoutTable = ipaddressRouts.get(0);
+////                                }else{
+////                                    ipaddressRoutTable = new RouteTable();
+////                                }
+//                                List<Map> list = null;
+//                                if(ipaddressRoutTable.getRemoteDevices() != null){
+//                                    list = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);
+//                                }else{
+//                                    list = new ArrayList<>();
+//                                }
+//                                // 下一跳对端设备信息
+//                                Map remote = new HashMap();
+//                                remote.put("remoteDevice", ipAddress.getDeviceName());
+//                                remote.put("remoteInterface", ipAddress.getInterfaceName());
+//                                remote.put("remoteUuid", ipAddress.getDeviceUuid());
+//                                list.add(remote);
+//                                // 保存所有连接路径
+////                            List ipaddressList = JSONArray.parseArray(ipaddressRoutTable.getRemoteDevices(), Map.class);
+////                            if(ipaddressList != null){
+////                                list.addAll(ipaddressList);
+////                            }
+//                                // 查询下一跳是否已存在
+//                                params.clear();
+//                                params.put("ip", nextIpaddress.getIp());
+//                                params.put("mask", nextIpaddress.getMask());
+//                                params.put("deviceName", nextIpaddress.getDeviceName());
+//                                params.put("interfaceName", nextIpaddress.getInterfaceName());
+//                                params.put("mac", nextIpaddress.getMac());
+//                                List<RouteTable> nextIpaddressRoutTables = this.routTableService.selectObjByMap(params);
+//                                RouteTable nextIpaddressRoutTable = null;
+//                                if(nextIpaddressRoutTables.size() > 0){
+//                                    nextIpaddressRoutTable = nextIpaddressRoutTables.get(0);
+//                                }else{
+//                                    nextIpaddressRoutTable = new RouteTable();
+//                                }
+//                                nextIpaddressRoutTable.setRemoteDevices(JSONArray.toJSONString(list));
+//                                String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
+//                                BeanUtils.copyProperties(nextIpaddress,nextIpaddressRoutTable,IGNORE_ISOLATOR_PROPERTIES);
+//
+//                                nextIpaddressRoutTable.setRemoteDevice(ipAddress.getDeviceName());
+//                                nextIpaddressRoutTable.setRemoteInterface(ipAddress.getInterfaceName());
+//                                nextIpaddressRoutTable.setRemoteUuid(ipAddress.getDeviceUuid());
+//                                this.routTableService.save(nextIpaddressRoutTable);
+//                                generatorRout(nextIpaddress, destIp, descMask);
+//                            }
+//                        }
+//                    }
+//                    ipAddress.setRouts(nexthops);
+//                }else{
+//                    ipAddress.setStatus(1);
+//                    ipaddressRoutTable.setStatus(1);
+//                    this.routTableService.update(ipaddressRoutTable);
+//                }
+//                ipAddresses.add(ipAddress);
+//                return ipAddresses;
+//            }
+//        }
+//        return null;
+//    }
 
     // 获取起点路由
 

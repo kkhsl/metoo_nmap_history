@@ -19,7 +19,7 @@ public interface IpAddressMapper {
 
     int update(IpAddress instance);
 
-    IpAddress querySrcDevice(Map params);
+    List<IpAddress> querySrcDevice(Map params);
 
     void truncateTable();
 
