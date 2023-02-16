@@ -1,6 +1,7 @@
 package com.metoo.nspm.container.java.util;
 
 import lombok.ToString;
+import org.apache.ibatis.javassist.runtime.Inner;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,28 +40,29 @@ public class StreamDemo {
     private static List<Inner> INNERLIST = new ArrayList<Inner>();
     private static Map<String, Object> MAP = new HashMap();
 
-    static{
+    static {
         LIST.add("a");
         LIST.add("b");
         LIST.add("c");
         LIST.add("d");
     }
 
-    static{
+    static {
         INTLIST.add(1);
         INTLIST.add(2);
         INTLIST.add(3);
         INTLIST.add(4);
     }
 
-    static{
+    static {
         DISORDERLIST.add("ab");
         DISORDERLIST.add("cc");
         DISORDERLIST.add("db");
         DISORDERLIST.add("bg");
         DISORDERLIST.add("eg");
     }
-    static{
+
+    static {
         DISTINCTLIST.add("ab");
         DISTINCTLIST.add("ab");
         DISTINCTLIST.add("cc");
@@ -70,19 +72,21 @@ public class StreamDemo {
         DISTINCTLIST.add("eg");
     }
 
-    static{
+    static {
         // 定义内部类bean数据
         Inner innser_1 = new Inner("曹操", 26, "男");
         Inner innser_2 = new Inner("刘备", 26, "女");
         Inner innser_3 = new Inner("关羽", 24, "男");
         Inner innser_4 = new Inner("张飞", 21, "女");
+        Inner innser_5 = new Inner("张飞", 24, "女");
         INNERLIST.add(innser_1);
         INNERLIST.add(innser_2);
         INNERLIST.add(innser_3);
         INNERLIST.add(innser_4);
+        INNERLIST.add(innser_5);
     }
 
-    static{
+    static {
         MAP.put("age", 26);
         MAP.put("name", "HKK");
     }
@@ -96,7 +100,7 @@ public class StreamDemo {
     /**
      * Stream创建
      */
-    public Stream stream(){
+    public Stream stream() {
         Stream stream = Stream.of(1, 2, 3, 4, 5);
         return stream;
     }
@@ -104,7 +108,7 @@ public class StreamDemo {
     /**
      * Collection
      */
-    public Stream listStream(){
+    public Stream listStream() {
         Stream<String> stream = LIST.stream();
         return stream;
     }
@@ -112,12 +116,12 @@ public class StreamDemo {
     /**
      * Array
      */
-    public Stream arrayStream(){
+    public Stream arrayStream() {
         Stream<Integer> stream = Arrays.stream(ARRAY);
         return stream;
     }
 
-    public Stream fileStream(){
+    public Stream fileStream() {
         try {
             Stream<String> fileStream = Files.lines(Paths.get("E:\\java\\project\\stream\\stream.txt"), Charset.defaultCharset());
             return fileStream;
@@ -131,8 +135,8 @@ public class StreamDemo {
     /**
      * 文件创建
      */
-    public void fileLineStream(){
-        try{
+    public void fileLineStream() {
+        try {
 
 //            File file = new File("E:\\java\\project\\stream\\stream.txt");
             String file = "E:\\java\\project\\stream\\stream.txt";
@@ -145,9 +149,10 @@ public class StreamDemo {
 
     /**
      * 函数创建
+     *
      * @return
      */
-    public Stream iteratorStream(){
+    public Stream iteratorStream() {
         Stream stream = Stream.iterate(0, n -> n + 2).limit(10);
         return stream;
     }
@@ -156,32 +161,32 @@ public class StreamDemo {
 
     /**
      * filter：
-     *          用于通过设置的条件过滤出元素
+     * 用于通过设置的条件过滤出元素
      */
     @Test
-    public void filterStream(){
+    public void filterStream() {
         List list = DISORDERLIST.stream().filter(str -> !str.isEmpty()).collect(Collectors.toList());
         out.println(list);
     }
 
     /**
      * Map：
-     *      接受一个函数作为参数。这个函数会被应用到每个元素上，
-     *      并将其映射成一个新的元素（使用映射一词，是因为它和转换类似，
-     *      但其中的细微差别在于它是“创建一个新版本”而不是去“修改”）
+     * 接受一个函数作为参数。这个函数会被应用到每个元素上，
+     * 并将其映射成一个新的元素（使用映射一词，是因为它和转换类似，
+     * 但其中的细微差别在于它是“创建一个新版本”而不是去“修改”）
      */
     @Test
-    public void mapStream(){
+    public void mapStream() {
         List list = DISORDERLIST.stream().map(str -> str + "-itcast").collect(Collectors.toList());
         out.println(list);
     }
 
     /**
      * distinct：
-     *              返回一个元素各异（根据流所生成元素的hashcode和equals方法实现）的流
+     * 返回一个元素各异（根据流所生成元素的hashcode和equals方法实现）的流
      */
     @Test
-    public void distinct(){
+    public void distinct() {
         List list = DISTINCTLIST.stream().distinct().collect(Collectors.toList());
         out.println(list);
     }
@@ -190,7 +195,7 @@ public class StreamDemo {
      * Srot：返回排序后的流
      */
     @Test
-    public void sortStream(){
+    public void sortStream() {
         List list = DISORDERLIST.stream().sorted().collect(Collectors.toList());
         out.println(list);
     }
@@ -199,7 +204,7 @@ public class StreamDemo {
      * limit：返回一个给定长度的流
      */
     @Test
-    public void limitStream(){
+    public void limitStream() {
         List list = null;
         try {
             list = LIST.stream().limit(-1).collect(Collectors.toList());
@@ -214,13 +219,13 @@ public class StreamDemo {
      * skip：返回一个扔掉了前n个元素的流
      */
     @Test
-    public void skipStream(){
+    public void skipStream() {
         List list = LIST.stream().skip(1).collect(Collectors.toList());
         logger.info("返回一个扔掉了前n个元素的流：" + list);
     }
 
     @Test
-    public void flatMap(){
+    public void flatMap() {
 //        Stream flatMap = LIST.stream().flatMap(Java8StreamTest::getCharacterByString);
     }
 
@@ -228,10 +233,10 @@ public class StreamDemo {
      * 对元素遍历处理
      */
     @Test
-    public void peekStream(){
+    public void peekStream() {
         LIST.stream()
                 .peek(str ->
-                    String.valueOf(str))
+                        String.valueOf(str))
                 .forEach(out::println);
     }
 
@@ -241,13 +246,13 @@ public class StreamDemo {
      * collect：收集器，将流转换为其他形式
      */
     @Test
-    public void collectionStream(){
+    public void collect() {
         List list = LIST.stream().collect(Collectors.toList());
         logger.info("List ={}", new Object[]{list});
         Set set = LIST.stream().collect(Collectors.toSet());
         logger.info("Set ={}", new Object[]{set});
         Map<String, String> innerMap = INNERLIST.stream()
-                                    .collect(Collectors.toMap(Inner::getName, Inner::getSex));
+                .collect(Collectors.toMap(Inner::getName, Inner::getSex));
         logger.info("Map ={}", new Object[]{innerMap});
     }
 
@@ -255,7 +260,7 @@ public class StreamDemo {
      * forEach：遍历流
      */
     @Test
-    public void forEachStrea(){
+    public void forEach() {
         LIST.stream().forEach(item -> System.out.println(item));
         INNERLIST.stream().forEach(item -> System.out.println(item.getName() + ":" + item.getSex() + ":" + item.getAge()));
     }
@@ -264,27 +269,35 @@ public class StreamDemo {
      * first：返回第一个元素
      */
     @Test
-    public void firstStream(){
+    public void first() {
+
         Optional optional = LIST.stream().findFirst();
-        System.out.println(optional);
+        if (optional.isPresent()) System.out.println(optional.get());
+
         Optional<String> str = LIST.stream().findFirst();
         System.out.println(str.get());
+
+        List<String> list = new ArrayList();
+        String orElse = list.stream().findFirst().orElse(null);
+        System.out.println(orElse);
+
     }
 
     /**
      * findAny：将返回当前流中的任意元素
      */
     @Test
-    public void findAny(){
+    public void findAny() {
         String str = LIST.stream().findAny().get();
-        System.out.println(str);;
+        System.out.println(str);
+        ;
     }
 
     /**
      * count：返回流中元素总数
      */
     @Test
-    public void countStream(){
+    public void count() {
         long count = LIST.stream().count();
         System.out.println(count);
     }
@@ -293,12 +306,25 @@ public class StreamDemo {
      * sum：求和
      */
     @Test
-    public void sum(){
-        int sum = Stream.of(1, 2, 3, 4, 5).mapToInt(e->e).sum();
+    public void sum() {
+        int sum = Stream.of(1, 2, 3, 4, 5).mapToInt(e -> e).sum();
         System.out.println(sum);
 
-        int sum2 = INNERLIST.stream().mapToInt(Innser->Innser.getAge()).sum();
+        int sum2 = INNERLIST.stream().mapToInt(Innser -> Innser.getAge()).sum();
         System.out.println(sum2);
+
+
+        IntSummaryStatistics summaryStatistics = INTLIST.stream().mapToInt((s) -> s).summaryStatistics();
+        int sum3 = (int) summaryStatistics.getSum();
+        int count = (int) summaryStatistics.getCount();
+        int max = (int) summaryStatistics.getMax();
+        int min = (int) summaryStatistics.getMin();
+        int avg = (int) summaryStatistics.getAverage();
+        System.out.println("sum3：" + sum3
+                + "\ncount：" + count
+                + "\nmax：" + max
+                + "\nmin：" + min
+                + "\navg：" + avg);
     }
 
     /**
@@ -307,7 +333,7 @@ public class StreamDemo {
      * Average：返回平均值
      */
     @Test
-    public void max(){
+    public void max() {
         Optional<Inner> maxListOptional = INNERLIST.stream().max(Comparator.comparingInt(Inner::getAge));
         maxListOptional.ifPresent(e -> System.out.println("Max: " + e.getAge()));
         Optional<Inner> minListOptional = INNERLIST.stream().min(Comparator.comparingInt(Inner::getAge));
@@ -322,7 +348,7 @@ public class StreamDemo {
      * anyMathc：检查是否至少匹配一个元素，返回boolean
      */
     @Test
-    public void anyMatch(){
+    public void anyMatch() {
         // 数组
         boolean anyMatch = Stream.of(1, 2, 3, 4).anyMatch(e -> e.intValue() % 2 == 0);
         System.out.println("AnyMatche：" + anyMatch);
@@ -339,10 +365,10 @@ public class StreamDemo {
 
 
     /**
-     * allMath：检查是否至少匹配一个元素，返回boolean
+     * allMath：检查是否匹配所有元素，返回boolean
      */
     @Test
-    public void allMathc(){
+    public void allMatch() {
         // 数组
         boolean anyMatch = Stream.of(1, 2, 3, 4).anyMatch(e -> e.intValue() % 2 == 0);
         System.out.println("AnyMatche：" + anyMatch);
@@ -368,41 +394,166 @@ public class StreamDemo {
                 ));
     }
 
-
-
-}
-class Inner{
-
-    private String name;
-    private Integer age;
-    private String sex;
-
-    public String getName(){
-        return name;
-    };
-
-    public Integer getAge(){
-        return age;
-    };
-
-    public String getSex(){
-        return sex;
+    /**
+     * noonMatch：检查是否没有匹配所有元素，返回boolean
+     */
+    @Test
+    public void noonMatch() {
+        boolean noonMatch = MAP.entrySet().stream().noneMatch(e -> e.getKey().equals("age"));
+        logger.info("noonMatch：" + noonMatch);
     }
 
-    public void setName(String name){
-        this.name = name;
-    }
-    public void setAge(Integer age){
-        this.age = age;
-    }
-    public void setSex(String sex){
-        this.sex = sex;
+    private Inner inner1 = new Inner("Inner1", 26, "男");
+    private Inner inner2 = new Inner("Inner2", 26, "女");
+
+    /**
+     * reduce：将流中元素反复结合，得到一个值
+     */
+    @Test
+    public void reduce() {
+        Optional reduce = LIST.stream().reduce((e, e1) -> {
+            return e;
+        });
+        if (reduce.isPresent()) System.out.println(reduce.get());
+
+        Optional reduce1 = INNERLIST.stream().reduce((inner, inner2) -> {
+            return inner;
+        });
+        if (reduce1.isPresent()) System.out.println(reduce1.get());
+
+        Optional reduce2 = INTLIST.stream().reduce((e, e1) -> {
+            return e;
+        });
+        if (reduce2.isPresent()) System.out.println(reduce2.get());
     }
 
-    public Inner(){};
-    public Inner(String name, Integer age, String sex) {
-        this.name = name;
-        this.age = age;
-        this.sex = sex;
+    // ------------- Collect收集 -------------------------------------
+
+    /**
+     * toList：
+     */
+    @Test
+    public void toList() {
+        List<String> names = INNERLIST.stream().map(Inner::getName).collect(Collectors.toList());
+        System.out.println(names);
+    }
+
+    /**
+     * toMap：
+     * @return
+     */
+    @Test
+    public void toMap(){
+        Map map = MAP.entrySet().stream().collect(Collectors.toMap(e->e.getKey(), e->e.getValue()));
+        Map map1 = INNERLIST.stream().collect(Collectors.toMap(Inner::getName, Inner::getAge));
+        System.out.println(map);
+        System.out.println(map1);
+    }
+
+    /**
+     * toSet
+     */
+    @Test
+    public void toSet(){
+        Set<Integer> set = INTLIST.stream().filter(e -> e % 2 == 0)
+                .map(e -> e * 2)
+                .collect(Collectors.toSet());
+        System.out.println(set);
+    }
+
+    /**
+     * counting：符合条件的用户总数
+     */
+    @Test
+    public void counting(){
+        long i = INNERLIST.stream().filter(e -> e.getAge() % 2 == 0).collect(Collectors.counting());
+        System.out.println(i);
+    }
+
+    /**
+     * summingInt：对结果元素求和
+     */
+    @Test
+    public void summingInt(){
+        Integer sumInt = INNERLIST.stream().filter(e -> e.getAge() % 2 == 0).collect(Collectors.summingInt(Inner::getAge)) ;
+        System.out.println(sumInt);
+    }
+
+    /**
+     * minBy：筛选元素中ID最小的用户
+     */
+    @Test
+    public void minBy(){
+        Inner minBy = INNERLIST.stream().filter(e -> e.getAge() % 2 == 0)
+                .collect(Collectors.minBy(Comparator.comparingInt(Inner::getAge))).get();
+        System.out.println(minBy);
+    }
+
+    /**
+     * joining：指定分隔符连接成字符串
+     * @return
+     */
+    @Test
+    public void joining(){
+        String joining = LIST.stream().collect(Collectors.joining("-"));
+        System.out.println(joining);
+    }
+
+    /**
+     * groupingBy
+     */
+    @Test
+    public void groupingBy(){
+        Map<String, List<Inner>> groupingBy = INNERLIST.stream().collect(Collectors.groupingBy(Inner::getName));
+        System.out.println(groupingBy);
+    }
+
+
+
+    public static Inner getInner(){
+        // 内部类是延迟加载的，也就是说只有在使用的时候才会去加载内部类，避免了内存的浪费，线程安全等问题
+        Inner inner = Inner.instance;
+        return inner;
+    }
+    static class Inner {
+
+        private static Inner instance = new Inner();
+
+        private String name;
+        private Integer age;
+        private String sex;
+
+        public String getName() {
+            return name;
+        }
+
+        public Integer getAge() {
+            return age;
+        }
+
+        public String getSex() {
+            return sex;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setAge(Integer age) {
+            this.age = age;
+        }
+
+        public void setSex(String sex) {
+            this.sex = sex;
+        }
+
+        public Inner() {
+        }
+
+        public Inner(String name, Integer age, String sex) {
+            this.name = name;
+            this.age = age;
+            this.sex = sex;
+        }
     }
 }

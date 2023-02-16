@@ -694,8 +694,9 @@ public class SubnetManagerController {
                 params.put("endUsage", 10);
                 List<IpDetail> regular = this.ipDetailService.selectObjByMap(params);
                 List<Integer> list = this.genericSubnetIps(subnetId);
-                IntSummaryStatistics summaryStatistics = list.stream().mapToInt((s) -> (int) s).summaryStatistics();
-                int sum = (int) summaryStatistics.getSum();
+//                IntSummaryStatistics summaryStatistics = list.stream().mapToInt((s) -> s).summaryStatistics();
+//                int sum = (int) summaryStatistics.getSum();
+                int sum = list.stream().mapToInt((s) -> s).sum();
                 int existingSum = unuseds.size() + seldom.size() + unmeant.size() + regular.size();
                 int inexistenceSum = sum - existingSum;
 

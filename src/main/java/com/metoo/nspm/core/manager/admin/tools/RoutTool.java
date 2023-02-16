@@ -3,11 +3,9 @@ package com.metoo.nspm.core.manager.admin.tools;
 import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.util.StringUtil;
 import com.metoo.nspm.core.service.nspm.*;
+import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
-import com.metoo.nspm.entity.nspm.IpAddress;
-import com.metoo.nspm.entity.nspm.Mac;
-import com.metoo.nspm.entity.nspm.Route;
-import com.metoo.nspm.entity.nspm.RouteTable;
+import com.metoo.nspm.entity.nspm.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,6 +30,12 @@ public class RoutTool {
     private IMacService macService;
     @Autowired
     private IMacHistoryService macHistoryService;
+    @Autowired
+    private ZabbixSubnetService zabbixSubnetService;
+    @Autowired
+    private IIPAddressHistoryService ipAddressHistoryServie;
+    @Autowired
+    private SubnetTool subnetTool;
 
 
     /**
@@ -795,5 +799,86 @@ public class RoutTool {
         return srcMacs;
     }
 
+    public List queryRoutePath(String srcIp, String destIp, Date time){
+        // 查询路由
+        Map map = new HashMap();
+        List<IpAddress> srcIpAddresses = this.queryRoutDevice(srcIp, time);
+        if(srcIpAddresses.size() >= 0){
+            // 终点设备
+//        List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
+//        if(destIpAddress.size() <= 0){
+//            return ResponseUtil.badArgument("终点Ip不存在");
+//        }
+//        map.put("destinationDevice", destIpAddress);
+            this.routTableService.truncateTable();// 清除 routTable
+
+            Map params = new HashMap();
+            // 保存起点设备到路由表
+            // 多起点
+            for (IpAddress srcIpAddress : srcIpAddresses) {
+                params.clear();
+                params.put("ip", srcIpAddress.getIp());
+                params.put("mask", srcIpAddress.getMask());
+                params.put("deviceName", srcIpAddress.getDeviceName());
+                params.put("interfaceName", srcIpAddress.getInterfaceName());
+                params.put("mac", srcIpAddress.getMac());
+                List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
+                RouteTable routTable = null;
+                if(routTables.size() > 0){
+                    routTable = routTables.get(0);
+                }else{
+                    routTable = new RouteTable();
+                }
+                String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
+                BeanUtils.copyProperties(srcIpAddress, routTable, IGNORE_ISOLATOR_PROPERTIES);
+                this.routTableService.save(routTable);
+                // 路由查询
+                this.generatorRout(srcIpAddress, destIp, time);
+            }
+        }
+        List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
+        return routTableList;
+    }
+
+    public List<IpAddress> queryRoutDevice(String Ip, Date time){
+        List<IpAddress> list = new ArrayList<IpAddress>();
+        Map params = new HashMap();
+        params.put("ip", IpUtil.ipConvertDec(Ip));
+        List<IpAddress> ipAddresses = this.ipAddressServie.selectObjByMap(params);
+        if(ipAddresses.size() > 0){
+            list.add(ipAddresses.get(0));
+        }else{
+            // 获取起点ip网络地址和广播地址
+            Map originMap =  null;
+            List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(null);
+            if(subnets.size() > 0){
+                if(Ip != null){
+                    if(Ip.equals("0.0.0.0")){
+                    }
+                    if(!IpUtil.verifyIp(Ip)){
+                    }
+                    // 判断ip地址是否属于子网
+                    for(Subnet subnet : subnets){
+                        Subnet sub = this.subnetTool.verifySubnetByIp(subnet, Ip);
+                        if(sub != null){
+                            String mask = IpUtil.bitMaskConvertMask(sub.getMask());
+                            originMap = IpUtil.getNetworkIpDec(sub.getIp(), mask);
+                            break;
+                        }
+                    }
+                }
+            }
+            if(originMap == null || originMap.isEmpty()){
+                return new ArrayList<>();
+            }
+            if(time == null){
+                list = this.ipAddressServie.querySrcDevice(originMap);
+            }else{
+                originMap.put("time", time);
+                list = this.ipAddressHistoryServie.querySrcDevice(originMap);
+            }
+        }
+        return list;
+    }
 
 }

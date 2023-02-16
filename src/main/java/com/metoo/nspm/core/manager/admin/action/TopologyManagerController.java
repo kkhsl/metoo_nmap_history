@@ -917,8 +917,6 @@ public class TopologyManagerController {
         }
         // 查询路由
         Map map = new HashMap();
-        Map params = new HashMap();
-
         List<IpAddress> srcIpAddresses = this.queryRoutDevice(srcIp, time);
         if(type == 0 && srcIpAddresses.size() <= 0){
             return ResponseUtil.badArgument("起点Ip不存在");
@@ -931,6 +929,7 @@ public class TopologyManagerController {
 //        map.put("destinationDevice", destIpAddress);
         this.routTableService.truncateTable();// 清除 routTable
 
+        Map params = new HashMap();
         // 保存起点设备到路由表
         // 多起点
         for (IpAddress srcIpAddress : srcIpAddresses) {
@@ -1059,6 +1058,59 @@ public class TopologyManagerController {
         return ResponseUtil.ok(map);
     }
 
+    @GetMapping("/path")
+    public Object queryPath(@RequestParam(value = "srcIp") String srcIp,
+                            @RequestParam(value = "srcGateway") String srcGateway,
+                            @RequestParam(value = "destIp") String destIp,
+                            @RequestParam(value = "destGateway") String destGateway){
+        if(StringUtil.isEmpty(srcIp)){
+            return ResponseUtil.badArgument("起点不能为空");
+        }
+        if(StringUtil.isEmpty(srcGateway)){
+            return ResponseUtil.badArgument("起点网关不能为空");
+        }
+        if(StringUtil.isEmpty(destIp)){
+            return ResponseUtil.badArgument("终点不能为空");
+        }
+        if(StringUtil.isEmpty(destGateway)){
+            return ResponseUtil.badArgument("终点网关不能为空");
+        }
+        if(!IpUtil.verifyIp(srcIp)){
+            return ResponseUtil.badArgument("起点格式错误");
+        }
+        if(!IpUtil.verifyIp(srcGateway)){
+            return ResponseUtil.badArgument("起点网关格式错误");
+        }
+        if(!IpUtil.verifyIp(destIp)){
+            return ResponseUtil.badArgument("终点格式错误");
+        }
+        if(!IpUtil.verifyIp(destGateway)){
+            return ResponseUtil.badArgument("终点网关格式错误");
+        }
+        Map map = new HashMap();
+        // 第一段 起点ip至起点ip网关的二层路径查询
+        String srcMac = "";
+        String destMac = "";
+        Arp srcArp = this.queryArp(srcIp);
+        srcMac = srcArp.getMac();
+        Arp destArp = this.queryArp(srcGateway);
+        destMac = destArp.getMac();
+        List one = this.routTool.twoLayerPath2(srcMac, destMac);
+        // 第二段 起点ip网关到终点ip网关的路由查询
+        List two = this.routTool.queryRoutePath(srcGateway, destGateway, null);
+        // 第三段 终点ip网关到终点ip的二层查询
+        srcArp = this.queryArp(destGateway);
+        srcMac = srcArp.getMac();
+        destArp = this.queryArp(destIp);
+        destMac = destArp.getMac();
+        List three = this.routTool.twoLayerPath2(srcMac, destMac);
+        map.put("one", one);
+        map.put("two", two);
+        map.put("three", three);
+
+        return ResponseUtil.ok(map);
+    }
+
     public Arp queryArp(String ip, Date time){
         Arp arp = null;
         if(time == null){
@@ -1073,6 +1125,11 @@ public class TopologyManagerController {
                 arp = srcArps.get(0);
             }
         }
+        return arp;
+    }
+
+    public Arp queryArp(String ip){
+        Arp arp = this.arpService.selectObjByIp(IpUtil.ipConvertDec(ip));
         return arp;
     }
 
