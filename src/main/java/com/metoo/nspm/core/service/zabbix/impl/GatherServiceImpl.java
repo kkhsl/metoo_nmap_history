@@ -60,6 +60,9 @@ public class GatherServiceImpl implements IGatherService {
         this.macService.copyMacTemp();
         // 记录历史
         this.macHistoryService.copyMacTemp();
+        // 同步网元数据到Mac
+        this.itemService.topologySyncToMac();
+
     }
 
     @Override

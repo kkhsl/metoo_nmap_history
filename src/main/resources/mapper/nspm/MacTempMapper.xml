@@ -202,7 +202,7 @@
 
     <select id="macJoinArp" parameterType="java.lang.String" resultMap="Base_Result_Map">
         SELECT
-            mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, Inet_ntoa(arp.ip) ip
+            mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, mac.mac
         FROM
             rsms_mac_temp mac
         JOIN

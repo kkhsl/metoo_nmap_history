@@ -455,9 +455,11 @@ public class SubnetManagerController {
                             if(address != null){
                                 IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(ip));
                                 int time = ipDetail.getTime();
-                                int day = time / 24;
-                                int time1 = time % 24;
-                                ipDetail.setDuration(day + "天" + time1 + "小时");
+                                // 每分钟采一次
+                                int hourAll = time / 60;// 一共多少小时
+                                int day = hourAll / 24;
+                                int hour = hourAll % 24;
+                                ipDetail.setDuration(day + "天" + hour + "小时");
                                 address.setIpDetail(ipDetail);
                             }
                             addresses.put(ip, address);

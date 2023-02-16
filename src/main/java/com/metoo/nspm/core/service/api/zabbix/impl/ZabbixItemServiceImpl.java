@@ -7,6 +7,7 @@ import com.metoo.nspm.core.manager.myzabbix.utils.ItemUtil;
 import com.metoo.nspm.core.manager.myzabbix.utils.ZabbixApiUtil;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixHostService;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixItemService;
+import com.metoo.nspm.core.service.nspm.IArpService;
 import com.metoo.nspm.core.service.nspm.IArpTempService;
 import com.metoo.nspm.core.service.nspm.IMacService;
 import com.metoo.nspm.core.service.nspm.IMacTempService;
@@ -14,6 +15,7 @@ import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.core.utils.network.IpV4Util;
 import com.metoo.nspm.dto.zabbix.HostDTO;
 import com.metoo.nspm.dto.zabbix.ItemDTO;
+import com.metoo.nspm.entity.nspm.Arp;
 import com.metoo.nspm.entity.nspm.ArpTemp;
 import com.metoo.nspm.entity.nspm.IpAddress;
 import com.metoo.nspm.entity.nspm.MacTemp;
@@ -39,6 +41,8 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
     private IMacService macService;
     @Autowired
     private IMacTempService macTempService;
+    @Autowired
+    private IArpService arpService;
 
     @Override
     public JSONObject getItem(ItemDTO dto) {
@@ -832,7 +836,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                 obj.setTag("E");
                 obj.setRemoteDevice(instancce.getDeviceName());
                 obj.setRemoteUuid(instancce.getUuid());
-                obj.setRemoteInterface(instancce.getInterfaceName());
+//                obj.setRemoteInterface(instancce.getInterfaceName());
                 obj.setRemoteDeviceIp(instancce.getDeviceIp());
                 obj.setRemoteDeviceType(instancce.getDeviceType());
                 this.macTempService.update(obj);
@@ -848,6 +852,14 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                 this.macTempService.update(obj);
             }else{
                 obj.setTag("DT");
+                params.clear();
+                params.put("mac", obj.getMac());
+                List<Arp> arps = arpService.selectObjByMap(params);
+                if (arps.size() > 0) {
+                    Arp arp = arps.get(0);
+                    obj.setIp(arp.getIp());
+                    obj.setIpAddress(arp.getIpAddress());
+                }
                 this.macTempService.update(obj);
             }
         }
@@ -867,7 +879,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                 obj.setTag("E");
                 obj.setRemoteDevice(instancce.getDeviceName());
                 obj.setRemoteUuid(instancce.getUuid());
-                obj.setRemoteInterface(instancce.getInterfaceName());
+//                obj.setRemoteInterface(instancce.getInterfaceName());
                 obj.setRemoteDeviceIp(instancce.getDeviceIp());
                 obj.setRemoteDeviceType(instancce.getDeviceType());
                 this.macTempService.update(obj);
@@ -904,10 +916,10 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                             List<MacTemp> remoteMacs = this.macTempService.selectByMap(params);
                             for(MacTemp remoteMac : remoteMacs){
                                 if(com.metoo.nspm.core.utils.StringUtils.isInteger(remoteMac.getIndex())){
-                                    if(remoteMac.getIndex() != null && Integer.parseInt(remoteMac.getIndex()) < 4096){
-                                        mac.setTag("DE");
-                                        this.macTempService.update(mac);
-                                    }
+//                                    if(remoteMac.getIndex() != null && Integer.parseInt(remoteMac.getIndex()) < 4096){
+//                                        mac.setTag("DE");
+//                                        this.macTempService.update(mac);
+//                                    }
                                     if(remoteMac.getIndex() != null && Integer.parseInt(remoteMac.getIndex()) >= 4096){
                                         mac.setTag("E");
                                         this.macTempService.update(mac);
@@ -921,29 +933,39 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             }
 
         }
-        // 标记为E
-        params.clear();
-        params.put("tag", "E");
-        List<MacTemp> emacList = this.macTempService.selectTagByMap(params);
-        if(emacList.size() > 0){
-            for(MacTemp mac : emacList){
-                params.clear();
-                params.put("macId", mac.getId());
-                params.put("other", "L");
-                params.put("mac", mac.getMac());
-                List<MacTemp> macList = this.macTempService.selectTagByMap(params);
-                if(macList.size() == 0){
-                    mac.setTag("DE");
-                    this.macTempService.update(mac);
-                }
-            }
-        }
+        // 标记为DE
+//        params.clear();
+//        params.put("tag", "E");
+//        List<MacTemp> emacList = this.macTempService.selectTagByMap(params);
+//        if(emacList.size() > 0){
+//            for(MacTemp mac : emacList){
+//                params.clear();
+//                params.put("macId", mac.getId());
+//                params.put("other", "L");
+//                params.put("mac", mac.getMac());
+//                List<MacTemp> macList = this.macTempService.selectTagByMap(params);
+//                if(macList.size() == 0){
+//                    mac.setTag("DE");
+//                    this.macTempService.update(mac);
+//                }
+//            }
+//        }
         // mac|arp联查
         // 标记为UT且有ip地址的，标记为DT
         params.clear();
         params.put("tag", "S");
         List<MacTemp> macs = this.macTempService.macJoinArp(params);
         macs.forEach(item ->{
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(item.getMac())){
+                params.clear();
+                params.put("mac", item.getMac());
+                List<Arp> arps = arpService.selectObjByMap(params);
+                if (arps.size() > 0) {
+                    Arp arp = arps.get(0);
+                    item.setIp(arp.getIp());
+                    item.setIpAddress(arp.getIpAddress());
+                }
+            }
             this.macTempService.update(item);
         });
     }

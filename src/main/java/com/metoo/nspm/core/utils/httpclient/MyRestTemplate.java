@@ -33,7 +33,7 @@
 //import java.network.URI;
 //import java.util.*;
 //import java.util.stream.Collectors;
-//import java.util.stream.Stream;
+//import java.util.stream.StreamDemo;
 //
 //public class MyRestTemplate extends RestTemplate {
 //    private static final boolean shouldIgnoreXml = SpringProperties.getFlag("spring.xml.ignore");
@@ -679,7 +679,7 @@
 //            }
 //        }
 //
-//        private Stream<MediaType> getSupportedMediaTypes(Type type, HttpMessageConverter<?> converter) {
+//        private StreamDemo<MediaType> getSupportedMediaTypes(Type type, HttpMessageConverter<?> converter) {
 //            Type rawType = type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type;
 //            Class<?> clazz = rawType instanceof Class ? (Class)rawType : null;
 //            return (clazz != null ? converter.getSupportedMediaTypes(clazz) : converter.getSupportedMediaTypes()).stream().map((mediaType) -> {

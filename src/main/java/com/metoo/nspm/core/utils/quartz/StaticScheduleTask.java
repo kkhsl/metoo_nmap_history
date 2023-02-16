@@ -33,9 +33,9 @@ import java.util.*;
 
 @EnableScheduling
 @Configuration // 用于标记配置类，兼备Component
-public class SaticScheduleTask {
+public class StaticScheduleTask {
 
-    Logger log = LoggerFactory.getLogger(SaticScheduleTask.class);
+    Logger log = LoggerFactory.getLogger(StaticScheduleTask.class);
 
     @Value("${task.switch.is-open}")
     private boolean flag;
@@ -56,8 +56,11 @@ public class SaticScheduleTask {
 
     static DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
 
-//
-    // 添加定时任务
+
+
+    /**
+     * 修改采集时间，调整子网在线时长
+     */
     @Scheduled(cron = "0 */1 * * * ?")
     public void configureTask(){
 //        ThreadContext.bind(manager);

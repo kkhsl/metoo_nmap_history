@@ -506,7 +506,7 @@ public class TopologyManagerController {
 //        if(dto.getTime() == null){
 //            page = this.routService.selectConditionQuery(dto);
 //        }else{
-//            page = this.routHistoryService.selectConditionQuery(dto);
+//            page = this.routdestIpService.selectConditionQuery(dto);
 //        }
 //        if(page != null && page.getResult().size() > 0) {
 //            return ResponseUtil.ok(new PageInfo<Route>(page));
@@ -891,12 +891,15 @@ public class TopologyManagerController {
         if(!IpUtil.verifyIp(srcIp)){
             return ResponseUtil.badArgument("起点Ip格式错误");
         }
+        String srcMac = "";// 起点Mac
+        String destMac = "";// 终点Mac
         Arp srcArp = null;
         if(type == 1){
             srcArp = this.queryArp(srcIp, time);
             if(srcArp == null){
                 return ResponseUtil.badArgument("起点Ip不存在");
             }
+            srcMac = srcArp.getMac();
         }
         if(StringUtil.isEmpty(destIp)){
             return ResponseUtil.badArgument("终点Ip不能为空");
@@ -907,23 +910,24 @@ public class TopologyManagerController {
         Arp destArp = null;
         if(type == 1){
             destArp = this.queryArp(destIp, time);
-            if(destArp == null){
-                return ResponseUtil.badArgument("终点Ip不存在");
-            }
+//            if(destArp == null){
+//                return ResponseUtil.badArgument("终点Ip不存在");
+//            }
+            destMac = destArp.getMac();
         }
         // 查询路由
         Map map = new HashMap();
         Map params = new HashMap();
 
         List<IpAddress> srcIpAddresses = this.queryRoutDevice(srcIp, time);
-        if(srcIpAddresses.size() <= 0){
+        if(type == 0 && srcIpAddresses.size() <= 0){
             return ResponseUtil.badArgument("起点Ip不存在");
         }
         // 终点设备
-        List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
-        if(destIpAddress.size() <= 0){
-            return ResponseUtil.badArgument("终点Ip不存在");
-        }
+//        List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
+//        if(destIpAddress.size() <= 0){
+//            return ResponseUtil.badArgument("终点Ip不存在");
+//        }
 //        map.put("destinationDevice", destIpAddress);
         this.routTableService.truncateTable();// 清除 routTable
 
@@ -951,7 +955,6 @@ public class TopologyManagerController {
         }
         List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
         map.put("routTable", routTableList);
-
 
         // 二层路径
 //        if(type == 1){
@@ -998,54 +1001,61 @@ public class TopologyManagerController {
 //                }
 //
 //                // 查询终点二层路径
-//                if(routTableList.size() > 0){
-//                    List<RouteTable> destToutTables = routTableList.stream()
-//                            .filter(item -> item.getStatus() == 1 || item.getStatus() == 3).collect(Collectors.toList());
-//                    Map routTableMap = new HashMap();
-//                    List list = new ArrayList();
-//                    List destRemoteList = new ArrayList();
-//                    for(RouteTable item : destToutTables){
-//                        List<Mac> dest_layer_2_device = this.routTool.generetorSrcLayer_2_device(destArp.getMac(), item.getDeviceName(), time);
-//                        int number1 = dest_layer_2_device.size();
-//                        boolean flag1 = true;
-//                        if(number1 == 1){
-//                            Mac mac = dest_layer_2_device.get(0);
-//                            if(mac.getTag().equals("L")){
-//                                flag1 = false;
-//                            }
-//                        }
-//                        if(number1 > 1 && flag1){
-//                            flag1 = false;
-//                            routTableMap.put(item.getIp(), dest_layer_2_device);
-//                            list.add(dest_layer_2_device);
-//                        }
-//                        if(flag1){
-//                            // 查找 二层路径 路由起点设备的remote设备为有起点ip的mac地址记录且与起点设备相连的那台设备
-//                            params.clear();
-//                            params.put("mac", destArp.getMac());
-//                            List<Mac> destRemoteDevice = this.routTool.queryMac(params, time);
-////                        List<Mac> destRemoteDevice = this.macService.selectByMap(params);
-//                            if(destRemoteDevice.size() > 0){
-//                                params.clear();
-//                                params.put("remoteDevice", destIpAddress.get(0).getDeviceName());
-//                                List<Mac> mac = this.routTool.queryMac(params, time);
-////                            List<Mac> mac = this.macService.selectByMap(params);
-//                                for(Mac obj : mac){
-//                                    if(obj.getRemoteDevice() != null && destIpAddress.get(0).getDeviceName() != null){
-//                                        if(obj.getRemoteDevice().equals(destIpAddress.get(0).getDeviceName())){
-//                                            destRemoteList.add(obj);
-//                                            break;
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                    map.put("dest_layer_2_device", list);
-//                    map.put("destRemoteDevice", destRemoteList);
-//                }
+////                if(routTableList.size() > 0){
+////                    List<RouteTable> destToutTables = routTableList.stream()
+////                            .filter(item -> item.getStatus() == 1 || item.getStatus() == 3).collect(Collectors.toList());
+////                    Map routTableMap = new HashMap();
+////                    List list = new ArrayList();
+////                    List destRemoteList = new ArrayList();
+////                    for(RouteTable item : destToutTables){
+////                        List<Mac> dest_layer_2_device = this.routTool.generetorSrcLayer_2_device(destArp.getMac(), item.getDeviceName(), time);
+////                        int number1 = dest_layer_2_device.size();
+////                        boolean flag1 = true;
+////                        if(number1 == 1){
+////                            Mac mac = dest_layer_2_device.get(0);
+////                            if(mac.getTag().equals("L")){
+////                                flag1 = false;
+////                            }
+////                        }
+////                        if(number1 > 1 && flag1){
+////                            flag1 = false;
+////                            routTableMap.put(item.getIp(), dest_layer_2_device);
+////                            list.add(dest_layer_2_device);
+////                        }
+////                        if(flag1){
+////                            // 查找 二层路径 路由起点设备的remote设备为有起点ip的mac地址记录且与起点设备相连的那台设备
+////                            params.clear();
+////                            params.put("mac", destArp.getMac());
+////                            List<Mac> destRemoteDevice = this.routTool.queryMac(params, time);
+//////                        List<Mac> destRemoteDevice = this.macService.selectByMap(params);
+////                            if(destRemoteDevice.size() > 0){
+////                                params.clear();
+////                                params.put("remoteDevice", destIpAddress.get(0).getDeviceName());
+////                                List<Mac> mac = this.routTool.queryMac(params, time);
+//////                            List<Mac> mac = this.macService.selectByMap(params);
+////                                for(Mac obj : mac){
+////                                    if(obj.getRemoteDevice() != null && destIpAddress.get(0).getDeviceName() != null){
+////                                        if(obj.getRemoteDevice().equals(destIpAddress.get(0).getDeviceName())){
+////                                            destRemoteList.add(obj);
+////                                            break;
+////                                        }
+////                                    }
+////                                }
+////                            }
+////                        }
+////                    }
+////                    map.put("dest_layer_2_device", list);
+////                    map.put("destRemoteDevice", destRemoteList);
+////                }
+//
 //            }
 //        }
+
+//                // 查询二层路径
+        if(type == 1){
+            List dest_layer_2_device = this.routTool.twoLayerPath2(srcMac, destMac);
+            map.put("dest_layer_2_device", dest_layer_2_device);
+        }
         return ResponseUtil.ok(map);
     }
 

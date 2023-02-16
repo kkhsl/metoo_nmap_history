@@ -310,6 +310,140 @@ public class RoutTool {
         }
     }
 
+    // 二层路径查询
+//    public List twoLayerPath(String srcMac, String destMac){
+//        // 查询起点设备
+//        Map params = new HashMap();
+//        params.clear();
+//        params.put("tag", "DT");
+//        params.put("mac", srcMac);
+//        List<Mac> srcDevices = this.macService.selectByMap(params);
+//        if(srcDevices.size() <= 0){
+//            params.clear();
+//            params.put("tag", "L");
+//            params.put("mac", srcMac);
+//            srcDevices = this.macService.selectByMap(params);
+//        }
+//        if(srcDevices.size() > 0){
+//            params.clear();
+//            params.put("tag", "DT");
+//            params.put("mac", destMac);
+//            List<Mac> destDevices = this.macService.selectByMap(params);
+//            if(destDevices.size() <= 0){
+//                params.clear();
+//                params.put("tag", "L");
+//                params.put("mac", destMac);
+//                destDevices = this.macService.selectByMap(params);
+//            }
+//            if(destDevices.size() > 0){
+//                // 查询下一跳
+//                Mac srcDevice = srcDevices.get(0);
+//                Mac destDevice = destDevices.get(0);
+//                List list = this.recursionLayPath(srcDevice.getUuid(), destDevice);
+//                list.add(destDevice);
+//                return list;
+//            }
+//        }
+//        return new ArrayList();
+//    }
+
+
+    public List twoLayerPath2(String srcMac, String destMac){
+        // 查询起点设备
+        Map params = new HashMap();
+        List<Mac> srcDevices = new ArrayList<>();
+        if(srcMac.contains("0:0:5e")){
+            params.put("tag", "LV");
+            params.put("mac", srcMac);
+            srcDevices = this.macService.selectByMap(params);
+        }
+        if(srcDevices.size() <= 0){
+            params.clear();
+            params.put("tag", "DT");
+            params.put("mac", srcMac);
+            srcDevices = this.macService.selectByMap(params);
+            if(srcDevices.size() <= 0){
+                params.clear();
+                params.put("tag", "L");
+                params.put("mac", srcMac);
+                srcDevices = this.macService.selectByMap(params);
+            }
+        }
+        if(srcDevices.size() > 0){
+            List<Mac> destDevices = new ArrayList<>();
+            if(destMac.contains("0:0:5e")){
+                params.put("tag", "LV");
+                params.put("mac", destMac);
+                destDevices = this.macService.selectByMap(params);
+            }
+            if(destDevices.size() <= 0){
+                params.clear();
+                params.put("tag", "DT");
+                params.put("mac", destMac);
+                destDevices = this.macService.selectByMap(params);
+                if(destDevices.size() <= 0){
+                    params.clear();
+                    params.put("tag", "L");
+                    params.put("mac", destMac);
+                    destDevices = this.macService.selectByMap(params);
+                }
+            }
+            if(destDevices.size() > 0){
+                // 查询下一跳
+                Mac srcDevice = srcDevices.get(0);
+                Mac destDevice = destDevices.get(0);
+                String tag = "";
+                if(destDevice.getTag().equals("L")){
+                    tag = "DE";
+                }
+                List list = this.recursionLayPath(srcDevice.getUuid(), destDevice, tag);
+                list.add(destDevice);
+                return list;
+            }
+        }
+        return new ArrayList();
+    }
+
+    // 递归查询二层路径
+    public List recursionLayPath(String srcUuid, Mac destDevice, String tag){
+        List list = new ArrayList();
+        Map params = new HashMap();
+        params.clear();
+        params.put("uuid", srcUuid);
+        params.put("mac", destDevice.getMac());
+        if(!tag.equals("")){
+            params.put("tag", "DE");
+        }
+        List<Mac> macs = this.macService.selectByMap(params);
+        if(macs.size() > 0){
+            for(Mac mac : macs){// 多个下一跳路径
+                if(mac.getId() == destDevice.getId()){// 下一跳与终点
+                    continue;
+                }else{
+                    if(tag.equals("")){
+                        params.clear();
+                        params.put("interfaceName", mac.getInterfaceName());
+                        params.put("uuid", mac.getUuid());
+                        params.put("tag", "DE");
+                        List<Mac> vMacs = this.macService.selectByMap(params);
+                        if(vMacs.size() > 0){
+                            Mac vmac = vMacs.stream().findAny().get();
+                            List listr = this.recursionLayPath(vmac.getRemoteUuid(), destDevice, "");
+                            list.addAll(listr);
+                            list.add(vmac);
+                        }
+                    }else{
+                        List listr = this.recursionLayPath(mac.getRemoteUuid(), destDevice, tag);
+                        list.addAll(listr);
+                        list.add(mac);
+                    }
+                }
+            }
+            return list;
+        }
+        return new ArrayList();
+    }
+
 //    public void generatorRout(IpAddress ipAddress, String destIp, String descMask, Date time) {
 //        if (ipAddress != null) {
 //            ipAddress.setStatus(0);

@@ -203,23 +203,6 @@
             tag is null
     </select>
 
-    <select id="macJoinArp" parameterType="java.lang.String" resultMap="Base_Result_Map">
-        SELECT
-            mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, arp.ip ip
-        FROM
-            rsms_mac mac
-        JOIN
-            rsms_arp arp
-        ON
-            mac.mac=arp.mac
-        WHERE
-            (mac.tag = 'RT'
-        OR
-            mac.tag = 'UT')
-				and arp.ip is not null
-        order by mac.device_name desc, mac.interface_name desc
-    </select>
-
     <insert id="save" parameterType="com.metoo.nspm.entity.nspm.Mac">
         INSERT INTO rsms_mac
         <trim prefix="(" suffix=")" suffixOverrides=",">
