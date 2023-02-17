@@ -1,6 +1,5 @@
 package com.metoo.nspm.core.utils.collections;
 
-import com.sun.tools.javac.code.Scope;
 import org.junit.Test;
 
 import java.util.*;
@@ -61,7 +60,6 @@ public class MapTest {
             System.out.println("Key：" + next.getKey() + " Value：" + next.getValue());
         }
     }
-
 
     @Test
     public void circulication(){

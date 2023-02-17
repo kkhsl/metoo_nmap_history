@@ -6,6 +6,7 @@ import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -294,6 +295,8 @@ public class RoutTool {
                                                 nextIpaddressRoutTable.setRemoteDevice(ipAddress.getDeviceName());
                                                 nextIpaddressRoutTable.setRemoteInterface(ipAddress.getInterfaceName());
                                                 nextIpaddressRoutTable.setRemoteUuid(ipAddress.getDeviceUuid());
+                                                nextIpaddressRoutTable.setUserId(ShiroUserHolder.currentUser().getId());
+                                                nextIpaddressRoutTable.setUserId(ShiroUserHolder.currentUser().getId());
                                                 this.routTableService.save(nextIpaddressRoutTable);
                                                 generatorRout(nextIpaddress, destIp, time);
                                             }
@@ -351,9 +354,9 @@ public class RoutTool {
 //        return new ArrayList();
 //    }
 
-
-    public List twoLayerPath2(String srcMac, String destMac){
+    public Map secondLayer(String srcMac, String destMac){
         // 查询起点设备
+        Map map = new HashMap();
         Map params = new HashMap();
         List<Mac> srcDevices = new ArrayList<>();
         if(srcMac.contains("0:0:5e")){
@@ -400,12 +403,50 @@ public class RoutTool {
                 if(destDevice.getTag().equals("L")){
                     tag = "DE";
                 }
-                List list = this.recursionLayPath(srcDevice.getUuid(), destDevice, tag);
-                list.add(destDevice);
-                return list;
+                List path = this.recursionLayPath(srcDevice.getUuid(), destDevice, tag);
+                path.add(destDevice);
+                map.put("destDevice", destDevice);
+                map.put("path", path);
+                return map;
             }
         }
-        return new ArrayList();
+        return new HashMap();
+    }
+
+    public List secondLayers(String srcUuid, String destMac){
+        // 查询起点设备
+        Map params = new HashMap();
+        if(StringUtils.isNotEmpty(srcUuid)){
+            List<Mac> destDevices = new ArrayList<>();
+            if(destMac.contains("0:0:5e")){
+                params.put("tag", "LV");
+                params.put("mac", destMac);
+                destDevices = this.macService.selectByMap(params);
+            }
+            if(destDevices.size() <= 0){
+                params.clear();
+                params.put("tag", "DT");
+                params.put("mac", destMac);
+                destDevices = this.macService.selectByMap(params);
+                if(destDevices.size() <= 0){
+                    params.clear();
+                    params.put("tag", "L");
+                    params.put("mac", destMac);
+                    destDevices = this.macService.selectByMap(params);
+                }
+            }
+            if(destDevices.size() > 0){
+                // 查询下一跳
+                Mac destDevice = destDevices.get(0);
+                String tag = "";
+                if(destDevice.getTag().equals("L")){
+                    tag = "DE";
+                }
+                List path = this.recursionLayPath(srcUuid, destDevice, tag);
+                return path;
+            }
+        }
+        return new ArrayList<>();
     }
 
     // 递归查询二层路径
@@ -799,10 +840,10 @@ public class RoutTool {
         return srcMacs;
     }
 
-    public List queryRoutePath(String srcIp, String destIp, Date time){
+    public List queryRoutePath(String srcIp, String destIp, Date time, Mac destDevice){
         // 查询路由
-        Map map = new HashMap();
         List<IpAddress> srcIpAddresses = this.queryRoutDevice(srcIp, time);
+        User user = ShiroUserHolder.currentUser();
         if(srcIpAddresses.size() >= 0){
             // 终点设备
 //        List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
@@ -816,27 +857,37 @@ public class RoutTool {
             // 保存起点设备到路由表
             // 多起点
             for (IpAddress srcIpAddress : srcIpAddresses) {
-                params.clear();
-                params.put("ip", srcIpAddress.getIp());
-                params.put("mask", srcIpAddress.getMask());
-                params.put("deviceName", srcIpAddress.getDeviceName());
-                params.put("interfaceName", srcIpAddress.getInterfaceName());
-                params.put("mac", srcIpAddress.getMac());
-                List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
-                RouteTable routTable = null;
-                if(routTables.size() > 0){
-                    routTable = routTables.get(0);
-                }else{
-                    routTable = new RouteTable();
+                boolean flag = true;
+                if(destDevice != null && !srcIpAddress.getDeviceUuid().equals(destDevice.getUuid())) {
+                    flag = false;
                 }
-                String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
-                BeanUtils.copyProperties(srcIpAddress, routTable, IGNORE_ISOLATOR_PROPERTIES);
-                this.routTableService.save(routTable);
-                // 路由查询
-                this.generatorRout(srcIpAddress, destIp, time);
+                if(flag){
+                    params.clear();
+                    params.put("ip", srcIpAddress.getIp());
+                    params.put("mask", srcIpAddress.getMask());
+                    params.put("deviceName", srcIpAddress.getDeviceName());
+                    params.put("interfaceName", srcIpAddress.getInterfaceName());
+                    params.put("mac", srcIpAddress.getMac());
+                    List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
+                    RouteTable routTable = null;
+                    if(routTables.size() > 0){
+                        routTable = routTables.get(0);
+                    }else{
+                        routTable = new RouteTable();
+                    }
+                    String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
+                    BeanUtils.copyProperties(srcIpAddress, routTable, IGNORE_ISOLATOR_PROPERTIES);
+                    routTable.setUserId(user.getId());
+                    this.routTableService.save(routTable);
+                    // 路由查询
+                    this.generatorRout(srcIpAddress, destIp, time);
+                }
             }
         }
-        List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
+        Map params = new HashMap();
+        params.clear();
+        params.put("userId", user.getId());
+        List<RouteTable> routTableList = this.routTableService.selectObjByMap(params);
         return routTableList;
     }
 

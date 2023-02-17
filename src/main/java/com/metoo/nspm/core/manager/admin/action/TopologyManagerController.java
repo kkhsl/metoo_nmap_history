@@ -17,6 +17,7 @@ import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
+import org.nutz.lang.random.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -932,6 +933,7 @@ public class TopologyManagerController {
         Map params = new HashMap();
         // 保存起点设备到路由表
         // 多起点
+        User user = ShiroUserHolder.currentUser();
         for (IpAddress srcIpAddress : srcIpAddresses) {
             params.clear();
             params.put("ip", srcIpAddress.getIp());
@@ -948,11 +950,14 @@ public class TopologyManagerController {
             }
             String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
             BeanUtils.copyProperties(srcIpAddress, routTable, IGNORE_ISOLATOR_PROPERTIES);
+            routTable.setUserId(user.getId());
             this.routTableService.save(routTable);
             // 路由查询
             this.routTool.generatorRout(srcIpAddress, destIp, time);
         }
-        List<RouteTable> routTableList = this.routTableService.selectObjByMap(null);
+        params.clear();
+        params.put("userId", user.getId());
+        List<RouteTable> routTableList = this.routTableService.selectObjByMap(params);
         map.put("routTable", routTableList);
 
         // 二层路径
@@ -1051,14 +1056,14 @@ public class TopologyManagerController {
 //        }
 
 //                // 查询二层路径
-        if(type == 1){
-            List dest_layer_2_device = this.routTool.twoLayerPath2(srcMac, destMac);
-            map.put("dest_layer_2_device", dest_layer_2_device);
-        }
+//        if(type == 1){
+//            List dest_layer_2_device = this.routTool.twoLayerPath2(srcMac, destMac);
+//            map.put("dest_layer_2_device", dest_layer_2_device);
+//        }
         return ResponseUtil.ok(map);
     }
 
-    @GetMapping("/path")
+    @GetMapping("/Two-layer/equipment/path")
     public Object queryPath(@RequestParam(value = "srcIp") String srcIp,
                             @RequestParam(value = "srcGateway") String srcGateway,
                             @RequestParam(value = "destIp") String destIp,
@@ -1087,26 +1092,54 @@ public class TopologyManagerController {
         if(!IpUtil.verifyIp(destGateway)){
             return ResponseUtil.badArgument("终点网关格式错误");
         }
+
+        Map first = new HashMap();
         Map map = new HashMap();
         // 第一段 起点ip至起点ip网关的二层路径查询
         String srcMac = "";
         String destMac = "";
         Arp srcArp = this.queryArp(srcIp);
-        srcMac = srcArp.getMac();
         Arp destArp = this.queryArp(srcGateway);
-        destMac = destArp.getMac();
-        List one = this.routTool.twoLayerPath2(srcMac, destMac);
+        if(srcArp != null && destArp != null){
+            srcMac = srcArp.getMac();
+            destMac = destArp.getMac();
+            first = this.routTool.secondLayer(srcMac, destMac);
+            map.put("one", first.get("path"));
+        }else{
+            map.put("one", new ArrayList<>());
+        }
+
         // 第二段 起点ip网关到终点ip网关的路由查询
-        List two = this.routTool.queryRoutePath(srcGateway, destGateway, null);
-        // 第三段 终点ip网关到终点ip的二层查询
-        srcArp = this.queryArp(destGateway);
-        srcMac = srcArp.getMac();
-        destArp = this.queryArp(destIp);
-        destMac = destArp.getMac();
-        List three = this.routTool.twoLayerPath2(srcMac, destMac);
-        map.put("one", one);
+        List two = this.routTool.queryRoutePath(srcGateway, destGateway, null, (Mac)first.get("destDevice"));
         map.put("two", two);
-        map.put("three", three);
+
+        // 第三段 终点ip网关到终点ip的二层查询
+        User user = ShiroUserHolder.currentUser();
+        Map params = new HashMap();
+        params.clear();
+        params.put("userId", user.getId());
+        params.put("status", 3);
+        List<RouteTable> routTableList = this.routTableService.selectObjByMap(params);
+        destArp = this.queryArp(destIp);
+        if(routTableList.size() > 0 && destArp != null){
+            destMac = destArp.getMac();
+            List list = new ArrayList();
+            for(RouteTable routeTable : routTableList){
+                List path = this.routTool.secondLayers(routeTable.getDeviceUuid(), destMac);
+                list.addAll(path);
+            }
+            map.put("three", list);
+        }else{
+            srcArp = this.queryArp(destGateway);
+            if(srcArp != null && destArp != null){
+                srcMac = srcArp.getMac();
+                destMac = destArp.getMac();
+                Map third = this.routTool.secondLayer(srcMac, destMac);
+                map.put("three", third.get("path"));
+            }else{
+                map.put("three", new ArrayList<>());
+            }
+        }
 
         return ResponseUtil.ok(map);
     }

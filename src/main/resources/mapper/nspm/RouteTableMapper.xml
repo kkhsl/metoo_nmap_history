@@ -17,11 +17,12 @@
         <result column="remote_uuid" property="remoteUuid"></result>
         <result column="remote_devices" property="remoteDevices"></result>
         <result column="status" property="status"></result>
+        <result column="user_id" property="userId"></result>
     </resultMap>
 
     <sql id="Base_Column_List">
         id, ip, mac, mask, ip_segment, `index`, device_name, interface_name, ip_address, device_uuid,
-          remote_device, remote_interface, remote_uuid, remote_devices, status
+          remote_device, remote_interface, remote_uuid, remote_devices, status, user_id
     </sql>
 
 
@@ -61,6 +62,12 @@
             </if>
             <if test="interfaceName != null">
                 AND interface_name = #{interfaceName}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND user_id = #{userId}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
             </if>
         </where>
     </select>
@@ -113,6 +120,9 @@
             <if test="status != null">
                 status,
             </if>
+            <if test="userId != null">
+                user_id,
+            </if>
         </trim>
         <trim prefix="VALUES(" suffixOverrides="," suffix=")">
             <if test="addTime != null">
@@ -159,6 +169,9 @@
             </if>
             <if test="status != null">
                 #{status},
+            </if>
+            <if test="userId != null">
+                #{userId},
             </if>
         </trim>
     </insert>
@@ -210,6 +223,9 @@
             </if>
             <if test="status != null">
                 status = #{status},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
             </if>
         </set>
         where id = #{id, jdbcType=BIGINT}

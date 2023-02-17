@@ -624,11 +624,91 @@ public class ItemServiceImpl implements ItemService {
                             }
                         }
                     }
+                }else{
+                    params.put("ip", ip);
+                    params.put("tag", "arp");
+                    params.put("index", "ifindex");
+                    params.put("tag_relevance", "ifbasic");
+                    params.put("index_relevance", "ifindex");
+                    params.put("name_relevance", "ifname");
+                    List<Item> arpList = itemMapper.gatherItemByTag(params);
+                    if (arpList.size() > 0) {
+                        for (Item item : arpList) {
+                            List<ItemTag> tags = item.getItemTags();
+                            ArpTemp arpTemp = new ArpTemp();
+                            arpTemp.setDeviceName(deviveName);
+                            arpTemp.setDeviceType(deviceType);
+                            arpTemp.setUuid(uuid);
+                            arpTemp.setDeviceIp(ip);
+                            arpTemp.setTag("S");
+                            if (tags != null && tags.size() > 0) {
+                                for (ItemTag tag : tags) {
+                                    String value = tag.getValue();
+                                    if (tag.getTag().equals("ip")) {
+                                        arpTemp.setIp(IpUtil.ipConvertDec(value));
+                                    }
+                                    if (tag.getTag().equals("mac")) {
+                                        arpTemp.setMac(value);
+                                    }
+                                    if (tag.getTag().equals("type")) {
+                                        switch (value){
+                                            case "4":
+                                                value = "static";
+                                                break;
+                                            case "3":
+                                                value = "dynamic";
+                                                break;
+                                            case "1":
+                                                value = "other";
+                                                break;
+                                            default:
+                                                value = null;
+                                                break;
+                                        }
+                                        arpTemp.setType(value);
+                                    }
+                                    if (tag.getTag().equals("ifindex")) {
+                                        if(value != null){
+                                            arpTemp.setInterfaceName(tag.getName());
+                                            arpTemp.setIndex(value);
+                                        }else{
+                                            //
+                                            switch (value){
+                                                case "1":
+                                            }
+                                        }
+                                    }
+                                }
+                                // 获取arp，写入mac
+                                if (arpTemp.getIp() != null
+                                        && !arpTemp.getIp().equals("")
+                                        && arpTemp.getType().equals("dynamic")) {
+                                    MacTemp macTemp = new MacTemp();
+                                    macTemp.setMac(arpTemp.getMac());
+                                    macTemp.setIndex(arpTemp.getIndex());
+                                    macTemp.setType(arpTemp.getType());
+                                    macTemp.setDeviceName(deviveName);
+                                    macTemp.setDeviceType(deviceType);
+                                    macTemp.setInterfaceName(arpTemp.getInterfaceName());
+                                    macTemp.setUuid(uuid);
+                                    macTemp.setDeviceIp(ip);
+                                    params.clear();
+                                    params.put("deviceName", macTemp.getDeviceName());
+                                    params.put("interfaceName", macTemp.getInterfaceName());
+                                    params.put("mac", macTemp.getMac());
+                                    List<MacTemp> macs = macTempService.selectByMap(params);
+                                    if (macs.size() == 0) {
+                                        macTemp.setAddTime(time);
+                                        macTempService.save(macTemp);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-
 
     @Override
     public void gatherRouteItem(Date time) {
