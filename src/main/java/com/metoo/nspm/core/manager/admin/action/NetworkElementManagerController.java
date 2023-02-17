@@ -169,6 +169,15 @@ public class NetworkElementManagerController {
     public Object neInterfaceAll(){
         List<NetworkElement> networkElements = this.networkElementService.selectObjAll();
         for (NetworkElement networkElement : networkElements) {
+            if(networkElement.getIp() != null){
+                Interface obj = this.interfaceService.selectObjByIp(networkElement.getIp());
+                if(obj != null){
+                    networkElement.setAvailable(obj.getAvailable());
+                    networkElement.setError(obj.getError());
+                }else{
+                    networkElement.setAvailable("3");
+                }
+            }
             networkElement.setInterfaces(this.interfaceAll(networkElement));
         }
         return ResponseUtil.ok(networkElements);

@@ -43,7 +43,7 @@ public class NetworkElement extends IdEntity {
     private Long userId;
     private String userName;
     private boolean sync_device;
-    private String available;
+    private String available; // 0 - (默认) 未知; 1 - 可用; 2 - 不可用。 3:未配置
     private String error;
     private String uuid;
     private String interfaceNames;
