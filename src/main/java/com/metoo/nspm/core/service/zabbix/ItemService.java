@@ -37,7 +37,7 @@ public interface ItemService {
     List<Item> selectNameObjByIndex(String index);
 
     /**
-     * 同步拓扑连线关系到Mac
+     * 同步拓扑连线关系到MacTemp
      */
     void topologySyncToMac();
 

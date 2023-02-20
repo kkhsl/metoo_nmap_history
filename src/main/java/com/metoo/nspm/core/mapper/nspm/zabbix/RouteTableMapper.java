@@ -20,6 +20,10 @@ public interface RouteTableMapper {
 
     int update(RouteTable instance);
 
+    int deleteObjByUserId(Long userId);
+
     void truncateTable();
+
+    void truncateTableByMap(Map params);
 
 }

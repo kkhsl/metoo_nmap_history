@@ -123,9 +123,6 @@
             <if test="ip != null">
                 AND ip = #{ip}
             </if>
-            <if test="remoteDevice != null">
-                AND remote_device = #{remoteDevice}
-            </if>
             <if test="macId != null and macId != ''">
                 AND id != #{macId}
             </if>

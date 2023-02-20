@@ -895,44 +895,44 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             this.macTempService.update(obj);
         }
         // 为DE的条目，查询mac对应的L条目的portindex < 4069标记为DE,记录端口名
-        params.clear();
-        List<MacTemp> emacs = this.macTempService.groupByObjByMap(params);
-        for(MacTemp eobj : emacs){
-            params.clear();
-            params.put("deviceName", eobj.getDeviceName());
-            List<MacTemp> demacs = this.macTempService.groupByObjByMap2(params);
-            if(demacs.size() > 0){
-                for (MacTemp demac : demacs){
-                    params.clear();
-                    params.put("deviceName", demac.getDeviceName());
-                    params.put("remoteDevice", demac.getRemoteDevice());
-                    List<MacTemp> macs = this.macTempService.selectByMap(params);
-                    if(macs.size() >= 2){
-                        for(MacTemp mac : macs){
-                            params.clear();
-                            params.put("tag", "L");
-                            params.put("device_name", mac.getRemoteDevice());
-                            params.put("mac", mac.getMac());
-                            List<MacTemp> remoteMacs = this.macTempService.selectByMap(params);
-                            for(MacTemp remoteMac : remoteMacs){
-                                if(com.metoo.nspm.core.utils.StringUtils.isInteger(remoteMac.getIndex())){
-//                                    if(remoteMac.getIndex() != null && Integer.parseInt(remoteMac.getIndex()) < 4096){
-//                                        mac.setTag("DE");
+//        params.clear();
+//        List<MacTemp> emacs = this.macTempService.groupByObjByMap(params);
+//        for(MacTemp eobj : emacs){
+//            params.clear();
+//            params.put("deviceName", eobj.getDeviceName());
+//            List<MacTemp> demacs = this.macTempService.groupByObjByMap2(params);
+//            if(demacs.size() > 0){
+//                for (MacTemp demac : demacs){
+//                    params.clear();
+//                    params.put("deviceName", demac.getDeviceName());
+//                    params.put("remoteDevice", demac.getRemoteDevice());
+//                    List<MacTemp> macs = this.macTempService.selectByMap(params);
+//                    if(macs.size() >= 2){
+//                        for(MacTemp mac : macs){
+//                            params.clear();
+//                            params.put("tag", "L");
+//                            params.put("device_name", mac.getRemoteDevice());
+//                            params.put("mac", mac.getMac());
+//                            List<MacTemp> remoteMacs = this.macTempService.selectByMap(params);
+//                            for(MacTemp remoteMac : remoteMacs){
+//                                if(com.metoo.nspm.core.utils.StringUtils.isInteger(remoteMac.getIndex())){
+////                                    if(remoteMac.getIndex() != null && Integer.parseInt(remoteMac.getIndex()) < 4096){
+////                                        mac.setTag("DE");
+////                                        this.macTempService.update(mac);
+////                                    }
+//                                    if(remoteMac.getIndex() != null && Integer.parseInt(remoteMac.getIndex()) >= 4096){
+//                                        mac.setTag("E");
 //                                        this.macTempService.update(mac);
+//                                        break;
 //                                    }
-                                    if(remoteMac.getIndex() != null && Integer.parseInt(remoteMac.getIndex()) >= 4096){
-                                        mac.setTag("E");
-                                        this.macTempService.update(mac);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//        }
         // 标记为DE
 //        params.clear();
 //        params.put("tag", "E");

@@ -9,6 +9,23 @@
         <version>2.4.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+    <!--
+        groupId：包名（域名反写）
+        artfactId：项目名
+        version：版本
+        type：依赖类型，jar或war（默认为jar，表示依赖的是一个jar包），另外当type表示为<type>pom.lastUpdated</type> 这种属性时，表示只将jar的描述信息加载了进来，实际的jar包并未导入。
+        classifier：
+        scope：
+            compile：所有范围此jar都生效
+            runtime：在测试和运行时生效；例如JDBC驱动（默认compile，不会报错，扩展了runtime），在编译时是没有用到这个jar包的
+            test：在测测试范围此生效，例如Junit（默认compile，扩展了test）
+            system：表示我们手动添加的包，不属于maven仓库，属于别的类库的jar包或本地jar
+            provided:表示在编译和测试时此jar生效，例如servlet-api，jsp-api，这个的provided必须填写，不能使用compile，原因是：
+                        我们在eclispe里创建web项目时，eclipse为我们添加了这两个jar包，离开了eclispe之后，到Tomcat中Tomcat又会为我们提供这两个包，所以一直不会报错，但是在我们创建maven项目时，我们就不是web项目了，所以eclispe不会为我们添加这两个jar包，就需要我们通过maven来添加，但是如果设置了compile，在Tomcat中运行时，就会与Tomcat中提供的这两个包产生冲突，所以要设置为provided，
+        systemPath：表示我们手动添加的包，不属于maven仓库，属于别的类库的jar包，只在编译和测试期生效，运行时无效，一般不用，使用时，需要配合下面的systemPath使用；为并非依赖maven的包指明路径
+        exclusions：排除传递依赖，解决jar冲突问题；（就近原则，优先原则；不同版本直接，依赖冲突）
+        optional
+            是 maven的9种依赖属性，-->
 
     <groupId>com.cloud.tv</groupId>
     <artifactId>metoo_nspm</artifactId>
@@ -359,11 +376,20 @@
             <scope>compile</scope>
         </dependency>
 
-        <!--Zabbix -->
+        <!--Zabbix maven管理依赖-->
+        <!--<dependency>-->
+            <!--<groupId>zabbix.api</groupId>-->
+            <!--<artifactId>self</artifactId>-->
+            <!--<version>0.0.2</version>-->
+        <!--</dependency>-->
+
+        <!--引入web依赖，非maven管理-->
         <dependency>
-            <groupId>zabbix.api</groupId>
+            <groupId>external.zabbix.api</groupId>
             <artifactId>self</artifactId>
             <version>0.0.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/self-0.0.2.jar</systemPath>
         </dependency>
 
         <!--<dependency>-->
@@ -479,6 +505,10 @@
                 <!--<mainClass>NspmApplicationTests</mainClass>-->
                 <!--&lt;!&ndash;配置可执行jar的名称，不对原jar重命名为.original&ndash;&gt;-->
                 <!--<classifier>exec</classifier>-->
+
+                <!-- 在打包时将引用的外部jar引入到当前项目包中	-->
+                <includeSystemScope>true</includeSystemScope>
+
             </configuration>
             <!--<executions>-->
                 <!--<execution>-->

@@ -235,4 +235,17 @@
         TRUNCATE TABLE rsms_rout_table
     </update>
 
+    <delete id="deleteObjByUserId" parameterType="java.lang.Long">
+        DELETE FROM rsms_rout_table where user_id = #{userId}
+    </delete>
+
+    <update id="truncateTableByMap" parameterType="java.util.Map">
+        TRUNCATE TABLE rsms_rout_table
+        <where>
+            <if test = "userId != null and userId != ''">
+                AND user_id = #{userId}
+            </if>
+        </where>
+    </update>
+
 </mapper>

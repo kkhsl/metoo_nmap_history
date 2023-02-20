@@ -60,7 +60,17 @@ public class RoutTableServiceImpl implements IRoutTableService {
     }
 
     @Override
+    public int deleteObjByUserId(Long userId) {
+        return this.routTableMapper.deleteObjByUserId(userId);
+    }
+
+    @Override
     public void truncateTable() {
         this.routTableMapper.truncateTable();
+    }
+
+    @Override
+    public void truncateTableByMap(Map params) {
+        this.routTableMapper.truncateTableByMap(params);
     }
 }

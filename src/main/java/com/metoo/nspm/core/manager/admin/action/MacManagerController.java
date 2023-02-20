@@ -16,9 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequestMapping("/admin/mac")
 @RestController
@@ -31,6 +34,23 @@ public class MacManagerController {
     @Autowired
     private INetworkElementService networkElementService;
 
+    public static void main(String[] args) {
+        String str = "00:25:9e:03:76:12";
+        Pattern pattern = Pattern.compile(":");
+        Matcher findMatcher = pattern.matcher(str);
+        List list = new ArrayList();
+        while(findMatcher.find()) {
+            list.add(findMatcher.start());
+        }
+        System.out.println(list.get(2));
+    }
+
+
+    /**
+     * 设备Mac 列表
+     * @param dto
+     * @return
+     */
     @RequestMapping("/list")
     public Object deviceMac(@RequestBody MacDTO dto){
         NetworkElement networkElement = this.networkElementService.selectObjByUuid(dto.getUuid());
@@ -45,28 +65,15 @@ public class MacManagerController {
                     params.clear();
                     if (mac.getMac() != null && !mac.getMac().equals("")) {
                         String macAddr = mac.getMac();
-                        int one_index = macAddr.indexOf(":");
-                        String one = macAddr.substring(0, one_index);
-                        if (one.equals("0")) {
-                            one = "00";
-                        }
-                        int tow_index = macAddr.indexOf(":", one_index + 1);
-                        String two = macAddr.substring(one_index, tow_index);
-                        if (two.equals("0")) {
-                            two = "00";
-                        }
-                        int three_index = macAddr.indexOf(":", tow_index + 1);
-                        String three = macAddr.substring(tow_index, three_index);
-                        if (three.equals("0")) {
-                            three = "00";
-                        }
-                        macAddr = one + two + three;
-
-                        params.put("mac", macAddr);
-                        List<MacVendor> macVendors = this.macVendorService.selectObjByMap(params);
-                        if (macVendors.size() > 0) {
-                            MacVendor macVendor = macVendors.get(0);
-                            mac.setVendor(macVendor.getVendor());
+                        int index = com.metoo.nspm.core.utils.StringUtils.acquireCharacterPosition(macAddr, ":", 3);
+                        if(index != -1){
+                            macAddr = macAddr.substring(0, index);
+                            params.put("mac", macAddr);
+                            List<MacVendor> macVendors = this.macVendorService.selectObjByMap(params);
+                            if (macVendors.size() > 0) {
+                                MacVendor macVendor = macVendors.get(0);
+                                mac.setVendor(macVendor.getVendor());
+                            }
                         }
                     }
                 }

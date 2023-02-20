@@ -54,15 +54,15 @@ public class GatherServiceImpl implements IGatherService {
     @Override
     public void gatherMacItem(Date time) {
         this.itemService.gatherMacItem(time);
-        // 同步到系统其他表
+
         this.zabbixItemService.macTag();
+
+        this.itemService.topologySyncToMac();
+        // 同步网元数据到Mac
         this.macService.truncateTable();
         this.macService.copyMacTemp();
         // 记录历史
         this.macHistoryService.copyMacTemp();
-        // 同步网元数据到Mac
-        this.itemService.topologySyncToMac();
-
     }
 
     @Override

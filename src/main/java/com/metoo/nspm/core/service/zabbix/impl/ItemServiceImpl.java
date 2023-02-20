@@ -2,6 +2,7 @@ package com.metoo.nspm.core.service.zabbix.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.core.manager.admin.tools.MacUtil;
 import com.metoo.nspm.core.manager.myzabbix.utils.ItemUtil;
 import com.metoo.nspm.core.mapper.nspm.zabbix.MacMapper;
 import com.metoo.nspm.core.mapper.zabbix.ItemMapper;
@@ -52,6 +53,8 @@ public class ItemServiceImpl implements ItemService {
     private IIPAddressTempService ipAddressTempService;
     @Autowired
     private ITopologyService topologyService;
+    @Autowired
+    private MacUtil macUtil;
 
 //    public static void main(String[] args) {
 //        String value = "4.10.25.65.162.32.2.0.0.1.4.10.25.248.18";
@@ -121,8 +124,14 @@ public class ItemServiceImpl implements ItemService {
                                     ips.add(IpUtil.ipConvertDec(value));
                                 }
                                 if (tag.getTag().equals("mac")) {
-                                    arpTemp.setMac(value);
-                                    ipDetail.setMac(value);
+
+                                    String mac = this.macUtil.supplement(value);
+                                    arpTemp.setMac(mac);
+
+//                                    arpTemp.setMac(value);
+//                                    ipDetail.setMac(value);
+                                    ipDetail.setMac(mac);
+
                                 }if (tag.getTag().equals("type")) {
                                     switch (value){
                                         case "4":
@@ -209,8 +218,12 @@ public class ItemServiceImpl implements ItemService {
                                         ips.add(IpUtil.ipConvertDec(value));
                                     }
                                     if (tag.getTag().equals("mac")) {
-                                        arpTemp.setMac(value);
-                                        ipDetail.setMac(value);
+
+                                        String mac = this.macUtil.supplement(value);
+                                        arpTemp.setMac(mac);
+                                        ipDetail.setMac(mac);
+//                                        arpTemp.setMac(value);
+//                                        ipDetail.setMac(value);
                                     }
                                     if (tag.getTag().equals("type")) {
                                         switch (value){
@@ -310,7 +323,11 @@ public class ItemServiceImpl implements ItemService {
 //                                }
                                 if (tag.getTag().equals("ifindex")) {
                                     arpTemp.setInterfaceName(tag.getName());
-                                    arpTemp.setMac(tag.getMac());
+
+                                    String mac = this.macUtil.supplement(value);
+                                    arpTemp.setMac(mac);
+//                                    arpTemp.setMac(tag.getMac());
+
                                     arpTemp.setIndex(value);
                                 }
                             }
@@ -374,18 +391,6 @@ public class ItemServiceImpl implements ItemService {
 
     }
 
-    @Test
-    public void vlanTest(){
-        String vlan = "0.0.80.121.102.104.29";
-        int i = vlan.indexOf(".");
-        System.out.println(i);
-        System.out.println(vlan.substring(0, i));
-        System.out.println(vlan.substring(i+1));
-        String mac16 = vlan.substring(i+1);
-        System.out.println(mac16);
-        String mac = mac16ConvertMac10(mac16);
-        System.out.println(mac);
-    }
 
     public String mac16ConvertMac10(String param){
         String[] strs = param.split("\\.");
@@ -419,10 +424,12 @@ public class ItemServiceImpl implements ItemService {
                         if (tag.getTag().equals("vlan")) {
 //                            String vlanMac = "0.80.121.102.104.29";
                             int i = vlanMac.indexOf(".");
-                            String vlan = vlanMac.substring(0, i);
-                            String mac16 = vlanMac.substring(i + 1);
-                            String mac = mac16ConvertMac10(mac16);
-                            map.put(mac, vlan);
+                            if(i != -1){
+                                String vlan = vlanMac.substring(0, i);
+                                String mac16 = vlanMac.substring(i + 1);
+                                String mac = mac16ConvertMac10(mac16);
+                                map.put(mac, vlan);
+                            }
                         }
                     }
                 }
@@ -479,7 +486,8 @@ public class ItemServiceImpl implements ItemService {
                                         if(!value.contains(":")){
                                             value = value.trim().replaceAll(" ", ":");
                                         }
-                                        macTemp.setMac(value);
+                                        String mac = this.macUtil.supplement(value);
+                                        macTemp.setMac(mac);
                                         if(macMap != null && !macMap.isEmpty()){
                                             String vlan = macMap.get(value);
                                             macTemp.setVlan(vlan);
@@ -551,7 +559,8 @@ public class ItemServiceImpl implements ItemService {
                                     if(!value.contains(":")){
                                         value = value.trim().replaceAll(" ", ":");
                                     }
-                                    macTemp.setMac(value);
+                                    String mac = this.macUtil.supplement(value);
+                                    macTemp.setMac(mac);
                                     if(macMap != null && !macMap.isEmpty()){
                                         String vlan = macMap.get(value);
                                         macTemp.setVlan(vlan);
@@ -605,7 +614,7 @@ public class ItemServiceImpl implements ItemService {
                                 List<MacTemp> macs = macTempService.selectByMap(params);
                                 if(macs.size() == 0){
                                     if(macTemp.getTag() == null || "".equals(macTemp.getTag())){
-                                        if(macTemp.getType() != null && macTemp.getType().equals("local")
+                                        if(macTemp.getType() != null && "local".equals(macTemp.getType())
                                                 && macTemp.getMac().contains("0:0:5e:0")){
                                             macTemp.setTag("LV");
                                         }else if(macTemp.getMac().contains("0:0:5e:0")){
@@ -648,7 +657,8 @@ public class ItemServiceImpl implements ItemService {
                                         arpTemp.setIp(IpUtil.ipConvertDec(value));
                                     }
                                     if (tag.getTag().equals("mac")) {
-                                        arpTemp.setMac(value);
+                                        String mac = this.macUtil.supplement(value);
+                                        arpTemp.setMac(mac);
                                     }
                                     if (tag.getTag().equals("type")) {
                                         switch (value){
@@ -682,7 +692,7 @@ public class ItemServiceImpl implements ItemService {
                                 // 获取arp，写入mac
                                 if (arpTemp.getIp() != null
                                         && !arpTemp.getIp().equals("")
-                                        && arpTemp.getType().equals("dynamic")) {
+                                        && "dynamic".equals(arpTemp.getType())) {
                                     MacTemp macTemp = new MacTemp();
                                     macTemp.setMac(arpTemp.getMac());
                                     macTemp.setIndex(arpTemp.getIndex());
@@ -1024,7 +1034,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void topologySyncToMac() {
-        Map params = new HashMap();
         // 获取拓扑列表
         List<Topology> topologies = this.topologyService.selectObjByMap(null);
         if(topologies.size() > 0){
@@ -1036,59 +1045,45 @@ public class ItemServiceImpl implements ItemService {
                         if(links.size() > 0) {
                             for (Object object : links) {
                                 Map link = JSONObject.parseObject(object.toString(), Map.class);
-                                String fromPort = String.valueOf(link.get("fromPort"));
-                                String from = String.valueOf(link.get("from"));
-                                String toPort = String.valueOf(link.get("toPort"));
-                                String to = String.valueOf(link.get("to"));
-                                params.clear();
-                                params.put("interfaceName", fromPort);
-                                params.put("uuid", from);
-                                params.put("tag", "E");
-                                List<Mac> fromMasc = this.macMapper.selectByMap(params);
-                                if(fromMasc.size() > 0){
-                                    for (Mac mac1 : fromMasc) {
-                                        try {
-                                            Map toNode = JSONObject.parseObject(link.get("toNode").toString(), Map.class);
-                                            if(toNode != null){
-                                                String name = String.valueOf(toNode.get("name"));
-                                                mac1.setRemoteDevice(name);
-                                            }
-                                            if(!toPort.equals("")){
-                                                mac1.setRemoteInterface(toPort);
-                                            }
-                                            mac1.setRemoteUuid(to);
-                                            mac1.setTag("DE");
-                                            this.macMapper.update(mac1);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
+                                if(link.get("category") == null || !"deviceTeamLink".equals(link.get("category"))){
+                                    String fromPort = String.valueOf(link.get("fromPort"));
+                                    String from = String.valueOf(link.get("from"));
+                                    Map fromNode = JSONObject.parseObject(String.valueOf(link.get("fromNode")), Map.class);
+                                    String toPort = String.valueOf(link.get("toPort"));
+                                    String to = String.valueOf(link.get("to"));
+                                    Map toNode = JSONObject.parseObject(String.valueOf(link.get("toNode")), Map.class);
+                                    MacTemp fromMac = new MacTemp();
+                                    fromMac.setTag("DE");
+                                    fromMac.setMac("00:00:00:00:00:00");
+                                    fromMac.setUuid(from);
+                                    fromMac.setInterfaceName(fromPort);
+                                    if(fromNode != null){
+                                        String name = String.valueOf(fromNode.get("name"));
+                                        fromMac.setDeviceName(name);
                                     }
-                                }
-
-                                // 反向连线
-                                params.clear();
-                                params.put("interfaceName", toPort);
-                                params.put("uuid", to);
-                                params.put("tag", "E");
-                                List<Mac> toMacs = this.macMapper.selectByMap(params);
-                                if(toMacs.size() > 0){
-                                    for (Mac mac1 : toMacs) {
-                                        try {
-                                            Map fromNode = JSONObject.parseObject(link.get("fromNode").toString(), Map.class);
-                                            if(fromNode != null){
-                                                String name = String.valueOf(fromNode.get("name"));
-                                                mac1.setRemoteDevice(name);
-                                            }
-                                            if(!toPort.equals("")){
-                                                mac1.setRemoteInterface(fromPort);
-                                            }
-                                            mac1.setRemoteUuid(from);
-                                            mac1.setTag("DE");
-                                            this.macMapper.update(mac1);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
+                                    fromMac.setRemoteUuid(to);
+                                    fromMac.setRemoteInterface(toPort);
+                                    if(toNode != null){
+                                        String name = String.valueOf(toNode.get("name"));
+                                        fromMac.setRemoteDevice(name);
                                     }
+                                    MacTemp toMac = new MacTemp();
+                                    toMac.setTag("DE");
+                                    toMac.setMac("00:00:00:00:00:00");
+                                    toMac.setUuid(to);
+                                    toMac.setInterfaceName(toPort);
+                                    if(toNode != null){
+                                        String name = String.valueOf(toNode.get("name"));
+                                        toMac.setDeviceName(name);
+                                    }
+                                    toMac.setRemoteUuid(from);
+                                    toMac.setRemoteInterface(fromPort);
+                                    if(fromNode != null){
+                                        String name = String.valueOf(fromNode.get("name"));
+                                        toMac.setRemoteDevice(name);
+                                    }
+                                    this.macTempService.save(fromMac);
+                                    this.macTempService.save(toMac);
                                 }
                             }
                         }
@@ -1097,5 +1092,81 @@ public class ItemServiceImpl implements ItemService {
             }
         }
     }
+
+//    @Override
+//    public void topologySyncToMac() {
+//        Map params = new HashMap();
+//        // 获取拓扑列表
+//        List<Topology> topologies = this.topologyService.selectObjByMap(null);
+//        if(topologies.size() > 0){
+//            for (Topology topology : topologies) {
+//                if(topology.getContent() != null){
+//                    Map content = JSONObject.parseObject(topology.getContent().toString(), Map.class);
+//                    if(content.get("links") != null){
+//                        JSONArray links = JSONArray.parseArray(content.get("links").toString());
+//                        if(links.size() > 0) {
+//                            for (Object object : links) {
+//                                Map link = JSONObject.parseObject(object.toString(), Map.class);
+//                                String fromPort = String.valueOf(link.get("fromPort"));
+//                                String from = String.valueOf(link.get("from"));
+//                                String toPort = String.valueOf(link.get("toPort"));
+//                                String to = String.valueOf(link.get("to"));
+//                                params.clear();
+//                                params.put("interfaceName", fromPort);
+//                                params.put("uuid", from);
+//                                params.put("tag", "E");
+//                                List<MacTemp> fromMacTemps = this.macTempService.selectByMap(params);
+//                                if(fromMacTemps.size() > 0){
+//                                    for (MacTemp macTemp : fromMacTemps) {
+//                                        try {
+//                                            Map toNode = JSONObject.parseObject(link.get("toNode").toString(), Map.class);
+//                                            if(toNode != null){
+//                                                String name = String.valueOf(toNode.get("name"));
+//                                                macTemp.setRemoteDevice(name);
+//                                            }
+//                                            if(!toPort.equals("")){
+//                                                macTemp.setRemoteInterface(toPort);
+//                                            }
+//                                            macTemp.setRemoteUuid(to);
+//                                            macTemp.setTag("DE");
+//                                            this.macTempService.update(macTemp);
+//                                        } catch (Exception e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                }
+//
+//                                // 反向连线
+//                                params.clear();
+//                                params.put("interfaceName", toPort);
+//                                params.put("uuid", to);
+//                                params.put("tag", "E");
+//                                List<MacTemp> toMacTemps = this.macTempService.selectByMap(params);
+//                                if(toMacTemps.size() > 0){
+//                                    for (MacTemp macTemp : toMacTemps) {
+//                                        try {
+//                                            Map fromNode = JSONObject.parseObject(link.get("fromNode").toString(), Map.class);
+//                                            if(fromNode != null){
+//                                                String name = String.valueOf(fromNode.get("name"));
+//                                                macTemp.setRemoteDevice(name);
+//                                            }
+//                                            if(!toPort.equals("")){
+//                                                macTemp.setRemoteInterface(fromPort);
+//                                            }
+//                                            macTemp.setRemoteUuid(from);
+//                                            macTemp.setTag("DE");
+//                                            this.macTempService.update(macTemp);
+//                                        } catch (Exception e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 }

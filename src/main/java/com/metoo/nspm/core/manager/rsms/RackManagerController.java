@@ -59,6 +59,9 @@ public class RackManagerController {
                             @RequestParam(value="uuid",required = false) String uuid){
         if(uuid != null){
             RsmsDevice device = this.rsmsDeviceService.getObjByUuid(uuid);
+            if(device == null){
+                return ResponseUtil.badArgument("设备已删除");
+            }
             Object obj = this.rackService.rack(device.getRackId());
             return ResponseUtil.ok(obj);
         }else if(id != null){

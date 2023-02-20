@@ -105,8 +105,8 @@ public class StaticScheduleTask {
         }
     }
 
-    @Scheduled(cron = "0 */2 * * * ?")
-    // 添加定时任务
+    @Scheduled(cron = "0 */5 * * * ?")
+//     添加定时任务
     public void gatherMac(){
 //        ThreadContext.bind(manager);
         //下面正常使用业务代码即可

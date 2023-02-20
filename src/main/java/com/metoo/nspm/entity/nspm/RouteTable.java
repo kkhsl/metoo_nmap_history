@@ -43,6 +43,6 @@ public class RouteTable extends IdEntity {
     private String remoteInterface;
     @ApiModelProperty("对端Uuid")
     private String remoteUuid;
-    private int status;// 路由状态 0：正常 1：没有下一跳 2：路由环路  3：为终端设备
+    private int status;// 路由状态 0：正常 1：没有下一跳 2：路由环路  3：为终端设备 4：起点路由
     private Long userId;
 }
