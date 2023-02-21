@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class RoutTool {
@@ -402,10 +403,12 @@ public class RoutTool {
                 Mac srcDevice = srcDevices.get(0);
                 Mac destDevice = destDevices.get(0);
                 String tag = "";
+                List path = new ArrayList();
                 if(destDevice.getTag().equals("L")){
-                    tag = "DE";
+                    path = this.nextHop(srcDevice.getUuid(), destDevice, "L");
+                }else{
+                    path = this.recursionLayPath(srcDevice.getUuid(), destDevice, tag);
                 }
-                List path = this.recursionLayPath(srcDevice.getUuid(), destDevice, tag);
                 path.add(destDevice);
                 path.add(srcDevice);
                 map.put("destDevice", destDevice);
@@ -442,10 +445,14 @@ public class RoutTool {
                 // 查询下一跳
                 Mac destDevice = destDevices.get(0);
                 String tag = "";
+                List path = new ArrayList();
                 if(destDevice.getTag().equals("L")){
-                    tag = "DE";
+                    path = this.nextHop(srcUuid, destDevice, "L");
+                }else{
+                    path = this.recursionLayPath(srcUuid, destDevice, tag);
                 }
-                List path = this.recursionLayPath(srcUuid, destDevice, tag);
+//                List path = this.recursionLayPath(srcUuid, destDevice, tag);
+
                 return path;
             }
         }
@@ -464,8 +471,10 @@ public class RoutTool {
         }
         List<Mac> macs = this.macService.selectByMap(params);
         if(macs.size() > 0){
-            for(Mac mac : macs){// 多个下一跳路径
-                if(mac.getId() == destDevice.getId()){// 下一跳与终点
+            // 多个下一跳路径
+            for(Mac mac : macs){
+                // 下一跳与终点
+                if(mac.getId() == destDevice.getId()){
                     continue;
                 }else{
                     if(tag.equals("")){
@@ -490,6 +499,100 @@ public class RoutTool {
             return list;
         }
         return new ArrayList();
+    }
+
+    public List nextHop(String srcUuid, Mac destDevice, String tag){
+//        List nextHop_1 = this.nextHop_1(srcUuid, destDevice, tag);
+//        if(nextHop_1.size() > 0){
+//            return nextHop_1;
+//        }
+        List nextHop_2 = this.nextHop_2(srcUuid, destDevice);
+        if(nextHop_2.size() > 0){
+            return nextHop_2;
+        }
+        return new ArrayList();
+    }
+
+    /**
+     * 查询下一跳：调整 1
+     * @param srcUuid
+     * @param destDevice
+     * @param tag
+     * @return
+     */
+    public List nextHop_1(String srcUuid, Mac destDevice, String tag){
+        List list = new ArrayList();
+        Map params = new HashMap();
+        if(tag.equals("L")){
+            params.clear();
+            params.put("uuid", srcUuid);
+            params.put("tag", "DE");
+            List<Mac> deMac = this.macService.selectByMap(params);
+            if(deMac.size() > 0){
+                List<Mac> remoteMacs = deMac.stream().filter(e -> e.getRemoteUuid() != null).collect(Collectors.toList());
+                if(remoteMacs.size() > 0){
+                    Mac nextHop = remoteMacs.stream().filter(e -> e.getRemoteUuid().equals(destDevice.getUuid())).findAny().get();
+                    List<Mac> des = remoteMacs.stream().filter(e -> e.getRemoteUuid().equals(destDevice.getUuid())).collect(Collectors.toList());
+                    if(nextHop != null){
+                        if(nextHop.getRemoteUuid().equals(destDevice.getUuid())){// 下一跳与终点
+                             }else{
+                                List listr = this.nextHop(nextHop.getRemoteUuid(), destDevice, "L");
+                                list.addAll(listr);
+                                list.add(nextHop);
+                            }
+//                        for(Mac mac : des){
+//                            if(mac.getRemoteUuid().equals(destDevice.getUuid())){// 下一跳与终点
+//                                continue;
+//                            }else{
+//                                List listr = this.recursionLayPath(mac.getRemoteUuid(), destDevice, "L");
+//                                list.addAll(listr);
+//                                list.add(mac);
+//                            }
+//                        }
+                    }
+                }
+            }
+        }else{
+
+        }
+        return list;
+    }
+
+    /**
+     * 查询下一跳：调整 2
+     * @param srcUuid
+     * @param destDevice
+     * @return
+     */
+    public List nextHop_2(String srcUuid, Mac destDevice){
+        List list = new ArrayList();
+        Map params = new HashMap();
+            params.clear();
+            params.put("uuid", srcUuid);
+            params.put("mac", destDevice.getMac());
+            List<Mac> macs = this.macService.selectByMap(params);
+            if(macs.size() > 0) {
+                // 多个下一跳路径
+                for (Mac mac : macs) {
+                    // 下一跳与终点
+                    if (mac.getId() == destDevice.getId()) {
+                        continue;
+                    } else {
+                        params.clear();
+                        params.put("interfaceName", mac.getInterfaceName());
+                        params.put("uuid", mac.getUuid());
+                        params.put("tag", "DE");
+                        List<Mac> demac = this.macService.selectByMap(params);
+                        if (demac.size() > 0) {
+                            Mac findAny = demac.stream().findAny().get();
+                            List listr = this.nextHop_2(findAny.getRemoteUuid(), destDevice);
+                            list.addAll(listr);
+                            list.add(findAny);
+                        }
+                    }
+                }
+            }
+        return list;
     }
 
 //    public void generatorRout(IpAddress ipAddress, String destIp, String descMask, Date time) {

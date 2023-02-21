@@ -1,4 +1,4 @@
-package com.metoo.nspm.core.service.zabbix.impl;
+package com.metoo.nspm.core.manager.admin.tools;
 
 import java.util.ArrayList;
 import java.util.List;

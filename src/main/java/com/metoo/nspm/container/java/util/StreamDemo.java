@@ -1,5 +1,8 @@
 package com.metoo.nspm.container.java.util;
 
+import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.entity.nspm.User;
+import jdk.nashorn.internal.parser.JSONParser;
 import lombok.ToString;
 import org.apache.ibatis.javassist.runtime.Inner;
 import org.junit.Test;
@@ -25,6 +28,8 @@ import static java.lang.System.*;
  * @author HKK
  *
  * @create 2023/02/15
+ *
+ * @version 1.0
  */
 public class StreamDemo {
 
@@ -79,11 +84,13 @@ public class StreamDemo {
         Inner innser_3 = new Inner("关羽", 24, "男");
         Inner innser_4 = new Inner("张飞", 21, "女");
         Inner innser_5 = new Inner("张飞", 24, "女");
+        Inner innser_6 = new Inner("张飞", 24, "女");
         INNERLIST.add(innser_1);
         INNERLIST.add(innser_2);
         INNERLIST.add(innser_3);
         INNERLIST.add(innser_4);
         INNERLIST.add(innser_5);
+        INNERLIST.add(innser_6);
     }
 
     static {
@@ -97,8 +104,10 @@ public class StreamDemo {
 
     // ---------- 创建 ----------
 
+
     /**
      * Stream创建
+     * @return
      */
     public Stream stream() {
         Stream stream = Stream.of(1, 2, 3, 4, 5);
@@ -187,8 +196,21 @@ public class StreamDemo {
      */
     @Test
     public void distinct() {
-        List list = DISTINCTLIST.stream().distinct().collect(Collectors.toList());
+        List list = DISTINCTLIST.stream().distinct(). collect(Collectors.toList());
         out.println(list);
+
+        // 去重无效
+        List<Inner> inners_list = INNERLIST.stream().distinct().collect(Collectors.toList());
+        logger.info("innert 去重数据：" + inners_list.toString());
+        // 有效
+        List<Inner> inners_list1 = INNERLIST.stream()
+                .collect(Collectors
+                            .collectingAndThen(
+                                    Collectors.toCollection(()
+                                            -> new TreeSet<>(
+                                                    Comparator
+                                                            .comparing(Inner::getName))), ArrayList::new));
+        logger.info("innert 去重数据2：" + inners_list1.toString());
     }
 
     /**
@@ -406,6 +428,21 @@ public class StreamDemo {
     private Inner inner1 = new Inner("Inner1", 26, "男");
     private Inner inner2 = new Inner("Inner2", 26, "女");
 
+    @Test
+    public void test(char x) {
+        List<Integer> list =  Arrays.asList(2);
+
+        //通过reduce方法得到一个Optional类
+        int a =  list.stream().reduce(Integer::sum).orElse(get("a"));
+        int b =  list.stream().reduce(Integer::sum).orElseGet(() -> get("b"));
+        System.out.println("a  "+a);
+        System.out.println("b  "+b);
+    }
+    public static int get(String name){
+        System.out.println(name+"执行了方法");
+        return 1;
+    }
+
     /**
      * reduce：将流中元素反复结合，得到一个值
      */
@@ -515,6 +552,8 @@ public class StreamDemo {
         Inner inner = Inner.instance;
         return inner;
     }
+
+    @ToString
     static class Inner {
 
         private static Inner instance = new Inner();
@@ -555,5 +594,32 @@ public class StreamDemo {
             this.age = age;
             this.sex = sex;
         }
+    }
+
+    // ----------------- 测试 ------------------
+
+    /**
+     * 先将所先将所有字母转小写，在将首字母转大写
+     */
+    @Test
+    public void streamFirstToLowerCase(){
+        List<String> list = new ArrayList();
+        list.add("abd");
+        list.add("abcde");
+        list.add("abc");
+        // 转小写
+        list.stream()
+                .map(n -> n.toLowerCase()).forEachOrdered(n->System.out.println(n));
+
+        System.out.println("------------------------------------------------");
+
+        // 根据长度进行排序
+        list.stream().map(n -> n.toLowerCase()).sorted(Comparator.comparingInt(String::length)).forEach(out::println);
+
+        System.out.println("------------------------------------------------");
+
+        // 映射字符串
+        list.stream().map(n -> n.toLowerCase()).sorted(Comparator.comparingInt(String::length)).map(n -> Character.toUpperCase(n.charAt(0)) + n.substring(1)).forEachOrdered(n -> System.out.println(n));
+        Character ch = 'a';
     }
 }

@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import com.metoo.nspm.core.manager.admin.tools.*;
 import com.metoo.nspm.core.service.nspm.*;
-import com.metoo.nspm.core.service.zabbix.impl.CompareUtils;
+import com.metoo.nspm.core.manager.admin.tools.CompareUtils;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.file.DownLoadFileUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
@@ -16,9 +16,6 @@ import com.github.pagehelper.Page;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
 import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
-import org.junit.Test;
-import org.nutz.lang.random.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequestMapping("/admin/topology")
 @RestController

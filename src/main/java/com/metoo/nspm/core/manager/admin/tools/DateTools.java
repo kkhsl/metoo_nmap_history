@@ -25,6 +25,7 @@ public class DateTools {
     public static String FORMAT_STANDARD = "yyyy-MM-dd HH:mm:ss";
     public static String FORMAT_yyyyMMddHHmm= "yyyy-MM-dd HH:mm";
     public static String FORMAT_yyyyMMddHHmmss = "yyyyMMddHHmmss";
+    public static String FORMAT_yyyyMMddHHmmss_CH = "yyyy 年 MM 月 dd 日 HH 时 mm 分 ss 秒";
     public static String TIME_000000 = "000000";
     public static String TIME_000 = "000";
     public static String TIME_235959 = "235959";
@@ -36,6 +37,8 @@ public class DateTools {
         System.out.println((1 * 60000));
         System.out.println(longToStr((1670317656 * 1000L) + (1 * 60000L), "yyyy-MM-dd HH:mm"));
     }
+
+    SimpleDateFormat sdf2 = new SimpleDateFormat();
 
     /**
      * @param date 当前时间
@@ -49,6 +52,13 @@ public class DateTools {
         return sdf.format(date);
     }
 
+    public static String getCurrentDateByCh(long timeStamp){
+        try {
+            return dateToStr(new Date(timeStamp), FORMAT_yyyyMMddHHmmss_CH);
+        } catch (Exception var4) {
+            return null;
+        }
+    }
 
     public static String longToStr(long date, String format) {
         try {

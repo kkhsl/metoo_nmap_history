@@ -59,7 +59,9 @@ public class StaticScheduleTask {
 
 
     /**
-     * 修改采集时间，调整子网在线时长
+     * 修改采集时间[调整子网在线时长]
+     *
+     * 采集Arp
      */
     @Scheduled(cron = "0 */1 * * * ?")
     public void configureTask(){
@@ -83,36 +85,17 @@ public class StaticScheduleTask {
                 e.printStackTrace();
             }
             System.out.println("===Arp采集耗时：" + (System.currentTimeMillis()-time) + "===");
-//
-//            try {
-//                this.gatherService.gatherMacItem(date);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//            try {
-//                this.gatherService.gatherIpaddressItem(date);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//            try {
-//                this.zabbixService.gatherProblem();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-
         }
     }
 
+    /**
+     * 采集Mac
+     */
     @Scheduled(cron = "0 */5 * * * ?")
-//     添加定时任务
     public void gatherMac(){
-//        ThreadContext.bind(manager);
-        //下面正常使用业务代码即可
         if(flag){
             Long time=System.currentTimeMillis();
-            System.out.println("Mac开始采集");
+            log.info("Task-Mac采集开始：" + time);
             // 采集时间
             Calendar cal = Calendar.getInstance();
             cal.clear(Calendar.SECOND);
@@ -123,10 +106,13 @@ public class StaticScheduleTask {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println("===Mac采集耗时：" + (System.currentTimeMillis()-time) + "===");
+            log.info("Task-Mac采集结束，采集时间为：" + (System.currentTimeMillis()-time));
         }
     }
 
+    /**
+     * 采集IpAddress
+     */
     @Scheduled(cron = "0 */1 * * * ?")
     // 添加定时任务
     public void gatherIpAddress(){
@@ -149,7 +135,9 @@ public class StaticScheduleTask {
         }
     }
 
-//     采集 zabbix problem
+    /**
+     * 采集Problem
+     */
 //    @Scheduled(cron = "0 */1 * * * ?")
     @Scheduled(cron = "*/10 * * * * ?")
 //    public void gatherProblem(){
@@ -170,6 +158,9 @@ public class StaticScheduleTask {
 //        }
 //    }
 
+    /**
+     * 采集Problem
+     */
     @Scheduled(cron = "*/10 * * * * ?")
     public void gatherThreadProblem(){
 //        ThreadContext.bind(manager);
@@ -190,8 +181,10 @@ public class StaticScheduleTask {
 //        this.zabbixService.updateProblemStatus();
 //    }
 
+    /**
+     * 采集路由
+     */
     @Scheduled(cron = "0 */1 * * * ?")
-    // 添加定时任务
     public void updateRout(){
 //        ThreadContext.bind(manager);
         if(flag) {
@@ -219,8 +212,8 @@ public class StaticScheduleTask {
         }
     }
 
+
     @Scheduled(cron = "0 0 0 */1 * ?")
-    // 添加定时任务
     public void clearHistory(){
 //        ThreadContext.bind(manager);
         if(flag) {
