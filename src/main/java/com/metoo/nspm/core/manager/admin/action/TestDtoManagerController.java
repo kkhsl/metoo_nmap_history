@@ -103,4 +103,17 @@ public class TestDtoManagerController {
         }
     }
 
+    @RequestMapping("gatherRoute")
+    public void gatherRoute(){
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        Date date = cal.getTime();
+        try {
+            this.gatherService.gatherRouteItem(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

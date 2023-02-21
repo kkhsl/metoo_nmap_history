@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--日志门面 JCL vs slf4j JCL2014年已停更-->
 <!--日志级别：ALL < TRACE < DEBUG < INFO < WARN < ERROR < FATAL < OFF -->
+<!--输出方式： ConsoleAppender：控制台；
+              FileAppender：磁盘文件；
+              DailyRollingFileAppender：每天产生一个日志磁盘文件；
+              RollingFileAppender：日志磁盘文件大小达到指定尺寸时产生一个新的文件；-->
 <!--Configuration后面Status用于设置Log4j2自身内部的信息，可以不设置，当设置为trace时，可以看到Log4j2内部各种详细输出-->
 <configuration status="INFO">
     <!--全局通用属性-->
@@ -33,7 +37,9 @@
               $${date:yyyy-MM-dd}：根据日期当天，创建一个文件夹
               rollog-%d{yyyy-MM-dd}-%i.log：为文件命名规则：%i表示序号、从0开始，目的是为了让每一份文件名字不会重复
               -->
-        <RollingFile name="rollingFile" fileName="${log4j2.file.path}/nmap.log" filepattern="${log4j2.file.path}/$${date:yyyy-MM-dd}/rollog-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="rollingFile"
+                     fileName="${log4j2.file.path}/nmap.log"
+                     filepattern="${log4j2.file.path}/$${date:yyyy-MM-dd}/rollog-%d{yyyy-MM-dd}-%i.log">
             <patternLayout pattern="%d{yyyy-MM-dd-HH:mm}[%t] [%-5level] %logger{36} - %msg%n"/>
 
             <Policies>

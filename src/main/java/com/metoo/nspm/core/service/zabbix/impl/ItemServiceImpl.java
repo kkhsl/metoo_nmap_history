@@ -56,32 +56,32 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private MacUtil macUtil;
 
-//    public static void main(String[] args) {
-//        String value = "4.10.25.65.162.32.2.0.0.1.4.10.25.248.18";
-//        String[] str = value.split("\\.");
-//        StringBuffer dest = new StringBuffer();
-//        String mask = "";
-//        StringBuffer nexthop = new StringBuffer();
-//        Scanner sc = new Scanner(value).useDelimiter("\\.");
-//        for(int i = 1; i<= str.length; i ++){
-//            if(2 <= i && i <= 4){
-//                dest.append(sc.next()).append(".");
-//            }else if(i == 5){
-//                dest.append(sc.next());
-//            }else if(i == 6){
-//                mask  = sc.next();
-//            }else if(12 <= i && i <= 14){
-//                nexthop.append(sc.next()).append(".");
-//            }else if(i == 15){
-//                nexthop.append(sc.next());
-//            }else{
-//                sc.next();
-//            }
-//        }
-//        System.out.println(dest.toString());
-//        System.out.println(mask);
-//        System.out.println(nexthop.toString());
-//    }
+    public static void main(String[] args) {
+        String value = "4.10.25.0.123.32.2.0.0.1.4.10.25.0.123";
+        String[] str = value.split("\\.");
+        StringBuffer dest = new StringBuffer();
+        String mask = "";
+        StringBuffer nexthop = new StringBuffer();
+        Scanner sc = new Scanner(value).useDelimiter("\\.");
+        for(int i = 1; i<= str.length; i ++){
+            if(2 <= i && i <= 4){
+                dest.append(sc.next()).append(".");
+            }else if(i == 5){
+                dest.append(sc.next());
+            }else if(i == 6){
+                mask  = sc.next();
+            }else if(12 <= i && i <= 14){
+                nexthop.append(sc.next()).append(".");
+            }else if(i == 15){
+                nexthop.append(sc.next());
+            }else{
+                sc.next();
+            }
+        }
+        System.out.println(dest.toString());
+        System.out.println(mask);
+        System.out.println(nexthop.toString());
+    }
 
     @Override
     public void gatherArpItem(Date time) {
@@ -772,8 +772,11 @@ public class ItemServiceImpl implements ItemService {
                                     }
                                     routedest = dest.toString();
                                     routTemp.setDestination(IpUtil.ipConvertDec(dest.toString()));
-                                    routTemp.setMask(mask);
-                                    routTemp.setMaskBit(IpV4Util.getMaskBitByMask(mask));
+                                    if(com.metoo.nspm.core.utils.StringUtils.isInteger(mask)){
+                                        routTemp.setMaskBit(Integer.parseInt(mask));
+                                        String mk = IpUtil.bitMaskConvertMask(Integer.parseInt(mask));
+                                        routTemp.setMask(mk);
+                                    }
                                     routTemp.setNextHop(IpUtil.ipConvertDec(nexthop.toString()));
                                 }
                                 if(tag.getTag().equals("routemetric")){
