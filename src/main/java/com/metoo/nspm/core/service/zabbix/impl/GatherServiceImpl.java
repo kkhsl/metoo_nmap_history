@@ -87,6 +87,42 @@ public class GatherServiceImpl implements IGatherService {
     }
 
     @Override
+    public void gatherMacBatch(Date time) {
+        Long startTime = System.currentTimeMillis();
+        log.info("Mac采集开始：" + DateTools.getCurrentDateByCh(startTime));
+        this.itemService.gatherMacBatch(time);
+        Long endTime = System.currentTimeMillis();
+        log.info("Mac采集结束：" + DateTools.getCurrentDateByCh(endTime) + " 耗时:" + (endTime - startTime) / (60 * 1000) % 60  + " 分钟"
+                + (endTime - startTime) / 1000 % 60 + "秒 ");
+
+        Long tagTime = System.currentTimeMillis();
+        log.info("Mac-Tag 开始：" + DateTools.getCurrentDateByCh(tagTime));
+//        this.zabbixItemService.macTag();// 单个数据插入
+        this.zabbixItemService.LabelTheMac();// 批量插入
+        Long endtagTime = System.currentTimeMillis();
+        log.info("Mac-Tag 结束：" + DateTools.getCurrentDateByCh(endtagTime) + " 耗时:" +  (endtagTime - tagTime) / (60 * 1000) % 60 + " 分钟"
+                + (tagTime - tagTime) / 1000 % 60 + "秒 ");
+
+        Long topologyTime = System.currentTimeMillis();
+        log.info("Mac-Topology 开始：" + DateTools.getCurrentDateByCh(topologyTime));
+        this.itemService.topologySyncToMac();
+        Long topologyEndTime = System.currentTimeMillis();
+        log.info("Mac-Topology 结束：" + DateTools.getCurrentDateByCh(topologyEndTime) + " 耗时:" + (topologyEndTime - topologyTime) / (60 * 1000) % 60 + " 分钟"
+                + (topologyTime - topologyTime) / 1000 % 60 + "秒 ");
+
+        Long copyTime = System.currentTimeMillis();
+        log.info("Mac-copy 开始：" + DateTools.getCurrentDateByCh(copyTime));
+        // 同步网元数据到Mac
+        this.macService.truncateTable();
+        this.macService.copyMacTemp();
+        // 记录历史
+        this.macHistoryService.copyMacTemp();
+        Long copyEndTime = System.currentTimeMillis();
+        log.info("Mac-copy 结束，采集时间为：" + DateTools.getCurrentDateByCh(copyEndTime) + " 耗时:" + (copyEndTime - copyTime) / (60 * 1000) % 60 + " 分钟"
+                + (copyTime - copyTime) / 1000 % 60 + "秒 ");
+    }
+
+    @Override
     public void gatherRouteItem(Date time) {
         this.itemService.gatherRouteItem(time);
         this.routService.truncateTable();

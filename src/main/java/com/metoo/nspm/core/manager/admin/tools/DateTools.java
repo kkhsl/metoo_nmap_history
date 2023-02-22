@@ -173,4 +173,54 @@ public class DateTools {
         return second;
     }
 
+    // 计算时间差
+    @Test
+    public void CalculatingTimeDifference() throws InterruptedException {
+        Calendar cal = Calendar.getInstance();
+        Long start_1 = cal.getTime().getTime();
+
+        Thread.sleep(5000);
+
+        cal.add(Calendar.MINUTE, 1);
+        cal.add(Calendar.SECOND, 1);
+        Long start_2 = cal.getTime().getTime();
+        Long diff = start_2 - start_1;
+
+
+
+        long diffSeconds = diff / 1000 % 60;
+
+        long diffMinutes = diff / (60 * 1000) % 60;
+
+        long diffHours = diff / (60 * 60 * 1000) % 24;
+
+        long diffDays = diff / (24 * 60 * 60 * 1000);
+
+        System.out.println(diffSeconds);
+        System.out.println(diffMinutes);
+        System.out.println(diffHours);
+        System.out.println(diffDays);
+    }
+
+    @Test
+    public void diff(){
+        long time = 1677059659000L;
+        long time2 = 1677059898000L;
+        long diff = time2 - time;
+
+        long diffSeconds = diff / 1000 % 60;
+
+        long diffMinutes = diff / (60 * 1000) % 60;
+
+        long diffHours = diff / (60 * 60 * 1000) % 24;
+
+        long diffDays = diff / (24 * 60 * 60 * 1000);
+
+        System.out.println(diffSeconds);
+        System.out.println(diffMinutes);
+        System.out.println(diffHours);
+        System.out.println(diffDays);
+
+    }
+
 }

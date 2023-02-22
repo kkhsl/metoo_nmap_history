@@ -126,6 +126,9 @@
             <if test="macId != null and macId != ''">
                 AND id != #{macId}
             </if>
+            <if test="unDeviceName != null and unDeviceName != ''">
+                AND `device_name` != #{unDeviceName}
+            </if>
         </where>
     </select>
 
@@ -397,8 +400,84 @@
         WHERE id=#{id}
     </update>
 
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO rsms_mac_temp (addTime, device_name, interface_name, tag, `index`,
+            type, device_type, uuid, device_ip, vlan, mac)
+        VALUES
+        <foreach collection ="list" item="item" separator ="," >
+            (
+                #{item.addTime},
+                #{item.deviceName},
+                #{item.interfaceName},
+                #{item.tag},
+                #{item.index},
+                #{item.type},
+                #{item.deviceType},
+                #{item.uuid},
+                #{item.deviceIp},
+                #{item.vlan},
+                #{item.mac}
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdate" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE rsms_mac_temp
+            <set>
+                <if test="item.deviceName != null and item.deviceName != ''">
+                    device_name = #{item.deviceName},
+                </if>
+                <if test="item.interfaceName != null and item.interfaceName != ''">
+                    interface_name = #{item.interfaceName},
+                </if>
+                <if test="item.tag != null and item.tag != ''">
+                    tag = #{item.tag},
+                </if>
+                <if test="item.index != null and item.index != ''">
+                    `index` = #{item.index},
+                </if>
+                <if test="item.type != null and item.type != ''">
+                    `type` = #{item.type},
+                </if>
+                <if test="item.deviceType != null and item.index != ''">
+                    `device_type` = #{item.deviceType},
+                </if>
+                <if test="item.uuid != null and item.uuid != ''">
+                    `uuid` = #{item.uuid},
+                </if>
+                <if test="item.deviceIp != null and item.deviceIp != ''">
+                    `device_ip` = #{item.deviceIp},
+                </if>
+                <if test="item.vlan != null and item.vlan != ''">
+                    `vlan` = #{item.vlan},
+                </if>
+                <if test="item.mac != null and item.mac != ''">
+                    `mac` = #{item.mac},
+                </if>
+                <if test="item.remoteDevice != null and item.remoteDevice != ''">
+                    `remote_device` = #{item.remoteDevice},
+                </if>
+                <if test="item.remoteUuid != null and item.remoteUuid != ''">
+                    `remote_uuid` = #{item.remoteUuid},
+                </if>
+                <if test="item.remoteDeviceIp != null and item.remoteDeviceIp != ''">
+                    `remote_device_ip` = #{item.remoteDeviceIp},
+                </if>
+                <if test="item.remoteDeviceType != null and item.remoteDeviceType != ''">
+                    `remote_device_type` = #{item.remoteDeviceType},
+                </if>
+                <if test="item.remoteInterface != null and item.remoteInterface != ''">
+                    `remote_interface` = #{item.remoteInterface},
+                </if>
+            </set>
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+
     <update id="truncateTable">
         TRUNCATE TABLE rsms_mac_temp
     </update>
+
 
 </mapper>

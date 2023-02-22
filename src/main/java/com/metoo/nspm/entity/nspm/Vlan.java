@@ -24,6 +24,7 @@ public class Vlan extends IdEntity {
     private Long groupId;
     private Long domainId;
     private String domainName;
+
     @ApiModelProperty("所属子网/网段")
     private String subnet;
 }

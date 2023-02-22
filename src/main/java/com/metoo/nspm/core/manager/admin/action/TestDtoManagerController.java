@@ -116,4 +116,17 @@ public class TestDtoManagerController {
         }
     }
 
+    @RequestMapping("gatherMacBatch")
+    public void gatherMacBatch(){
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        Date date = cal.getTime();
+        try {
+            this.gatherService.gatherMacBatch(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -16,6 +16,9 @@ import com.github.pagehelper.Page;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
 import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.lang3.StringUtils;
+import org.nutz.json.Json;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -539,15 +542,17 @@ public class TopologyManagerController {
                 dto.setDestination(IpUtil.ipConvertDec(dto.getDestination()));
             }
         }
-        Page<Route> page = null;
-        dto.setOrderBy("destination + 0");
-        dto.setOrderType("asc");
-        if(dto.getTime() == null){
-            page = this.routService.selectConditionQuery(dto);
+        if(StringUtils.isEmpty(dto.getDestination())){
+            Page<Route> page = null;
+            dto.setOrderBy("destination + 0");
+            dto.setOrderType("asc");
+            if(dto.getTime() == null){
+                page = this.routService.selectConditionQuery(dto);
+            }else{
+                page = this.routHistoryService.selectConditionQuery(dto);
+            }
+            return ResponseUtil.ok(new PageInfo<Route>(page));
         }else{
-            page = this.routHistoryService.selectConditionQuery(dto);
-        }
-        if(page == null || page.getResult().size() <= 0) {
             // 根据Ip未查询到数据（查询相同网段ip地址）
 //            String mask = IpV4Util.getMaskByMaskBit(maskBit);
 //            String network = IpV4Util.getNetwork(ip, mask);
@@ -558,9 +563,10 @@ public class TopologyManagerController {
 //                page = this.routService.selectConditionQuery(dto);
 //                return ResponseUtil.ok(new PageInfo<Route>(page));
 //            }
+            Page<Route> page = new Page<>();
             dto.setDestination(null);
-            page = this.routService.selectConditionQuery(dto);
-            List<Route> routes = page.getResult();
+            Map<String, Object> params = new BeanMap(dto);
+            List<Route> routes = this.routService.selectObjByMap(params);
             if (routes.size() > 0) {
                 List<Route> routList = new ArrayList<>();
                 for (Route rout : routes) {
@@ -578,7 +584,6 @@ public class TopologyManagerController {
                             routList2.add(rout);
                         }
                     }
-
                     page.setPageNum(1);
                     page.setPageSize(routList2.size());
                     page.setPageSize(routList2.size());
@@ -589,10 +594,8 @@ public class TopologyManagerController {
                     page = this.routService.selectConditionQuery(dto);
                 }
             }
+            return ResponseUtil.ok(new PageInfo<Route>(page));
         }
-        // 排序 使用Mysql排序
-//        this.sort(page.getResult());
-        return ResponseUtil.ok(new PageInfo<Route>(page));
     }
 
     public void sort(List<Route> list){

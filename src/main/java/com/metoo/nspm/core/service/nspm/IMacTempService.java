@@ -27,5 +27,9 @@ public interface IMacTempService {
 
     int update(MacTemp instance);
 
+    int batchInsert(List<MacTemp> macTemps);
+
+    int batchUpdate(List<MacTemp> macTemps);
+
     void truncateTable();
 }

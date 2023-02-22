@@ -91,7 +91,26 @@ public class StaticScheduleTask {
     /**
      * 采集Mac
      */
-    @Scheduled(cron = "0 */5 * * * ?")
+//    @Scheduled(cron = "0 */5 * * * ?")
+//    public void gatherMac(){
+//        if(flag){
+//            Long time=System.currentTimeMillis();
+//            log.info("Task-Mac采集开始：" + time);
+//            // 采集时间
+//            Calendar cal = Calendar.getInstance();
+//            cal.clear(Calendar.SECOND);
+//            cal.clear(Calendar.MILLISECOND);
+//            Date date = cal.getTime();
+//            try {
+//                this.gatherService.gatherMacItem(date);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            log.info("Task-Mac采集结束，采集时间为：" + (System.currentTimeMillis()-time));
+//        }
+//    }
+
+    @Scheduled(cron = "0 */2 * * * ?")
     public void gatherMac(){
         if(flag){
             Long time=System.currentTimeMillis();
@@ -102,7 +121,7 @@ public class StaticScheduleTask {
             cal.clear(Calendar.MILLISECOND);
             Date date = cal.getTime();
             try {
-                this.gatherService.gatherMacItem(date);
+                this.gatherService.gatherMacBatch(date);
             } catch (Exception e) {
                 e.printStackTrace();
             }

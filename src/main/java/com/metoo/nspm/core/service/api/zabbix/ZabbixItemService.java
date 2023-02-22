@@ -59,4 +59,6 @@ public interface ZabbixItemService {
     void arpTag();
 
     void macTag();
+
+    public void LabelTheMac();
 }

@@ -80,6 +80,16 @@ public class MacTempServiceImpl implements IMacTempService {
     }
 
     @Override
+    public int batchInsert(List<MacTemp> macTemps) {
+        return this.macTempMapper.batchInsert(macTemps);
+    }
+
+    @Override
+    public int batchUpdate(List<MacTemp> macTemps) {
+        return this.macTempMapper.batchUpdate(macTemps);
+    }
+
+    @Override
     public void truncateTable() {
         this.macTempMapper.truncateTable();
     }

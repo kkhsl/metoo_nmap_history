@@ -17,7 +17,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, mask, mask_bit, destination, cost, proto, flags, next_hop, interface_name, device_name, device_uuid, concat(inet_ntoa(destination), "/", mask_bit) AS cidr
+        id, mask, mask_bit, INET_NTOA(destination) AS destination, cost, proto, flags, INET_NTOA(next_hop) next_hop, interface_name, device_name, device_uuid, concat(inet_ntoa(destination), "/", mask_bit) AS cidr
     </sql>
 
     <sql id="INET_Column_List">
@@ -36,7 +36,7 @@
           <include refid="INET_Column_List" />
         FROM rsms_rout
         <where>
-            <if test="destination != null and destination != ''">
+            <if test="destination != ''">
                 AND destination = #{destination}
             </if>
             <if test="deviceUuid != null and deviceUuid != ''">
@@ -62,44 +62,44 @@
           <include refid="Base_Column_List" />
         FROM rsms_rout
         <where>
-            <if test="mask != null">
+            <if test="mask != null and mask != ''">
                 AND mask = #{mask}
             </if>
             <if test="maskBit != null">
                 AND mask_bit = #{maskBit}
             </if>
-            <if test="destination != null">
+            <if test="destination != null and mask != ''">
                 AND destination = #{destination}
             </if>
-            <if test="cost != null">
+            <if test="cost != null and cost != ''">
                 AND cost = #{cost}
             </if>
-            <if test="flags != null">
+            <if test="flags != null and flags != ''">
                 AND flags = #{flags}
             </if>
-            <if test="proto != null">
+            <if test="proto != null and proto != ''">
                 AND proto = #{proto}
             </if>
-            <if test="nextHop != null">
+            <if test="nextHop != null and nextHop != ''">
                 AND next_hop = #{nextHop}
             </if>
-            <if test="deviceName != null">
+            <if test="deviceName != null and deviceName != ''">
                 AND device_name = #{deviceName}
             </if>
-            <if test="interfaceName != null">
+            <if test="interfaceName != null and interfaceName != ''">
                 AND interface_name = #{interfaceName}
             </if>
             <if test="deviceUuid != null and deviceUuid != ''">
                 AND device_uuid = #{deviceUuid}
             </if>
-            <if test="network != null and broadcast != null">
+            <if test="network != null and network != null">
                 AND destination
                 BETWEEN
                   #{network}
                 AND
                   #{broadcast}
             </if>
-            <if test = "descMask != null">
+            <if test = "descMask != null and descMask != ''">
                 AND mask_bit &lt;= #{descMask}
             </if>
         </where>
