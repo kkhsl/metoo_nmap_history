@@ -26,6 +26,8 @@ public interface MacTempMapper {
 
     MacTemp selectByMac(String mac);
 
+    List<MacTemp> directTerminal(Map params);
+
     int save(MacTemp instance);
 
     int update(MacTemp instance);

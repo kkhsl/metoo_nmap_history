@@ -61,6 +61,11 @@ public class MacTempServiceImpl implements IMacTempService {
     }
 
     @Override
+    public List<MacTemp> directTerminal(Map params) {
+        return this.macTempMapper.directTerminal(params);
+    }
+
+    @Override
     public int save(MacTemp instance) {
         if(instance.getId() == null){
             if(instance.getAddTime() == null){

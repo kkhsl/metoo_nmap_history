@@ -19,6 +19,9 @@ public interface IGatherService {
 
     void gatherMacBatch(Date time);
 
+
+    void gatherMacBatchStream(Date time);
+
     /**
      * 采集路由
      * @param time

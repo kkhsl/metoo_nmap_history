@@ -13,10 +13,11 @@
         <result column="group_id" property="groupId"></result>
         <result column="domain_id" property="domainId"></result>
         <result column="subnet" property="subnet"></result>
+        <result column="subnet_id" property="subnetId"></result>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, addTime, deleteStatus, name, description, editDate, group_id, domain_id, subnet
+        id, addTime, deleteStatus, name, description, editDate, group_id, domain_id, subnet, subnet_id
     </sql>
 
     <select id="selectObjById" parameterType="java.lang.Long" resultMap="Base_Result_Map">
@@ -99,6 +100,9 @@
             <if test="subnet != null">
                 subnet,
             </if>
+            <if test="subnetId != null and subnetId != ''">
+                subnet_id,
+            </if>
         </trim>
         <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
             <if test="addTime != null">
@@ -127,6 +131,9 @@
             </if>
             <if test="subnet != null">
                 #{subnet},
+            </if>
+            <if test="subnetId != null and subnetId != ''">
+                #{subnetId},
             </if>
         </trim>
     </insert>
@@ -160,6 +167,9 @@
             </if>
             <if test="subnet != null">
                 subnet = #{subnet},
+            </if>
+            <if test="subnetId != null and subnetId != ''">
+                subnet_id = #{subnetId},
             </if>
         </set>
         where id = #{id}

@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ZabbixSubnetMapper {
@@ -17,6 +18,8 @@ public interface ZabbixSubnetMapper {
     List<Subnet> selectSubnetByParentId(Long id);
 
     List<Subnet> selectSubnetByParentIp(Long ip);
+
+    List<Subnet> selectObjByMap(Map params);
 
     int save(Subnet instance);
 

@@ -16,7 +16,7 @@
 
     </resultMap>
 
-    <sql id="Base_Column_List>">
+    <sql id="Base_Column_List">
         id, ip, mask, parent_id, parent_ip, vlan, threshold, description, vlan_id, vlan_name
     </sql>
 
@@ -65,6 +65,15 @@
         WHERE id = #{id}
     </select>
 
+    <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+        SELECT <include refid="Inet_Column_List" />
+        FROM metoo_subnet
+        <where>
+            <if test="ip != null and ip != ''">
+                and ip = #{ip}
+            </if>
+        </where>
+    </select>
 
     <insert id="save" parameterType="com.metoo.nspm.entity.nspm.Subnet" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO metoo_subnet

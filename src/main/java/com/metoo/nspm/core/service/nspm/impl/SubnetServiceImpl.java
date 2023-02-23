@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SubnetServiceImpl implements ZabbixSubnetService {
@@ -34,6 +35,11 @@ public class SubnetServiceImpl implements ZabbixSubnetService {
     @Override
     public List<Subnet> selectSubnetByParentIp(Long ip) {
         return this.zabbixSubnetMapper.selectSubnetByParentIp(ip);
+    }
+
+    @Override
+    public List<Subnet> selectObjByMap(Map params) {
+        return this.zabbixSubnetMapper.selectObjByMap(params);
     }
 
     @Override

@@ -129,6 +129,9 @@
             <if test="unDeviceName != null and unDeviceName != ''">
                 AND `device_name` != #{unDeviceName}
             </if>
+            <if test="unUuid != null and unUuid != ''">
+                AND `uuid` != #{unUuid}
+            </if>
         </where>
     </select>
 
@@ -202,7 +205,24 @@
 
     <select id="macJoinArp" parameterType="java.lang.String" resultMap="Base_Result_Map">
         SELECT
-            mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, mac.mac
+            mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, mac.mac, INET_NTOA(arp.ip) ip
+        FROM
+            rsms_mac_temp mac
+        JOIN
+            rsms_arp arp
+        ON
+            mac.mac=arp.mac
+        WHERE
+            mac.tag = 'RT'
+        OR
+            mac.tag = 'UT'
+        order by mac.device_name desc, mac.interface_name desc
+
+    </select>
+
+    <select id="directTerminal" parameterType="java.lang.String" resultMap="Base_Result_Map">
+        SELECT
+            mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, mac.mac, INET_NTOA(arp.ip) ip
         FROM
             rsms_mac_temp mac
         JOIN
@@ -401,8 +421,21 @@
     </update>
 
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO rsms_mac_temp (addTime, device_name, interface_name, tag, `index`,
-            type, device_type, uuid, device_ip, vlan, mac)
+        INSERT INTO rsms_mac_temp (
+                    addTime,
+                    device_name,
+                    interface_name,
+                    tag,
+                    type,
+                    device_type,
+                    uuid,
+                    device_ip,
+                    vlan,
+                    mac,
+                    remote_uuid,
+                    remote_interface,
+                    remote_device
+        )
         VALUES
         <foreach collection ="list" item="item" separator ="," >
             (
@@ -410,13 +443,15 @@
                 #{item.deviceName},
                 #{item.interfaceName},
                 #{item.tag},
-                #{item.index},
                 #{item.type},
                 #{item.deviceType},
                 #{item.uuid},
                 #{item.deviceIp},
                 #{item.vlan},
-                #{item.mac}
+                #{item.mac},
+                #{item.remoteUuid},
+                #{item.remoteInterface},
+                #{item.remoteDevice}
             )
         </foreach>
     </insert>
@@ -469,6 +504,9 @@
                 </if>
                 <if test="item.remoteInterface != null and item.remoteInterface != ''">
                     `remote_interface` = #{item.remoteInterface},
+                </if>
+                <if test="item.ip != null and item.ip != ''">
+                    `ip` = #{item.ip},
                 </if>
             </set>
             WHERE id = #{item.id}

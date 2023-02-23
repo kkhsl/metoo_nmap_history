@@ -3,6 +3,7 @@ package com.metoo.nspm.core.service.api.zabbix.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.myzabbix.utils.ItemUtil;
 import com.metoo.nspm.core.manager.myzabbix.utils.ZabbixApiUtil;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixHostService;
@@ -11,6 +12,7 @@ import com.metoo.nspm.core.service.nspm.IArpService;
 import com.metoo.nspm.core.service.nspm.IArpTempService;
 import com.metoo.nspm.core.service.nspm.IMacService;
 import com.metoo.nspm.core.service.nspm.IMacTempService;
+import com.metoo.nspm.core.utils.SystemOutputLogUtils;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.core.utils.network.IpV4Util;
 import com.metoo.nspm.dto.zabbix.HostDTO;
@@ -21,6 +23,8 @@ import com.metoo.nspm.entity.nspm.IpAddress;
 import com.metoo.nspm.entity.nspm.MacTemp;
 import io.github.hengyunabc.zabbix.api.Request;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +33,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ZabbixItemServiceImpl implements ZabbixItemService {
+
+    Logger log = LoggerFactory.getLogger(ZabbixItemServiceImpl.class);
 
     @Autowired
     private ZabbixApiUtil zabbixApiUtil;
@@ -804,121 +810,150 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
     }
 
     @Override
-    public void LabelTheMac() {
+    public void labelTheMac() {
         // 单台设备 标记’U|S‘
         List list = new ArrayList();
         Map params = new HashMap();
         params.put("u", 1);
-        List<MacTemp> umac = this.macTempService.getMacUS(params);
-        List ulist = umac.stream().map(e -> e.setTag("U")).collect(Collectors.toList());
-//        umac.forEach(item ->{
-//            item.setTag("U");
-////            this.macTempService.update(item);
-//            list.add(item);
-//        });
+        List<MacTemp> macU = this.macTempService.getMacUS(params);
+        List ulist = macU.stream().map(e -> e.setTag("U")).collect(Collectors.toList());
         if(ulist.size() > 0){
             this.macTempService.batchUpdate(ulist);
-            list.clear();
         }
 
         params.clear();
         params.put("s", 2);
-        List<MacTemp> smac = this.macTempService.getMacUS(params);
-        smac.forEach(item ->{
-            item.setTag("S");
-//            this.macTempService.update(item);
-            list.add(item);
-        });
-        if(list.size() > 0){
-            this.macTempService.batchUpdate(list);
-            list.clear();
+        List<MacTemp> macS = this.macTempService.getMacUS(params);
+        List listS = macS.stream().map(e -> e.setTag("S")).collect(Collectors.toList());
+        if(listS.size() > 0){
+            this.macTempService.batchUpdate(listS);
         }
 
+        Long start = System.currentTimeMillis();
+        SystemOutputLogUtils.start(log, start, "Mac-U-E 采集开始");
         // 标记E|UE|UT(优化)
         params.clear();
         params.put("tag", "U");
-        List<MacTemp> umacs = this.macTempService.selectByMap(params);
-        for (MacTemp obj : umacs){
+        List<MacTemp> macU2 = this.macTempService.selectByMap(params);
+        // 方式一:for
+        for (MacTemp macTemp : macU2){
             params.clear();
             params.put("tag", "L");
-            params.put("mac", obj.getMac());
-//            params.put("ip", IpUtil.ipConvertDec(obj.getIp()));
-            params.put("unDeviceName", obj.getDeviceName());
+            params.put("mac", macTemp.getMac());
+            params.put("uuid", macTemp.getUuid());// 改为使用Uuid
             List<MacTemp> macs = this.macTempService.selectByMap(params);// 只有一个
             if(macs.size() > 0){
-                MacTemp instancce = macs.get(0);
-                obj.setTag("E");
-                obj.setRemoteDevice(instancce.getDeviceName());
-                obj.setRemoteUuid(instancce.getUuid());
-//                obj.setRemoteInterface(instancce.getInterfaceName());
-                obj.setRemoteDeviceIp(instancce.getDeviceIp());
-                obj.setRemoteDeviceType(instancce.getDeviceType());
-//                this.macTempService.update(obj);
-                list.add(obj);
+                macs.stream().findAny().map(e ->
+                        macTemp.setTag("E")
+                                .setRemoteDevice(e.getDeviceName())
+                                .setRemoteUuid(e.getUuid())
+                                .setDeviceIp(e.getDeviceIp())
+                                .setRemoteDeviceType(e.getDeviceType())).get();
+                list.add(macTemp);
                 continue;
-            }
-            params.clear();
-            params.put("macId", obj.getId());
-            params.put("other", "L");
-            params.put("mac", obj.getMac());
-            List<MacTemp> macList = this.macTempService.selectByMap(params);
-            if(macList.size() > 0){
-                obj.setTag("UT");
-//                this.macTempService.update(obj);
-
-                list.add(obj);
             }else{
-                obj.setTag("DT");
-                params.clear();
-                params.put("mac", obj.getMac());
-                List<Arp> arps = arpService.selectObjByMap(params);
-                if (arps.size() > 0) {
-                    Arp arp = arps.get(0);
-                    obj.setIp(arp.getIp());
-                    obj.setIpAddress(arp.getIpAddress());
-                }
-//                this.macTempService.update(obj)
-
-                list.add(obj);
+                macTemp.setTag("UT");
+                list.add(macTemp);
             }
         }
-
+        // 方式二:foreach
+//        macU2.forEach(macTemp -> {
+//            params.clear();
+//            params.put("tag", "L");
+//            params.put("mac", macTemp.getMac());
+//            params.put("uuid", macTemp.getUuid());// 改为使用Uuid
+//            List<MacTemp> macs = this.macTempService.selectByMap(params);// 只有一个
+//            if(macs.size() > 0){
+//                macs.stream().findAny().map(e ->
+//                        macTemp.setTag("E")
+//                                .setRemoteDevice(e.getDeviceName())
+//                                .setRemoteUuid(e.getUuid())
+//                                .setDeviceIp(e.getDeviceIp())
+//                                .setRemoteDeviceType(e.getDeviceType())).get();
+//                list.add(macTemp);
+//            }else{
+//                macTemp.setTag("UT");
+//                list.add(macTemp);
+//            }
+//        });
+        // 第三种:stream
+//        macU2.stream().forEach(macTemp ->{
+//            params.clear();
+//            params.put("tag", "L");
+//            params.put("mac", macTemp.getMac());
+//            params.put("uuid", macTemp.getUuid());// 改为使用Uuid
+//            List<MacTemp> macs = this.macTempService.selectByMap(params);// 只有一个
+//            if(macs.size() > 0){
+//                macs.stream().findAny().map(e ->
+//                        macTemp.setTag("E")
+//                                .setRemoteDevice(e.getDeviceName())
+//                                .setRemoteUuid(e.getUuid())
+//                                .setDeviceIp(e.getDeviceIp())
+//                                .setRemoteDeviceType(e.getDeviceType())).get();
+//                list.add(macTemp);
+//            }else{
+//                macTemp.setTag("UT");
+//                list.add(macTemp);
+//            }
+//        });
         if(list.size() > 0){
             this.macTempService.batchUpdate(list);
             list.clear();
         }
 
+        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-U-E 采集结束");
+
+        start = System.currentTimeMillis();
+        SystemOutputLogUtils.start(log, start, "Mac-S-E 采集开始");
         // 标记E|RT|UE
         params.clear();
         params.put("tag", "S");
-        List<MacTemp> sMac = this.macTempService.selectByMap(params);
-        for (MacTemp obj :  sMac){
+        List<MacTemp> macSL = this.macTempService.selectByMap(params);
+//        for (MacTemp obj :  macSL){
+//            // 查询arp
+//            if(org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getMac())){
+//                params.clear();
+//                params.put("tag", "L");
+//                params.put("mac", obj.getMac());
+//                params.put("uuid", obj.getUuid());
+//                List<MacTemp> macs = this.macTempService.selectByMap(params);
+//                if(macs.size() > 0){
+//                    MacTemp instancce = macs.get(0);
+//                    obj.setTag("E");
+//                    obj.setRemoteDevice(instancce.getDeviceName());
+//                    obj.setRemoteUuid(instancce.getUuid());
+////                obj.setRemoteInterface(instancce.getInterfaceName());
+//                    obj.setRemoteDeviceIp(instancce.getDeviceIp());
+//                    obj.setRemoteDeviceType(instancce.getDeviceType());
+////                this.macTempService.update(obj);
+//                    list.add(obj);
+//                    continue;
+//                }
+//            }
+//        }
+        macSL.parallelStream().forEach(item -> {
             // 查询arp
-            if(org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getMac())){
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(item.getMac())){
                 params.clear();
                 params.put("tag", "L");
-                params.put("mac", obj.getMac());
-                params.put("unDeviceName", obj.getDeviceName());
+                params.put("mac", item.getMac());
+                params.put("uuid", item.getUuid());
                 List<MacTemp> macs = this.macTempService.selectByMap(params);
                 if(macs.size() > 0){
                     MacTemp instancce = macs.get(0);
-                    obj.setTag("E");
-                    obj.setRemoteDevice(instancce.getDeviceName());
-                    obj.setRemoteUuid(instancce.getUuid());
-//                obj.setRemoteInterface(instancce.getInterfaceName());
-                    obj.setRemoteDeviceIp(instancce.getDeviceIp());
-                    obj.setRemoteDeviceType(instancce.getDeviceType());
-//                this.macTempService.update(obj);
-                    list.add(obj);
-                    continue;
+                    item.setTag("E");
+                    item.setRemoteDevice(instancce.getDeviceName());
+                    item.setRemoteUuid(instancce.getUuid());
+                    item.setRemoteDeviceIp(instancce.getDeviceIp());
+                    item.setRemoteDeviceType(instancce.getDeviceType());
                 }
             }
+        });
+        if(macSL.size() > 0){
+            this.macTempService.batchUpdate(macSL);
         }
+        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-S-E 采集结束");
 
-        if(list.size() > 0){
-            this.macTempService.batchUpdate(list);
-            list.clear();
-        }
 
         // 查询剩余S条目
         params.clear();
@@ -935,70 +970,42 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         }
 
 
-        // 为DE的条目，查询mac对应的L条目的portindex < 4069标记为DE,记录端口名
-//        params.clear();
-//        List<MacTemp> emacs = this.macTempService.groupByObjByMap(params);
-//        for(MacTemp eobj : emacs){
-//            params.clear();
-//            params.put("deviceName", eobj.getDeviceName());
-//            List<MacTemp> demacs = this.macTempService.groupByObjByMap2(params);
-//            if(demacs.size() > 0){
-//                for (MacTemp demac : demacs){
-//                    params.clear();
-//                    params.put("deviceName", demac.getDeviceName());
-//                    params.put("remoteDevice", demac.getRemoteDevice());
-//                    List<MacTemp> macs = this.macTempService.selectByMap(params);
-//                    if(macs.size() >= 2){
-//                        for(MacTemp mac : macs){
-//                            params.clear();
-//                            params.put("tag", "L");
-//                            params.put("device_name", mac.getRemoteDevice());
-//                            params.put("mac", mac.getMac());
-//                            List<MacTemp> remoteMacs = this.macTempService.selectByMap(params);
-//                            for(MacTemp remoteMac : remoteMacs){
-//                                if(com.metoo.nspm.core.utils.StringUtils.isInteger(remoteMac.getIndex())){
-////                                    if(remoteMac.getIndex() != null && Integer.parseInt(remoteMac.getIndex()) < 4096){
-////                                        mac.setTag("DE");
-////                                        this.macTempService.update(mac);
-////                                    }
-//                                    if(remoteMac.getIndex() != null && Integer.parseInt(remoteMac.getIndex()) >= 4096){
-//                                        mac.setTag("E");
-//                                        this.macTempService.update(mac);
-//                                        break;
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//
-//        }
-        // 标记为DE
-//        params.clear();
-//        params.put("tag", "E");
-//        List<MacTemp> emacList = this.macTempService.selectTagByMap(params);
-//        if(emacList.size() > 0){
-//            for(MacTemp mac : emacList){
-//                params.clear();
-//                params.put("macId", mac.getId());
-//                params.put("other", "L");
-//                params.put("mac", mac.getMac());
-//                List<MacTemp> macList = this.macTempService.selectTagByMap(params);
-//                if(macList.size() == 0){
-//                    mac.setTag("DE");
-//                    this.macTempService.update(mac);
-//                }
-//            }
-//        }
-
-
+        start = System.currentTimeMillis();
+        SystemOutputLogUtils.start(log, start, "Mac-DT 采集开始");
         // mac|arp联查
         // 标记为UT且有ip地址的，标记为DT
         params.clear();
         params.put("tag", "S");
-        List<MacTemp> macs = this.macTempService.macJoinArp(params);
-        macs.forEach(item ->{
+        List<MacTemp> macDT = this.macTempService.macJoinArp(params);
+//        for (MacTemp macTemp : macs){
+//            if(org.apache.commons.lang3.StringUtils.isNotEmpty(macTemp.getMac())){
+//                params.clear();
+//                params.put("mac", macTemp.getMac());
+//                List<Arp> arps = arpService.selectObjByMap(params);
+//                if (arps.size() > 0) {
+//                    Arp arp = arps.get(0);
+//                    macTemp.setIp(arp.getIp());
+//                    macTemp.setIpAddress(arp.getIpAddress());
+//                }
+//            }
+//            list.add(macTemp);
+//        }
+        // 第二种：foreach
+//        macs.forEach(item ->{
+//            if(org.apache.commons.lang3.StringUtils.isNotEmpty(item.getMac())){
+//                params.clear();
+//                params.put("mac", item.getMac());
+//                List<Arp> arps = arpService.selectObjByMap(params);
+//                if (arps.size() > 0) {
+//                    Arp arp = arps.get(0);
+//                    item.setIp(arp.getIp());
+//                    item.setIpAddress(arp.getIpAddress());
+//                }
+//            }
+//            list.add(item);
+//        });
+        // 第三种：stream:foreach
+        macDT.parallelStream().forEach(item ->{
             if(org.apache.commons.lang3.StringUtils.isNotEmpty(item.getMac())){
                 params.clear();
                 params.put("mac", item.getMac());
@@ -1009,12 +1016,11 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                     item.setIpAddress(arp.getIpAddress());
                 }
             }
-//            this.macTempService.update(item);
-            list.add(item);
         });
-        if(list.size() > 0){
-            this.macTempService.batchUpdate(list);
+        if(macDT.size() > 0){
+            this.macTempService.batchUpdate(macDT);
         }
+        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-DT 采集结束");
     }
 
     @Override
@@ -1055,28 +1061,11 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                 obj.setRemoteDeviceIp(instancce.getDeviceIp());
                 obj.setRemoteDeviceType(instancce.getDeviceType());
                 this.macTempService.update(obj);
-                continue;
-            }
-            params.clear();
-            params.put("macId", obj.getId());
-            params.put("other", "L");
-            params.put("mac", obj.getMac());
-            List<MacTemp> macList = this.macTempService.selectByMap(params);
-            if(macList.size() > 0){
+            }else {
                 obj.setTag("UT");
                 this.macTempService.update(obj);
-            }else{
-                obj.setTag("DT");
-                params.clear();
-                params.put("mac", obj.getMac());
-                List<Arp> arps = arpService.selectObjByMap(params);
-                if (arps.size() > 0) {
-                    Arp arp = arps.get(0);
-                    obj.setIp(arp.getIp());
-                    obj.setIpAddress(arp.getIpAddress());
-                }
-                this.macTempService.update(obj);
             }
+
         }
         // 标记E|RT|UE
         params.clear();

@@ -175,7 +175,7 @@ public class DateTools {
 
     // 计算时间差
     @Test
-    public void CalculatingTimeDifference() throws InterruptedException {
+    public void calculatingTimeDifference() throws InterruptedException {
         Calendar cal = Calendar.getInstance();
         Long start_1 = cal.getTime().getTime();
 

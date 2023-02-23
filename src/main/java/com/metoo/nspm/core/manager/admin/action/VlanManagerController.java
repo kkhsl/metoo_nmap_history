@@ -5,11 +5,13 @@ import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
 import com.metoo.nspm.core.service.nspm.IDomainService;
 import com.metoo.nspm.core.service.nspm.IGroupService;
 import com.metoo.nspm.core.service.nspm.IVlanService;
+import com.metoo.nspm.core.service.nspm.ZabbixSubnetService;
+import com.metoo.nspm.core.service.phpipam.IpamSubnetService;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.entity.nspm.Domain;
-import com.metoo.nspm.entity.nspm.Group;
-import com.metoo.nspm.entity.nspm.User;
-import com.metoo.nspm.entity.nspm.Vlan;
+import com.metoo.nspm.core.utils.network.IpUtil;
+import com.metoo.nspm.entity.nspm.*;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +39,8 @@ public class VlanManagerController {
     @Autowired
     private IGroupService groupService;
     @Autowired
+    private ZabbixSubnetService subnetService;
+    @Autowired
     private GroupTools groupTools;
 
     /**
@@ -44,6 +48,7 @@ public class VlanManagerController {
      * @param domainId 非必填，默认查询全部
      * @return
      */
+    @ApiOperation("Vlan列表")
     @GetMapping
     public Object list(@RequestParam(value = "domainId",required = false) Long domainId){
             User user = ShiroUserHolder.currentUser();
@@ -53,35 +58,101 @@ public class VlanManagerController {
                 Set<Long> ids = this.groupTools.genericGroupId(group.getId());
                 params.put("groupIds", ids);
                 Domain domain = this.domainService.selectObjById(domainId);
-                if(domainId != null){
+                if(domain != null){
                     params.put("domainId", domain.getId());
                 }
-                List<Vlan> domains = this.vlanService.selectObjByMap(params);
-                return ResponseUtil.ok(domains);
+                List<Vlan> vlans = this.vlanService.selectObjByMap(params);
+//                for (Vlan vlan : vlans) {
+//                    if(vlan.getSubnetId() != null && !vlan.getSubnetId().equals("")){
+//                        Subnet subnet = this.subnetService.selectObjById(vlan.getSubnetId());
+//                        vlan.setSubnetIp(IpUtil.decConvertIp(Long.parseLong(subnet.getIp())));
+//                    }
+//                }
+//
+//                vlans.forEach(e -> {
+//                    if(e.getSubnetId() != null && !e.getSubnetId().equals("")){
+//                        Subnet subnet = this.subnetService.selectObjById(e.getSubnetId());
+//                        e.setSubnetIp(subnet.getIp());
+//                    }
+//                });
+
+                vlans.stream().forEach(e -> {
+                    if(e.getSubnetId() != null && !e.getSubnetId().equals("")) {
+                        Subnet subnet = this.subnetService.selectObjById(e.getSubnetId());
+                        e.setSubnetIp(subnet.getIp());
+                        e.setMaskBit(subnet.getMask());
+                    }
+                });
+                return ResponseUtil.ok(vlans);
 
         }
         return ResponseUtil.ok();
     }
 
+    @ApiOperation("Vlan添加")
     @GetMapping("/add")
     public Object add(){
+        Map map = new HashMap();
         Map params = new HashMap();
         List<Domain> domains = this.domainService.selectObjByMap(params);
-        return ResponseUtil.ok(domains);
+        map.put("domain", domains);
+//        List<Subnet> subnets = this.subnetService.selectObjByMap(null);
+//        map.put("subnet", subnets);
+        List<Subnet> parentList = this.subnetService.selectSubnetByParentId(null);
+        if(parentList.size() > 0){
+            for (Subnet subnet : parentList) {
+                this.genericSubnet(subnet);
+            }
+        }
+        map.put("subnet", parentList);
+        return ResponseUtil.ok(map);
     }
 
+    public List<Subnet> genericSubnet(Subnet subnet){
+        List<Subnet> subnets = this.subnetService.selectSubnetByParentId(subnet.getId());
+        if(subnets.size() > 0){
+            for(Subnet child : subnets){
+                List<Subnet> subnetList = genericSubnet(child);
+                if(subnetList.size() > 0){
+                    child.setSubnetList(subnetList);
+                }
+            }
+            subnet.setSubnetList(subnets);
+        }
+        return subnets;
+    }
+
+    @ApiOperation("VLan更新,数据回显")
     @GetMapping("/update")
     public Object updadte(@RequestParam(value = "id") Long id){
         Map map = new HashMap();
         Vlan vlan = this.vlanService.selectObjById(id);
+        if(vlan == null){
+            return ResponseUtil.badArgument("Vlan不存在");
+        }
         Domain domain = this.domainService.selectObjById(vlan.getDomainId());
         if(domain != null){
             vlan.setDomainName(domain.getName());
         }
+        if(vlan.getSubnetId() != null){
+            Subnet subnet = this.subnetService.selectObjById(vlan.getSubnetId());
+            vlan.setSubnetIp(subnet.getIp());
+            vlan.setMaskBit(subnet.getMask());
+        }
         map.put("vlan", vlan);
         Map params = new HashMap();
         List<Domain> domains = this.domainService.selectObjByMap(params);
-        map.put("Domain", domains);
+        map.put("domain", domains);
+//        List<Subnet> subnets = this.subnetService.selectObjByMap(null);
+//        map.put("subnet", subnets);
+
+        List<Subnet> parentList = this.subnetService.selectSubnetByParentId(null);
+        if(parentList.size() > 0){
+            for (Subnet subnet : parentList) {
+                this.genericSubnet(subnet);
+            }
+        }
+        map.put("subnet", parentList);
         return ResponseUtil.ok(map);
     }
 
@@ -105,9 +176,18 @@ public class VlanManagerController {
                 return ResponseUtil.badArgument("名称重复");
             }
         }
-        Domain domain = this.domainService.selectObjById(vlan.getDomainId());
-        if(domain == null){
-            return ResponseUtil.badArgument("请选择二层域");
+        if(vlan.getDomainId() != null && !vlan.getDomainId().equals("")){
+            Domain domain = this.domainService.selectObjById(vlan.getDomainId());
+            if(domain == null){
+                return ResponseUtil.badArgument("二层域不存在");
+            }
+        }
+
+        if(vlan.getSubnetId() != null){
+            Subnet subnet = this.subnetService.selectObjById(vlan.getSubnetId());
+            if(subnet == null){
+                return ResponseUtil.badArgument("网段不存在");
+            }
         }
         int result = this.vlanService.save(vlan);
         if(result >= 1){

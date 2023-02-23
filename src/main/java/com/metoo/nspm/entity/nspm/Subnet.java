@@ -28,5 +28,4 @@ public class Subnet extends IdEntity {
     private String description;
     private Object picture;
 
-
 }

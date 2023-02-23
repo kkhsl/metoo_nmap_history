@@ -64,7 +64,6 @@ public class VlanServiceImpl implements IVlanService {
             User user = ShiroUserHolder.currentUser();
             instance.setGroupId(user.getGroupId());
         }
-
         if(instance.getId() == null || instance.getId().equals("")){
             try {
                 return this.vlanMapper.save(instance);

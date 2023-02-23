@@ -14,6 +14,8 @@ public interface ItemService {
 
     void gatherMacBatch(Date time);
 
+    void gatherMacBatchStream(Date time);
+
     void gatherRouteItem(Date time);
 
     void gatherIpaddressItem(Date time);
@@ -42,6 +44,8 @@ public interface ItemService {
      * 同步拓扑连线关系到MacTemp
      */
     void topologySyncToMac();
+
+    void topologySyncToMacBatch(Date time);
 
 
 }

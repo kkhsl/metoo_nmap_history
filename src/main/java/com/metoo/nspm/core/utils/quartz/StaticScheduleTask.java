@@ -110,11 +110,14 @@ public class StaticScheduleTask {
 //        }
 //    }
 
-    @Scheduled(cron = "0 */2 * * * ?")
-    public void gatherMac(){
+    /**
+     * 使用批量插入、Stream并行流优化采集
+     */
+    @Scheduled(cron = "0 */1 * * * ?")
+    public void gatherMacBatch(){
         if(flag){
-            Long time=System.currentTimeMillis();
-            log.info("Task-Mac采集开始：" + time);
+            Long time = System.currentTimeMillis();
+
             // 采集时间
             Calendar cal = Calendar.getInstance();
             cal.clear(Calendar.SECOND);
