@@ -8,6 +8,11 @@ import lombok.experimental.Accessors;
 
 import java.util.List;
 
+/**
+ *
+ * @param <T>
+ */
+
 @ApiModel("分页DTO")
 @Data
 @Accessors(chain = true)

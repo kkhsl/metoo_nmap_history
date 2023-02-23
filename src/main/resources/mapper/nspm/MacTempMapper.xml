@@ -203,7 +203,7 @@
             tag is null
     </select>
 
-    <select id="macJoinArp" parameterType="java.lang.String" resultMap="Base_Result_Map">
+    <select id="macJoinArp" resultMap="Base_Result_Map">
         SELECT
             mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, mac.mac, INET_NTOA(arp.ip) ip
         FROM
@@ -220,7 +220,7 @@
 
     </select>
 
-    <select id="directTerminal" parameterType="java.lang.String" resultMap="Base_Result_Map">
+    <select id="directTerminal" resultMap="Base_Result_Map">
         SELECT
             mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, mac.mac, INET_NTOA(arp.ip) ip
         FROM

@@ -1,16 +1,10 @@
-package com.metoo.nspm.container.java.util;
+package com.metoo.nspm.container.feature;
 
-import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.entity.nspm.User;
-import jdk.nashorn.internal.parser.JSONParser;
 import lombok.ToString;
-import org.apache.ibatis.javassist.runtime.Inner;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;

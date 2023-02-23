@@ -734,11 +734,14 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void gatherMacBatch(Date time){
         List<MacTemp> batchInsert = new CopyOnWriteArrayList();
-        List<Map> ipList = this.topoNodeService.queryNetworkElement();
-        if (ipList != null && ipList.size() > 0) {
+        List<Map> devices = this.topoNodeService.queryNetworkElement();
+        if (devices != null && devices.size() > 0) {
             Map params = new HashMap();
             this.macTempService.truncateTable();
-            ipList.parallelStream().forEach(map ->{
+            devices.parallelStream().forEach(map ->{
+//            ipList.stream().forEach(map -> {
+//            for (Map map : devices) {
+//                devices.forEach(map -> {
                 String deviveName = map.get("deviceName").toString();
                 String deviceType = map.get("deviceType").toString();
                 String ip = map.get("ip").toString();

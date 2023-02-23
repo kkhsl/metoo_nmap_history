@@ -1,12 +1,14 @@
 package com.metoo.nspm.entity.nspm;
 
 import com.metoo.nspm.core.domain.IdEntity;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+@ApiModel("凭据管理")
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor

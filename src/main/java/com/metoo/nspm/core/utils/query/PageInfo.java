@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 @ApiModel("封装分页数据")
 @Data
 @Accessors
@@ -18,7 +20,7 @@ public class PageInfo<T> {
 
     @JsonIgnore
     @ApiModelProperty("Mybatis分页对象")
-    private Page<T> page;
+    private Page<T> t;
 
     @ApiModelProperty("起始条数")
     private Integer startRow;
@@ -42,7 +44,7 @@ public class PageInfo<T> {
     private String orderBy;
 
     @ApiModelProperty("结果集")
-    private Object obj;
+    private List<T> obj;
 
     @ApiModelProperty("其他结果集")
     private Object other;

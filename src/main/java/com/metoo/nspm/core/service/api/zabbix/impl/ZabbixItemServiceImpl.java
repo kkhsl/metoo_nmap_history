@@ -900,7 +900,6 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             this.macTempService.batchUpdate(list);
             list.clear();
         }
-
         SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-U-E 采集结束");
 
         start = System.currentTimeMillis();
@@ -954,29 +953,26 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         }
         SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-S-E 采集结束");
 
-
         // 查询剩余S条目
         params.clear();
         params.put("tag", "S");
         List<MacTemp> residueS = this.macTempService.selectTagByMap(params);
-        for (MacTemp obj :  residueS){
-            obj.setTag("RT");
-//            this.macTempService.update(obj);
-            list.add(obj);
+        residueS.stream().map(e ->
+            e.setTag("RT")
+        ).collect(Collectors.toList());
+        if(residueS.size() > 0){
+            this.macTempService.batchUpdate(residueS);
         }
-        if(list.size() > 0){
-            this.macTempService.batchUpdate(list);
-            list.clear();
-        }
-
 
         start = System.currentTimeMillis();
         SystemOutputLogUtils.start(log, start, "Mac-DT 采集开始");
         // mac|arp联查
         // 标记为UT且有ip地址的，标记为DT
         params.clear();
-        params.put("tag", "S");
-        List<MacTemp> macDT = this.macTempService.macJoinArp(params);
+        List<MacTemp> macDT = this.macTempService.directTerminal(params);
+//        params.clear();
+//        params.put("tag", "S");
+//        List<MacTemp> macDT = this.macTempService.macJoinArp(params);
 //        for (MacTemp macTemp : macs){
 //            if(org.apache.commons.lang3.StringUtils.isNotEmpty(macTemp.getMac())){
 //                params.clear();
@@ -1005,18 +1001,18 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
 //            list.add(item);
 //        });
         // 第三种：stream:foreach
-        macDT.parallelStream().forEach(item ->{
-            if(org.apache.commons.lang3.StringUtils.isNotEmpty(item.getMac())){
-                params.clear();
-                params.put("mac", item.getMac());
-                List<Arp> arps = arpService.selectObjByMap(params);
-                if (arps.size() > 0) {
-                    Arp arp = arps.get(0);
-                    item.setIp(arp.getIp());
-                    item.setIpAddress(arp.getIpAddress());
-                }
-            }
-        });
+//        macDT.parallelStream().forEach(item ->{
+//            if(org.apache.commons.lang3.StringUtils.isNotEmpty(item.getMac())){
+//                params.clear();
+//                params.put("mac", item.getMac());
+//                List<Arp> arps = arpService.selectObjByMap(params);
+//                if (arps.size() > 0) {
+//                    Arp arp = arps.get(0);
+//                    item.setIp(arp.getIp());
+//                    item.setIpAddress(arp.getIpAddress());
+//                }
+//            }
+//        });
         if(macDT.size() > 0){
             this.macTempService.batchUpdate(macDT);
         }
