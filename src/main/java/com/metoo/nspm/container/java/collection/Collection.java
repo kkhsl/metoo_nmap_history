@@ -1,4 +1,4 @@
-package com.metoo.nspm.container.java.util;
+package com.metoo.nspm.container.java.collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

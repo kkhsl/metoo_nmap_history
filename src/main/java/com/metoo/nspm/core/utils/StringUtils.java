@@ -84,7 +84,7 @@ public class StringUtils {
     }
 
     /**
-     * 获取指定字符第N次出现的位置
+     * 获取指定字符第N次出现的位置(下标)
      * @return
      */
     public static int acquireCharacterPosition(String param, String symbol, int num){

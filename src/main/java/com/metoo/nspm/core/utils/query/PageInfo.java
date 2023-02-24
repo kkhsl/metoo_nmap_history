@@ -16,11 +16,11 @@ import java.util.List;
 @Accessors
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageInfo<T> {
+public class PageInfo<E> {
 
     @JsonIgnore
     @ApiModelProperty("Mybatis分页对象")
-    private Page<T> t;
+    private Page<E> t;
 
     @ApiModelProperty("起始条数")
     private Integer startRow;
@@ -44,7 +44,7 @@ public class PageInfo<T> {
     private String orderBy;
 
     @ApiModelProperty("结果集")
-    private List<T> obj;
+    private List<E> obj;
 
     @ApiModelProperty("其他结果集")
     private Object other;

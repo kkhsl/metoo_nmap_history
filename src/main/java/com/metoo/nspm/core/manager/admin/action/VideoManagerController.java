@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Api("视频管理控制器")
+@Api("视频管理")
 @RestController
 @RequestMapping("/admin/video")
 public class VideoManagerController {

@@ -17,7 +17,8 @@ import static java.lang.System.*;
 
 
 /**
- * @description StreamDemo 参考链接：https://blog.csdn.net/MinggeQingchun/article/details/123184273
+ * @description Java8 新特性
+ * 参考链接：https://blog.csdn.net/MinggeQingchun/article/details/123184273
  *
  * @author HKK
  *
@@ -109,7 +110,7 @@ public class StreamDemo {
     }
 
     /**
-     * Collection
+     * collection
      */
     public Stream listStream() {
         Stream<String> stream = LIST.stream();

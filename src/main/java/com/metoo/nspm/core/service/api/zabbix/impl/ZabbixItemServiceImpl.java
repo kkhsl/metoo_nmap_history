@@ -512,7 +512,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         }
         // 遍历二级ip，生成上级Ip
         if(parentMap.size() > 1){
-            Map<String, List<Object>> parent = this.getShorMask(parentMap);
+            Map<String, List<Object>> parent = this.getShortMask(parentMap);
             if(parent != null && parent.size() > 0){
                 return parent;
             }
@@ -640,7 +640,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         }
         // 遍历二级ip，生成上级Ip
         if(parentMap.size() > 1){
-            Map<String, List<Object>> parent = this.getShorMask(parentMap);
+            Map<String, List<Object>> parent = this.getShortMask(parentMap);
             if(parent != null && parent.size() > 0){
                 return parent;
             }
@@ -1170,7 +1170,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         });
     }
 
-    public Map<String, List<Object>> getShorMask(Map<String, List<Object>> parentMap){
+    public Map<String, List<Object>> getShortMask(Map<String, List<Object>> parentMap){
 //        String parentIp = null;
         Integer shorMask = 0;
         for (Map.Entry<String, List<Object>> entry : parentMap.entrySet()){

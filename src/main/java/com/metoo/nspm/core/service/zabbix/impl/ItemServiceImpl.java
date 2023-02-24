@@ -742,10 +742,10 @@ public class ItemServiceImpl implements ItemService {
 //            ipList.stream().forEach(map -> {
 //            for (Map map : devices) {
 //                devices.forEach(map -> {
-                String deviveName = map.get("deviceName").toString();
-                String deviceType = map.get("deviceType").toString();
-                String ip = map.get("ip").toString();
-                String uuid = map.get("uuid").toString();
+                String deviceName = String.valueOf(map.get("deviceName"));
+                String deviceType = String.valueOf(map.get("deviceType"));
+                String ip = String.valueOf(map.get("ip"));
+                String uuid = String.valueOf(map.get("uuid"));
                 params.clear();
                 params.put("ip", ip);
                 params.put("tag", "macvlan");
@@ -769,7 +769,7 @@ public class ItemServiceImpl implements ItemService {
                         List<ItemTag> tags = item.getItemTags();
                         MacTemp macTemp = new MacTemp();
                         macTemp.setAddTime(time);
-                        macTemp.setDeviceName(deviveName);
+                        macTemp.setDeviceName(deviceName);
                         macTemp.setDeviceType(deviceType);
                         macTemp.setUuid(uuid);
                         macTemp.setDeviceIp(ip);
@@ -825,7 +825,7 @@ public class ItemServiceImpl implements ItemService {
                         List<ItemTag> tags = item.getItemTags();
                         MacTemp macTemp = new MacTemp();
                         macTemp.setAddTime(time);
-                        macTemp.setDeviceName(deviveName);
+                        macTemp.setDeviceName(deviceName);
                         macTemp.setDeviceType(deviceType);
                         macTemp.setUuid(uuid);
                         macTemp.setDeviceIp(ip);
@@ -900,7 +900,7 @@ public class ItemServiceImpl implements ItemService {
                         arpList.parallelStream().forEach(item -> {
                             List<ItemTag> tags = item.getItemTags();
                             ArpTemp arpTemp = new ArpTemp();
-                            arpTemp.setDeviceName(deviveName);
+                            arpTemp.setDeviceName(deviceName);
                             arpTemp.setDeviceType(deviceType);
                             arpTemp.setUuid(uuid);
                             arpTemp.setDeviceIp(ip);
@@ -953,7 +953,7 @@ public class ItemServiceImpl implements ItemService {
                                     macTemp.setMac(arpTemp.getMac());
                                     macTemp.setIndex(arpTemp.getIndex());
                                     macTemp.setType(arpTemp.getType());
-                                    macTemp.setDeviceName(deviveName);
+                                    macTemp.setDeviceName(deviceName);
                                     macTemp.setDeviceType(deviceType);
                                     macTemp.setInterfaceName(arpTemp.getInterfaceName());
                                     macTemp.setUuid(uuid);

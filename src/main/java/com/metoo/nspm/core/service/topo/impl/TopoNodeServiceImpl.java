@@ -102,4 +102,39 @@ public class TopoNodeServiceImpl implements ITopoNodeService {
         return ipList;
     }
 
+    public static void main(String[] args) {
+//        Map<String, String> params = new HashMap();
+//        params.put("name", null);
+//        try {
+//            System.out.println("测试空指针 toString()：" + params.get("name").toString());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println("测试空指针 toString()：" + e.getMessage());
+//            System.out.println("测试空指针 toString()：" + e.getLocalizedMessage());
+//            System.out.println("测试空指针 toString()：" + e.getCause());
+//            System.out.println("测试空指针 toString()：" + e.getSuppressed());
+//            System.out.println("测试空指针 toString()：" + e.getStackTrace());
+//            System.out.println("测试空指针 toString()：" + e.getClass());
+//        }
+//        System.out.println("测试空指针 String.valueOf()：" + String.valueOf(params.get("name")));
+//        System.out.println("测试空指针 String.valueOf()：" + params.get("a"));
+
+//        Map<String, Integer> numM = new HashMap();
+//        numM.put("num", -1);
+////        int i = numM.get("i");
+//
+//        Integer ii = numM.get("i");
+//
+//        int iii = numM.get("num");
+//
+//        Integer iiii = numM.get("num");
+
+
+        int i =128;
+        byte b = (byte)i;
+        System.out.println(i);
+        System.out.println(b);
+
+    }
+
 }

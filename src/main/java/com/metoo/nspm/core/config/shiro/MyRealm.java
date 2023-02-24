@@ -72,7 +72,7 @@ public class MyRealm extends AuthorizingRealm {
         User user = userService.findByUserName(username);
         if(!ObjectUtils.isEmpty(user)){
             if(username.equals(user.getUsername())){
-              /* Collection sessions = sess
+              /* collection sessions = sess
                     if(username.equals(loginUsername)){  //这里的username也就是当前登录的username
                         session.setTimeout(0);  //这里就把session清除，ionDAO.getActiveSessions();
                 for(Session scession: sessions){
