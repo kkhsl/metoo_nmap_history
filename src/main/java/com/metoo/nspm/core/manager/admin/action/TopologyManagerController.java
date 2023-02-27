@@ -1124,8 +1124,10 @@ public class TopologyManagerController {
             }
 
             // 第二段 起点ip网关到终点ip网关的路由查询
-            List two = this.routTool.queryRoutePath(srcGateway, destGateway, null, (Mac)first.get("destDevice"));
-            map.put("two", two);
+            if(first.get("destDevice") != null){
+                List two = this.routTool.queryRoutePath(srcGateway, destGateway, null, (Mac) first.get("destDevice"));
+                map.put("two", two);
+            }
 
             // 第三段 终点ip网关到终点ip的二层查询
             User user = ShiroUserHolder.currentUser();

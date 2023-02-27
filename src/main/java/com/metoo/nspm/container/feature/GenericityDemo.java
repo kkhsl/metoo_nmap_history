@@ -32,7 +32,6 @@ import java.util.List;
  */
 public class GenericityDemo {
 
-
     @Test
     public void testPrintArray(){
         // 创建不同类型数组

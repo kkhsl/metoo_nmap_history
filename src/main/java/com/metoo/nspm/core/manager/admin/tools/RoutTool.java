@@ -211,8 +211,8 @@ public class RoutTool {
 
                         if (nexthops.size() > 0) {
                             outCycle:for (Route nextHop : nexthops) {
-                                if(nextHop.getNextHop() != null && !nextHop.getNextHop().equals("")){
-                                    String nexeIp = IpUtil.decConvertIp(Long.parseLong(nextHop.getNextHop()));
+                                if(nextHop.getNextHop() != null && !nextHop.getNextHop().equals("") && !nextHop.getNextHop().equals("0")){
+                                    String nexeIp = nextHop.getNextHop();
                                     // 这里使用continue，继续进行下一个nexthop
                                     if(nexeIp == null || nexeIp.equals("")
                                             || nexeIp.equals("127.0.0.1")
@@ -224,7 +224,7 @@ public class RoutTool {
                                         this.routTableService.update(ipaddressRoutTable);
                                         continue;
                                     }
-                                    Map map = IpUtil.getNetworkIpDec(IpUtil.decConvertIp(Long.parseLong(nextHop.getNextHop())), "255.255.255.255");
+                                    Map map = IpUtil.getNetworkIpDec(nextHop.getNextHop(), "255.255.255.255");
                                     List<IpAddress> nextIpaddresses = this.ipAddressServie.querySrcDevice(map);// 下一跳Ipaddress
                                     if(nextIpaddresses.size() > 0){
                                         for (IpAddress nextIpaddress : nextIpaddresses) {

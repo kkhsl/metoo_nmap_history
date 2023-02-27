@@ -9,6 +9,7 @@ import com.metoo.nspm.entity.nspm.Arp;
 import com.metoo.nspm.entity.nspm.IpAddress;
 import com.metoo.nspm.entity.nspm.Mac;
 import com.metoo.nspm.entity.nspm.Route;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @EnableScheduling：Spring系列框架中SpringFramwork自带的定时任务（org.springframework.scheduling.annotation.*）
@@ -124,7 +126,11 @@ public class StaticScheduleTask {
             cal.clear(Calendar.MILLISECOND);
             Date date = cal.getTime();
             try {
+
+                StopWatch watch = StopWatch.createStarted();
                 this.gatherService.gatherMacBatch(date);
+                watch.stop();
+                System.out.println("采集总耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
             } catch (Exception e) {
                 e.printStackTrace();
             }

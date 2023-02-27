@@ -7,12 +7,18 @@ import com.metoo.nspm.core.service.zabbix.IGatherService;
 import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.core.utils.SystemOutputLogUtils;
 import com.metoo.nspm.entity.nspm.ArpTemp;
+import org.apache.commons.lang3.time.StopWatch;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 @Service
 //@Transactional
 public class GatherServiceImpl implements IGatherService {
@@ -87,68 +93,70 @@ public class GatherServiceImpl implements IGatherService {
 
     }
 
+
     @Override
-    public void gatherMacBatch(Date time) {
-        Long gatherTime = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, gatherTime, "Zabbix:Mac采集开始");
-
-        Long start = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, start, "Mac采集开始");
+    public void gatherMacBatch(Date time) throws InterruptedException {
+//        Long gatherTime = System.currentTimeMillis();
+//        SystemOutputLogUtils.start(log, gatherTime, "Zabbix:Mac采集开始");
+        StopWatch watch = new StopWatch();
+        watch.start();
         this.itemService.gatherMacBatch(time);
-        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac 采集结束");
+        watch.stop();
+        log.info("Mac采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
 
-        start = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, start, "Mac-Tag 采集开始");
-        this.zabbixItemService.labelTheMac();// 批量插入
-        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-Tag 采集结束");
+        watch.reset();
+        watch.start();
+        this.zabbixItemService.labelTheMac();
+        watch.stop();
+        log.info("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
 
-        start = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, start, "Mac-Topology 采集开始");
+        watch.reset();
+        watch.start();
         this.itemService.topologySyncToMacBatch(time);
-        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-Topology 采集结束");
+        watch.stop();
+        log.info("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
 
-        start = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, start, "Mac-copy 采集开始");
+        watch.reset();
+        watch.start();
         // 同步网元数据到Mac
         this.macService.truncateTable();
         this.macService.copyMacTemp();
         // 记录历史
         this.macHistoryService.copyMacTemp();
-        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-copy 采集结束");
-
-        SystemOutputLogUtils.diff(log, gatherTime, System.currentTimeMillis(), "Zabbix:mac 采集结束");
+        watch.stop();
+        log.info("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
     }
 
     @Override
     public void gatherMacBatchStream(Date time) {
-        Long gatherTime = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, gatherTime, "Zabbix:Mac采集开始");
 
-        Long start = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, start, "Mac采集开始");
+        StopWatch watch = new StopWatch();
+        watch.start();
         this.itemService.gatherMacBatchStream(time);
-        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac 采集结束");
+        watch.stop();
+        System.out.println("Mac采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
-        start = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, start, "Mac-Tag 采集开始");
-        this.zabbixItemService.labelTheMac();// 批量插入
-        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-Tag 采集结束");
+        watch.reset();
+        watch.start();
+        this.zabbixItemService.labelTheMac();
+        watch.stop();
+        System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
-        start = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, start, "Mac-Topology 采集开始");
+        watch.reset();
+        watch.start();
         this.itemService.topologySyncToMacBatch(time);
-        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-Topology 采集结束");
+        watch.stop();
+        System.out.println("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
-        start = System.currentTimeMillis();
-        SystemOutputLogUtils.start(log, start, "Mac-copy 采集开始");
+        watch.reset();
+        watch.start();
         // 同步网元数据到Mac
         this.macService.truncateTable();
         this.macService.copyMacTemp();
         // 记录历史
         this.macHistoryService.copyMacTemp();
-        SystemOutputLogUtils.diff(log, start, System.currentTimeMillis(), "Mac-copy 采集结束");
-
-        SystemOutputLogUtils.diff(log, gatherTime, System.currentTimeMillis(), "Zabbix:mac 采集结束");
+        watch.stop();
+        System.out.println("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
     }
 
     @Override

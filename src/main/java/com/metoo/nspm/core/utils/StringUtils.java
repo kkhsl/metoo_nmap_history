@@ -88,7 +88,7 @@ public class StringUtils {
      * @return
      */
     public static int acquireCharacterPosition(String param, String symbol, int num){
-        if(param.contains(symbol) && param.indexOf(":") != -1){
+        if(param.contains(symbol) && param.indexOf(symbol) != -1){
             Pattern pattern = Pattern.compile(symbol);
             Matcher findMatcher = pattern.matcher(param);
             List<Integer> list = new ArrayList();

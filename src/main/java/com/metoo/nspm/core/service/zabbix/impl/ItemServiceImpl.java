@@ -489,7 +489,7 @@ public class ItemServiceImpl implements ItemService {
                             for (ItemTag tag : tags) {
                                 String value = tag.getValue();
                                 if (tag.getTag().equals("ifmac")) {
-//                                    格式化mac
+                                    // 格式化mac
                                     if(!value.contains(":")){
                                         value = value.trim().replaceAll(" ", ":");
                                     }
@@ -499,7 +499,6 @@ public class ItemServiceImpl implements ItemService {
                                         String vlan = macMap.get(value);
                                         macTemp.setVlan(vlan);
                                     }
-
 //                                        params.clear();
 //                                        params.put("mac", value);
 //                                        List<Arp> arps = arpService.selectObjByMap(params);
@@ -572,15 +571,6 @@ public class ItemServiceImpl implements ItemService {
                                         String vlan = macMap.get(value);
                                         macTemp.setVlan(vlan);
                                     }
-
-//                                    params.clear();
-//                                    params.put("mac", value);
-//                                    List<Arp> arps = arpService.selectObjByMap(params);
-//                                    if(arps.size() > 0){
-//                                        Arp arp = arps.get(0);
-//                                        macTemp.setIp(arp.getIp());
-//                                        macTemp.setIpAddress(arp.getIpAddress());
-//                                    }
                                 }
                                 if (tag.getTag().equals("portindex")) {
                                     macTemp.setInterfaceName(tag.getName());
@@ -738,7 +728,7 @@ public class ItemServiceImpl implements ItemService {
         if (devices != null && devices.size() > 0) {
             Map params = new HashMap();
             this.macTempService.truncateTable();
-            devices.parallelStream().forEach(map ->{
+            devices.stream().forEach(map ->{
 //            ipList.stream().forEach(map -> {
 //            for (Map map : devices) {
 //                devices.forEach(map -> {
@@ -803,6 +793,8 @@ public class ItemServiceImpl implements ItemService {
                             if (macTemp.getInterfaceName() != null && !macTemp.getInterfaceName().equals("")
                                     && macTemp.getMac() != null && !macTemp.getMac().equals("{#MAC}")
                                     && !macTemp.getMac().equals("{#IFMAC}")) {
+                                macTemp.setTag("L");
+                                macTemp.setAddTime(time);
                                 batchInsert.add(macTemp);
                             }
                         }
@@ -965,11 +957,12 @@ public class ItemServiceImpl implements ItemService {
                     }
                 }
             });
+
             if(batchInsert.size() > 0){
-                // 执行去重
+                // 去重
                 List<MacTemp> list = null;
                 try {
-                    list = batchInsert.parallelStream().collect(
+                    list = batchInsert.stream().collect(
                             Collectors.collectingAndThen(
                                     Collectors.toCollection(() -> new TreeSet<>(Comparator
                                             .comparing(MacTemp::getDeviceName, Comparator.nullsLast(String::compareTo))
