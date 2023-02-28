@@ -42,14 +42,6 @@
         SELECT <include refid="Ntoa_Column_List" />
         FROM rsms_mac_history
         <where>
-            <if test="time != null">
-                AND addTime = (
-                SELECT addTime FROM rsms_mac_history WHERE addTime &lt;= #{time} ORDER BY addTime DESC limit 1
-                )
-            </if>
-            <if test="beforeTime != null">
-                AND addTime &lt;=#{beforeTime}
-            </if>
             <if test="mac != null">
                 AND mac = #{mac}
             </if>
@@ -68,6 +60,12 @@
             <if test="uuid != null">
                 AND uuid = #{uuid}
             </if>
+            <if test="uuids != null">
+                AND uuid in
+                <foreach collection="uuids" index="index" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="tags != null">
                 AND tag in
                 <foreach collection="tags" index = "index" item="item" separator="," open="(" close=")">
@@ -77,16 +75,21 @@
             <if test="ip != null">
                 AND ip = #{ip}
             </if>
-            <if test="remoteDevice != null">
-                AND remote_device = #{remoteDevice}
-            </if>
-            <if test="remoteDevice != null">
-                AND remote_device = #{remoteDevice}
+            <if test="time != null">
+                AND addTime = (
+                SELECT addTime FROM rsms_mac_history WHERE addTime &lt;=#{time} ORDER BY addTime DESC limit 1
+                )
             </if>
             <if test="macId != null and macId != ''">
                 AND id != #{macId}
             </if>
         </where>
+        <if test = "orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test = "orderType != null and orderType != ''">
+            ${orderType}
+        </if>
     </select>
 
     <delete id="batchDelete" parameterType="com.metoo.nspm.entity.nspm.Mac">

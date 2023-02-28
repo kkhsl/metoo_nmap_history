@@ -20,4 +20,6 @@ public interface IRoutHistoryService {
     int batchDelete(List<Route> routs);
 
     void copyRoutTemp();
+
+    public Object queryDeviceRout(RoutDTO dto, String ip);
 }

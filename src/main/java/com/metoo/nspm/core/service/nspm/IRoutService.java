@@ -23,4 +23,8 @@ public interface IRoutService {
     List<Route> selectNextHopDevice(Map params);
 
     void copyRoutTemp();
+
+
+    // servicer
+    public Object queryDeviceRout(RoutDTO dto, String ip);
 }

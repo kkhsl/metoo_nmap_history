@@ -357,6 +357,7 @@ public class RoutTool {
 //        return new ArrayList();
 //    }
 
+    // 当前路径
     public Map secondLayer(String srcMac, String destMac){
         // 查询起点设备
         Map map = new HashMap();
@@ -419,6 +420,75 @@ public class RoutTool {
         return new HashMap();
     }
 
+    public Map secondLayerHistory(String srcMac, String destMac, Date time){
+        // 查询起点设备
+        Map map = new HashMap();
+        Map params = new HashMap();
+        List<Mac> srcDevices = new ArrayList<>();
+        if(srcMac.contains("0:0:5e")){
+            params.put("tag", "LV");
+            params.put("mac", srcMac);
+            params.put("time", DateTools.getCurrentTimeNoSecond(time));
+            srcDevices = this.macHistoryService.selectObjByMap(params);
+        }
+        if(srcDevices.size() <= 0){
+            params.clear();
+            params.put("tag", "DT");
+            params.put("mac", srcMac);
+            params.put("time", DateTools.getCurrentTimeNoSecond(time));
+            srcDevices = this.macHistoryService.selectObjByMap(params);
+            if(srcDevices.size() <= 0){
+                params.clear();
+                params.put("tag", "L");
+                params.put("mac", srcMac);
+                params.put("time", DateTools.getCurrentTimeNoSecond(time));
+                srcDevices = this.macHistoryService.selectObjByMap(params);
+            }
+        }
+        if(srcDevices.size() > 0){
+            List<Mac> destDevices = new ArrayList<>();
+            if(destMac.contains("0:0:5e")){
+                params.put("tag", "LV");
+                params.put("mac", destMac);
+                params.put("time", DateTools.getCurrentTimeNoSecond(time));
+                destDevices = this.macHistoryService.selectObjByMap(params);
+            }
+            if(destDevices.size() <= 0){
+                params.clear();
+                params.put("tag", "DT");
+                params.put("mac", destMac);
+                params.put("time", DateTools.getCurrentTimeNoSecond(time));
+                destDevices = this.macHistoryService.selectObjByMap(params);
+                if(destDevices.size() <= 0){
+                    params.clear();
+                    params.put("tag", "L");
+                    params.put("mac", destMac);
+                    params.put("time", DateTools.getCurrentTimeNoSecond(time));
+                    destDevices = this.macHistoryService.selectObjByMap(params);
+                }
+            }
+            if(destDevices.size() > 0){
+                // 查询下一跳
+                Mac srcDevice = srcDevices.get(0);
+                Mac destDevice = destDevices.get(0);
+                String tag = "";
+                List path = new ArrayList();
+                if(destDevice.getTag().equals("L")){
+                    // 调整
+                    path = this.nextHopHistory(srcDevice.getUuid(), destDevice, time);
+                }else{
+                    path = this.recursionLayPath(srcDevice.getUuid(), destDevice, tag);
+                }
+                path.add(destDevice);
+                path.add(srcDevice);
+                map.put("destDevice", destDevice);
+                map.put("path", path);
+                return map;
+            }
+        }
+        return new HashMap();
+    }
+
     public List secondLayers(String srcUuid, String destMac){
         // 查询起点设备
         Map params = new HashMap();
@@ -459,6 +529,47 @@ public class RoutTool {
         return new ArrayList<>();
     }
 
+    public List secondLayersHistory(String srcUuid, String destMac, Date time){
+        // 查询起点设备
+        Map params = new HashMap();
+        if(StringUtils.isNotEmpty(srcUuid)){
+            List<Mac> destDevices = new ArrayList<>();
+            if(destMac.contains("0:0:5e")){
+                params.put("tag", "LV");
+                params.put("mac", destMac);
+                params.put("time", DateTools.getCurrentTimeNoSecond(time));
+                destDevices = this.macHistoryService.selectObjByMap(params);
+            }
+            if(destDevices.size() <= 0){
+                params.clear();
+                params.put("tag", "DT");
+                params.put("mac", destMac);
+                params.put("time", DateTools.getCurrentTimeNoSecond(time));
+                destDevices = this.macHistoryService.selectObjByMap(params);
+                if(destDevices.size() <= 0){
+                    params.clear();
+                    params.put("tag", "L");
+                    params.put("mac", destMac);
+                    params.put("time", DateTools.getCurrentTimeNoSecond(time));
+                    destDevices = this.macHistoryService.selectObjByMap(params);
+                }
+            }
+            if(destDevices.size() > 0){
+                // 查询下一跳
+                Mac destDevice = destDevices.get(0);
+                String tag = "";
+                List path = new ArrayList();
+                if(destDevice.getTag().equals("L")){
+                    path = this.nextHopHistory(srcUuid, destDevice, time);
+                }else{
+                    path = this.recursionLayPathHistory(srcUuid, destDevice, tag, time);
+                }
+                return path;
+            }
+        }
+        return new ArrayList<>();
+    }
+
     // 递归查询二层路径
     public List recursionLayPath(String srcUuid, Mac destDevice, String tag){
         List list = new ArrayList();
@@ -491,6 +602,50 @@ public class RoutTool {
                         }
                     }else{
                         List listr = this.recursionLayPath(mac.getRemoteUuid(), destDevice, tag);
+                        list.addAll(listr);
+                        list.add(mac);
+                    }
+                }
+            }
+            return list;
+        }
+        return new ArrayList();
+    }
+
+    // 递归查询二层路径
+    public List recursionLayPathHistory(String srcUuid, Mac destDevice, String tag, Date time){
+        List list = new ArrayList();
+        Map params = new HashMap();
+        params.clear();
+        params.put("uuid", srcUuid);
+        params.put("mac", destDevice.getMac());
+        params.put("time", DateTools.getCurrentTimeNoSecond(time));
+        if(!tag.equals("")){
+            params.put("tag", "DE");
+        }
+        List<Mac> macs = this.macHistoryService.selectObjByMap(params);
+        if(macs.size() > 0){
+            // 多个下一跳路径
+            for(Mac mac : macs){
+                // 下一跳与终点
+                if(mac.getId() == destDevice.getId()){
+                    continue;
+                }else{
+                    if(tag.equals("")){
+                        params.clear();
+                        params.put("interfaceName", mac.getInterfaceName());
+                        params.put("uuid", mac.getUuid());
+                        params.put("tag", "DE");
+                        params.put("time", DateTools.getCurrentTimeNoSecond(time));
+                        List<Mac> vMacs = this.macHistoryService.selectObjByMap(params);
+                        if(vMacs.size() > 0){
+                            Mac vmac = vMacs.stream().findAny().get();
+                            List listr = this.recursionLayPath(vmac.getRemoteUuid(), destDevice, "");
+                            list.addAll(listr);
+                            list.add(vmac);
+                        }
+                    }else{
+                        List listr = this.recursionLayPathHistory(mac.getRemoteUuid(), destDevice, tag, time);
                         list.addAll(listr);
                         list.add(mac);
                     }
@@ -592,6 +747,45 @@ public class RoutTool {
                     }
                 }
             }
+        return list;
+    }
+
+    /**
+     * 查询下一跳：调整 2(历史)
+     * @param srcUuid
+     * @param destDevice
+     * @return
+     */
+    public List nextHopHistory(String srcUuid, Mac destDevice, Date time){
+        List list = new ArrayList();
+        Map params = new HashMap();
+        params.clear();
+        params.put("uuid", srcUuid);
+        params.put("mac", destDevice.getMac());
+        params.put("time", DateTools.getCurrentTimeNoSecond(time));
+        List<Mac> macs = this.macHistoryService.selectObjByMap(params);
+        if(macs.size() > 0) {
+            // 多个下一跳路径
+            for (Mac mac : macs) {
+                // 下一跳与终点
+                if (mac.getId() == destDevice.getId()) {
+                    continue;
+                } else {
+                    params.clear();
+                    params.put("interfaceName", mac.getInterfaceName());
+                    params.put("uuid", mac.getUuid());
+                    params.put("tag", "DE");
+                    params.put("time", DateTools.getCurrentTimeNoSecond(time));
+                    List<Mac> demac = this.macHistoryService.selectObjByMap(params);
+                    if (demac.size() > 0) {
+                        Mac findAny = demac.stream().findAny().get();
+                        List listr = this.nextHopHistory(findAny.getRemoteUuid(), destDevice, time);
+                        list.addAll(listr);
+                        list.add(findAny);
+                    }
+                }
+            }
+        }
         return list;
     }
 

@@ -399,91 +399,7 @@ public class ZabbixItemManagerController {
         return null;
     }
 
-//    @ApiOperation("查询mac")
-//    @GetMapping(value = {"/obj/mac","/obj/mac/{uuid}","/obj/mac/{time}","/obj/mac/{uuid}/{time}"})
-//    public Object getObjMac(@PathVariable(value = "uuid", required = false) String uuid,
-//                             @PathVariable(value="time", required = false)
-//                             @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date time){
-//        Map params = new HashMap();
-//        List<Mac> macs = null;
-//        if(time == null){
-//            if(uuid != null && !uuid.equals("")){
-//                params.put("uuid", uuid);
-//                params.put("tag", "DT");
-//                macs = this.macService.selectByMap(params);
-//            }else{
-//                params.clear();
-//                params.put("tag", "DE");
-//                macs = this.macService.selectByMap(params);
-//            }
-//        }else{
-//            params.put("time", DateTools.getCurrentTimeNoSecond(time));
-//            if(uuid != null && !uuid.equals("")){
-//                params.put("uuid", uuid);
-//                params.put("tag", "DT");
-//                macs = this.macHistoryService.selectObjByMap(params);
-//            }else{
-//                params.put("tag", "DE");
-//                macs = this.macHistoryService.selectObjByMap(params);
-//            }
-//        }
-//
-//        if(macs != null && macs.size() > 0){
-//            ExecutorService exe = Executors.newFixedThreadPool(macs.size());
-//            for(Mac mac : macs){
-//                if(mac.getDeviceIp() != null && mac.getInterfaceName() != null){
-//                    exe.execute(new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            String interfaceName = itemUtil.getInterfaceName(
-//                                    mac.getDeviceIp(),
-//                                    mac.getInterfaceName());
-//                            mac.setInterfaceName(interfaceName);
-//                        }
-//                    }));
-//                }
-//            }
-//            exe.shutdown();
-//            while (true) {
-//                if (exe.isTerminated()){
-//                    for(Mac mac : macs){
-//                        if(mac.getMac() != null && !mac.getMac().equals("")){
-//                            String macAddr = mac.getMac();
-//                            int one_index = macAddr.indexOf(":");
-//                            String one = macAddr.substring(0, one_index);
-//                            if(one.equals("0")){
-//                                one = "00";
-//                            }
-//                            int tow_index = macAddr.indexOf(":", one_index + 1);
-//                            String two = macAddr.substring(one_index, tow_index);
-//                            if(two.equals("0")){
-//                                two = "00";
-//                            }
-//                            int three_index = macAddr.indexOf(":", tow_index + 1);
-//                            String three = macAddr.substring(tow_index, three_index);
-//                            if(three.equals("0")){
-//                                three = "00";
-//                            }
-////                            macAddr = macAddr.substring(0, index);
-//                            macAddr = one + two + three;
-//                            params.clear();
-//                            params.put("mac", macAddr);
-//                            List<MacVendor> macVendors = this.macVendorService.selectObjByMap(params);
-//                            if(macVendors.size() > 0){
-//                                MacVendor macVendor = macVendors.get(0);
-//                                mac.setVendor(macVendor.getVendor());
-//                            }
-//
-//                        }
-//                    }
-//                    return ResponseUtil.ok(macs);
-//                }
-//            }
-//        }
-//        return ResponseUtil.ok();
-//    }
-
-    @ApiOperation("查询mac")
+    @ApiOperation("Mac 列表")
     @GetMapping(value = {"/obj/mac"})
     public Object getObjMac(@RequestParam(value = "uuid", required = false) String uuid,
                             @RequestParam(value="time", required = false)
@@ -512,57 +428,36 @@ public class ZabbixItemManagerController {
             }
         }
         if(macs != null && macs.size() > 0){
-//            ExecutorService exe = Executors.newFixedThreadPool(macs.size());
-//            for(Mac mac : macs){
-//                if(mac.getDeviceIp() != null && mac.getInterfaceName() != null){
-//                    exe.execute(new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            String interfaceName = itemUtil.getInterfaceName(
-//                                    mac.getDeviceIp(),
-//                                    mac.getInterfaceName());
-//                            mac.setInterfaceName(interfaceName);
-//                        }
-//                    }));
-//                }
-//            }
-//            exe.shutdown();
-//            while (true) {
-//                if (exe.isTerminated()){
-                    for(Mac mac : macs){
-                        if(mac.getMac() != null && !mac.getMac().equals("")){
-                            String macAddr = mac.getMac();
-                            int one_index = macAddr.indexOf(":");
-                            String one = macAddr.substring(0, one_index);
-                            if(one.equals("0")){
-                                one = "00";
-                            }
-                            int tow_index = macAddr.indexOf(":", one_index + 1);
-                            String two = macAddr.substring(one_index, tow_index);
-                            if(two.equals("0")){
-                                two = "00";
-                            }
-                            int three_index = macAddr.indexOf(":", tow_index + 1);
-                            String three = macAddr.substring(tow_index, three_index);
-                            if(three.equals("0")){
-                                three = "00";
-                            }
-//                            macAddr = macAddr.substring(0, index);
-                            macAddr = one + two + three;
-                            params.clear();
-                            params.put("mac", macAddr);
-                            List<MacVendor> macVendors = this.macVendorService.selectObjByMap(params);
-                            if(macVendors.size() > 0){
-                                MacVendor macVendor = macVendors.get(0);
-                                mac.setVendor(macVendor.getVendor());
-                            }
-
-                        }
+            for(Mac mac : macs){
+                if(mac.getMac() != null && !mac.getMac().equals("")){
+                    String macAddr = mac.getMac();
+                    int one_index = macAddr.indexOf(":");
+                    String one = macAddr.substring(0, one_index);
+                    if(one.equals("0")){
+                        one = "00";
                     }
-                    return ResponseUtil.ok(macs);
+                    int tow_index = macAddr.indexOf(":", one_index + 1);
+                    String two = macAddr.substring(one_index, tow_index);
+                    if(two.equals("0")){
+                        two = "00";
+                    }
+                    int three_index = macAddr.indexOf(":", tow_index + 1);
+                    String three = macAddr.substring(tow_index, three_index);
+                    if(three.equals("0")){
+                        three = "00";
+                    }
+                    macAddr = one + two + three;
+                    params.clear();
+                    params.put("mac", macAddr);
+                    List<MacVendor> macVendors = this.macVendorService.selectObjByMap(params);
+                    if(macVendors.size() > 0){
+                        MacVendor macVendor = macVendors.get(0);
+                        mac.setVendor(macVendor.getVendor());
+                    }
                 }
-//            }
-//        }
+            }
+            return ResponseUtil.ok(macs);
+        }
         return ResponseUtil.ok();
     }
 
@@ -606,58 +501,7 @@ public class ZabbixItemManagerController {
         }
     }
 
-//    @ApiOperation("arp")
-//    @GetMapping(value = {"/obj/arp","/obj/arp/{uuid}","/obj/arp/{time}","/obj/arp/{uuid}/{time}"})
-//    public Object arp(@PathVariable(value = "uuid", required = false) String uuid,
-//                      @PathVariable(value="time", required = false)
-//                      @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date time){
-//        Map params = new HashMap();
-//        List<Arp> arps = null;
-//        if(time == null){
-//            if(uuid != null){
-//                params.clear();
-//                params.put("uuid", uuid);
-//            }
-//            arps = this.arpService.selectDistinctObjByMap(params);
-//        }else{
-//            params.clear();
-//            params.put("time", DateTools.getCurrentTimeNoSecond(time));
-//            if(uuid != null){
-//                params.put("uuid", uuid);
-//            }
-//            arps = this.arpHistoryService.selectDistinctObjByMap(params);
-//        }
-//        if(arps.size() > 0){
-//            ExecutorService exe = Executors.newFixedThreadPool(arps.size());
-//            for(Arp arp : arps){
-//                if(arp.getDeviceIp() != null && arp.getInterfaceName() != null){
-//                    exe.execute(new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            String interfaceName = itemUtil.getInterfaceName(
-//                                    arp.getDeviceIp(),
-//                                    arp.getInterfaceName());
-//                            arp.setInterfaceName(interfaceName);
-//                        }
-//                    }));
-//                }
-//            }
-//            if(exe != null){
-//                exe.shutdown();
-//            }
-//            while (true) {
-//                if (exe.isTerminated()) {
-//                    // 排序
-//                    SortedSet set = IpV4Util.sort(arps);
-//                    return ResponseUtil.ok(set);
-//
-//                }
-//            }
-//        }
-//        return ResponseUtil.ok();
-//    }
-
-    @ApiOperation("arp")
+    @ApiOperation("arp 列表")
     @GetMapping(value = {"/obj/arp"})
     public Object arp(@RequestParam(value = "uuid", required = false) String uuid,
                       @RequestParam(value="time", required = false)
@@ -682,33 +526,6 @@ public class ZabbixItemManagerController {
         }
         SortedSet set = IpV4Util.sort(arps);
         return ResponseUtil.ok(set);
-//        if(arps.size() > 0){
-//            ExecutorService exe = Executors.newFixedThreadPool(arps.size());
-//            for(Arp arp : arps){
-//                if(arp.getDeviceIp() != null && arp.getInterfaceName() != null){
-//                    exe.execute(new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            String interfaceName = itemUtil.getInterfaceName(
-//                                    arp.getDeviceIp(),
-//                                    arp.getInterfaceName());
-//                            arp.setInterfaceName(interfaceName);
-//                        }
-//                    }));
-//                }
-//            }
-//            if(exe != null){
-//                exe.shutdown();
-//            }
-//            while (true) {
-//                if (exe.isTerminated()) {
-//                    // 排序
-//                    SortedSet set = IpV4Util.sort(arps);
-//                    return ResponseUtil.ok(set);
-//
-//                }
-//            }
-//        }
     }
 
     @ApiOperation("arp:E")

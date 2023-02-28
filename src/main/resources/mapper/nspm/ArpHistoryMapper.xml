@@ -113,13 +113,17 @@
 
     <select id="selectDistinctObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
         SELECT
-        <include refid="Ntoa_Column_List"/>
+          <include refid="Ntoa_Column_List"/>
         FROM
         rsms_arp_history
         <where>
             <if test="time != null">
                 AND addTime = (
-                 SELECT addTime FROM rsms_arp_history WHERE addTime &lt;=#{time} ORDER BY addTime DESC limit 1
+                    SELECT addTime
+                    FROM rsms_arp_history
+                    WHERE addTime &lt;=#{time}
+                    ORDER BY addTime
+                    DESC limit 1
                 )
             </if>
             <if test="beforeTime != null">

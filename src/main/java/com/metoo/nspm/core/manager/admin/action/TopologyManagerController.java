@@ -493,28 +493,6 @@ public class TopologyManagerController {
         return null;
     }
 
-//    @ApiOperation("设备路由列表")
-//    @PostMapping("/device/rout")
-//    public Object deviceRoutList(@RequestBody RoutDTO dto){
-//        if(StringUtil.isEmpty(dto.getDeviceUuid())){
-//            return ResponseUtil.badArgument();
-//        }else{
-//            if(dto.getDestination() != null && !dto.getDestination().equals("")){
-//                dto.setDestination(IpUtil.ipConvertDec(dto.getDestination()));
-//            }
-//        }
-//        Page<Route> page = null;
-//        if(dto.getTime() == null){
-//            page = this.routService.selectConditionQuery(dto);
-//        }else{
-//            page = this.routdestIpService.selectConditionQuery(dto);
-//        }
-//        if(page != null && page.getResult().size() > 0) {
-//            return ResponseUtil.ok(new PageInfo<Route>(page));
-//        }
-//        return ResponseUtil.ok();
-//    }
-
     @ApiOperation("设备路由列表")
     @PostMapping("/device/rout")
     public Object deviceRoutList(@RequestBody RoutDTO dto){
@@ -542,59 +520,10 @@ public class TopologyManagerController {
                 dto.setDestination(IpUtil.ipConvertDec(dto.getDestination()));
             }
         }
-        if(StringUtils.isEmpty(dto.getDestination())){
-            Page<Route> page = null;
-            dto.setOrderBy("destination + 0");
-            dto.setOrderType("asc");
-            if(dto.getTime() == null){
-                page = this.routService.selectConditionQuery(dto);
-            }else{
-                page = this.routHistoryService.selectConditionQuery(dto);
-            }
-            return ResponseUtil.ok(new PageInfo<Route>(page));
+        if(dto.getTime() == null){
+            return this.routService.queryDeviceRout(dto, ip);
         }else{
-            // 根据Ip未查询到数据（查询相同网段ip地址）
-//            String mask = IpV4Util.getMaskByMaskBit(maskBit);
-//            String network = IpV4Util.getNetwork(ip, mask);
-//            String broadcast = IpV4Util.getBroadcast(ip, mask);
-//            if(!StringUtil.isEmpty(network) && !StringUtils.isEmpty(broadcast)){
-//                dto.setNetwork(network);
-//                dto.setBroadcast(broadcast);
-//                page = this.routService.selectConditionQuery(dto);
-//                return ResponseUtil.ok(new PageInfo<Route>(page));
-//            }
-            Page<Route> page = new Page<>();
-            dto.setDestination(null);
-            Map<String, Object> params = new BeanMap(dto);
-            List<Route> routes = this.routService.selectObjByMap(params);
-            if (routes.size() > 0) {
-                List<Route> routList = new ArrayList<>();
-                for (Route rout : routes) {
-                    boolean flag = IpUtil.ipIsInNet(ip, rout.getCidr());
-                    if (flag) {
-                        routList.add(rout);
-                    }
-                }
-                if (routList.size() > 0) {
-                    int maskBitMax = routList.get(0).getMaskBit();
-                    List<Route> routList2 = new ArrayList<>();
-                    for (Route rout : routList) {
-                        if (rout.getMaskBit() >= maskBitMax) {
-                            routList2.clear();
-                            routList2.add(rout);
-                        }
-                    }
-                    page.setPageNum(1);
-                    page.setPageSize(routList2.size());
-                    page.setPageSize(routList2.size());
-                    page.getResult().clear();
-                    page.getResult().addAll(routList2);
-                } else {
-                    dto.setDestination("0");
-                    page = this.routService.selectConditionQuery(dto);
-                }
-            }
-            return ResponseUtil.ok(new PageInfo<Route>(page));
+            return this.routHistoryService.queryDeviceRout(dto, ip);
         }
     }
 
@@ -895,7 +824,7 @@ public class TopologyManagerController {
         String srcMac = "";// 起点Mac
         String destMac = "";// 终点Mac
         Arp srcArp = null;
-        if(type == 1){
+            if(type == 1){
             srcArp = this.queryArp(srcIp, time);
             if(srcArp == null){
                 return ResponseUtil.badArgument("起点Ip不存在");
@@ -1071,7 +1000,8 @@ public class TopologyManagerController {
     public Object queryPath(@RequestParam(value = "srcIp") String srcIp,
                             @RequestParam(value = "srcGateway") String srcGateway,
                             @RequestParam(value = "destIp") String destIp,
-                            @RequestParam(value = "destGateway") String destGateway){
+                            @RequestParam(value = "destGateway") String destGateway,
+                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date time){
         if(StringUtil.isEmpty(srcIp)){
             return ResponseUtil.badArgument("未输入起点Ip");
         }
@@ -1117,7 +1047,11 @@ public class TopologyManagerController {
             if(srcArp != null && destArp != null){
                 srcMac = srcArp.getMac();
                 destMac = destArp.getMac();
-                first = this.routTool.secondLayer(srcMac, destMac);
+                if(time == null){
+                    first = this.routTool.secondLayer(srcMac, destMac);
+                }else{
+                    first = this.routTool.secondLayerHistory(srcMac, destMac, time);
+                }
                 map.put("one", first.get("path"));
             }else{
                 map.put("one", new ArrayList<>());
@@ -1125,7 +1059,7 @@ public class TopologyManagerController {
 
             // 第二段 起点ip网关到终点ip网关的路由查询
             if(first.get("destDevice") != null){
-                List two = this.routTool.queryRoutePath(srcGateway, destGateway, null, (Mac) first.get("destDevice"));
+                List two = this.routTool.queryRoutePath(srcGateway, destGateway, time, (Mac) first.get("destDevice"));
                 map.put("two", two);
             }
 
@@ -1141,8 +1075,13 @@ public class TopologyManagerController {
                 destMac = destArp.getMac();
                 List list = new ArrayList();
                 for(RouteTable routeTable : routTableList){
-                    List path = this.routTool.secondLayers(routeTable.getDeviceUuid(), destMac);
-                    list.addAll(path);
+                    if(time == null){
+                        List path = this.routTool.secondLayers(routeTable.getDeviceUuid(), destMac);
+                        list.addAll(path);
+                    }else{
+                        List path = this.routTool.secondLayersHistory(routeTable.getDeviceUuid(), destMac, time);
+                        list.addAll(path);
+                    }
                 }
                 map.put("three", list);
             }else{
@@ -1150,7 +1089,12 @@ public class TopologyManagerController {
                 if(srcArp != null && destArp != null){
                     srcMac = srcArp.getMac();
                     destMac = destArp.getMac();
-                    Map third = this.routTool.secondLayer(srcMac, destMac);
+                    Map third = null;
+                    if(time == null){
+                        third = this.routTool.secondLayer(srcMac, destMac);
+                    }else{
+                        third = this.routTool.secondLayerHistory(srcMac, destMac, time);
+                    }
                     map.put("three", third.get("path"));
                 }else{
                     map.put("three", new ArrayList<>());
@@ -1164,7 +1108,12 @@ public class TopologyManagerController {
             if(srcArp != null && destArp != null){
                 srcMac = srcArp.getMac();
                 destMac = destArp.getMac();
-                Map first = this.routTool.secondLayer(srcMac, destMac);
+                Map first = null;
+                if(time == null){
+                    first = this.routTool.secondLayer(srcMac, destMac);
+                }else{
+                    first = this.routTool.secondLayerHistory(srcMac, destMac, time);
+                }
                 map.put("one", first.get("path"));
             }else{
                 map.put("one", new ArrayList<>());

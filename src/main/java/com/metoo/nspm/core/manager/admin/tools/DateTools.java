@@ -102,6 +102,15 @@ public class DateTools {
         }
     }
 
+    public static Date parseDate(String date, String format) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            return sdf.parse(date);
+        } catch (Exception var3) {
+            return null;
+        }
+    }
+
     // 时间转时间戳
     public static Long dateToLong(Date date){
         try {

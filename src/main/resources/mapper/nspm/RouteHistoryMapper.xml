@@ -69,7 +69,16 @@
         <where>
             <if test="time != null">
                 AND addTime = (
-                SELECT addTime FROM rsms_rout_history WHERE addTime &lt;= #{time} ORDER BY addTime DESC limit 1
+                  SELECT
+                    addTime
+                  FROM
+                    rsms_rout_history
+                  WHERE
+                    addTime &lt;= #{time}
+                  ORDER BY
+                    addTime
+                  DESC
+                  LIMIT 1
                 )
             </if>
             <if test="mask != null">

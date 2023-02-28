@@ -18,7 +18,9 @@ import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.ItemTag;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Test;
+import org.nutz.lang.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,33 +66,32 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private MacUtil macUtil;
 
-    public static void main(String[] args) {
-        String value = "4.10.25.0.123.32.2.0.0.1.4.10.25.0.123";
-        String[] str = value.split("\\.");
-        StringBuffer dest = new StringBuffer();
-        String mask = "";
-        StringBuffer nexthop = new StringBuffer();
-        Scanner sc = new Scanner(value).useDelimiter("\\.");
-        for(int i = 1; i<= str.length; i ++){
-            if(2 <= i && i <= 4){
-                dest.append(sc.next()).append(".");
-            }else if(i == 5){
-                dest.append(sc.next());
-            }else if(i == 6){
-                mask  = sc.next();
-            }else if(12 <= i && i <= 14){
-                nexthop.append(sc.next()).append(".");
-            }else if(i == 15){
-                nexthop.append(sc.next());
-            }else{
-                sc.next();
-            }
-        }
-        System.out.println(dest.toString());
-        System.out.println(mask);
-        System.out.println(nexthop.toString());
-    }
+    public static void main(String[] args) throws Exception {
+        List<String> strList = Arrays.asList("a", "b", "c", "d", "e");
+        List<Integer> intList = Arrays.asList(1, 2, 3, 4, 5);
 
+        // 线程数默认和CPU个数一致
+        strList.parallelStream().forEach((str) -> {
+//            try {
+//                System.out.println(Thread.currentThread().getName() + "-" + str);
+//            } catch (InterruptedException e) {
+//            }
+
+            System.out.println(Thread.currentThread().getName() + "-" + str);
+        });
+
+        intList.parallelStream().forEach((number) -> {
+//            try {
+//                System.out.println(Thread.currentThread().getName() + " - " + number);
+//                Thread.sleep(5000);
+//            } catch (InterruptedException e) {
+//            }
+
+
+            System.out.println(Thread.currentThread().getName() + " - " + number);
+        });
+        System.out.println("---");
+    }
     @Override
     public void gatherArpItem(Date time) {
         Map params = new HashMap();
@@ -723,12 +725,15 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public void gatherMacBatch(Date time){
-        List<MacTemp> batchInsert = new CopyOnWriteArrayList();
+        StopWatch watch = StopWatch.createStarted();
+//        List<MacTemp> batchInsert = new ArrayList<>();
+        List<MacTemp> batchInsert = Collections.synchronizedList(new ArrayList<>());
         List<Map> devices = this.topoNodeService.queryNetworkElement();
         if (devices != null && devices.size() > 0) {
             Map params = new HashMap();
             this.macTempService.truncateTable();
             devices.stream().forEach(map ->{
+                System.out.println(Thread.currentThread().getName());
 //            ipList.stream().forEach(map -> {
 //            for (Map map : devices) {
 //                devices.forEach(map -> {
@@ -956,26 +961,30 @@ public class ItemServiceImpl implements ItemService {
                         });
                     }
                 }
-            });
-
+                System.out.println("采集中");
+        });
+            watch.stop();
+            log.info("Mac-采集 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
             if(batchInsert.size() > 0){
-                // 去重
-                List<MacTemp> list = null;
+                watch.reset();
+                watch.start();
                 try {
-                    list = batchInsert.stream().collect(
+                    List<MacTemp> list2 = batchInsert.parallelStream().collect(
                             Collectors.collectingAndThen(
                                     Collectors.toCollection(() -> new TreeSet<>(Comparator
                                             .comparing(MacTemp::getDeviceName, Comparator.nullsLast(String::compareTo))
                                             .thenComparing(MacTemp::getInterfaceName, Comparator.nullsLast(String::compareTo))
                                             .thenComparing(MacTemp::getMac, Comparator.nullsLast(String::compareTo)))),
                                     ArrayList::new));
-
-                    this.macTempService.batchInsert(list);
+                    System.out.println("批量插入");
+                    this.macTempService.batchInsert(list2);
                 } catch (Exception e) {
                     e.printStackTrace();
                     log.info("Mac采集异常：" + e.getMessage());
                 }
-
+                watch.stop();
+                log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+                // 等待并发Stream处理完成
             }
         }
     }

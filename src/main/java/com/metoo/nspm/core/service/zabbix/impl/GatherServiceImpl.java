@@ -95,9 +95,7 @@ public class GatherServiceImpl implements IGatherService {
 
 
     @Override
-    public void gatherMacBatch(Date time) throws InterruptedException {
-//        Long gatherTime = System.currentTimeMillis();
-//        SystemOutputLogUtils.start(log, gatherTime, "Zabbix:Mac采集开始");
+    public void gatherMacBatch(Date time)  {
         StopWatch watch = new StopWatch();
         watch.start();
         this.itemService.gatherMacBatch(time);

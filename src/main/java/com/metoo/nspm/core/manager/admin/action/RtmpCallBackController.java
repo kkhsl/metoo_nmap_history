@@ -79,6 +79,15 @@ public class RtmpCallBackController {
     @Autowired
     private ILiveRoomService liveRoomService;
 
+    public static void main(String[] args) {
+        int i = 0;
+        i = ++i;
+        int a = 0;
+        a++;
+        System.out.println(i);
+        System.out.println(a);
+    }
+
     @ApiOperation("OBS开启回调")
     @RequestMapping("/on_publish")
     public void onPublish(HttpServletRequest request) {

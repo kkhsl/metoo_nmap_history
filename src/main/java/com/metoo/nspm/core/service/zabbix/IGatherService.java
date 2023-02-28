@@ -17,6 +17,11 @@ public interface IGatherService {
     void gatherMacItem(Date time);
 
 
+    /**
+     *  Stream 批量处理
+     * @param time
+     * @throws InterruptedException
+     */
     void gatherMacBatch(Date time) throws InterruptedException;
 
 
