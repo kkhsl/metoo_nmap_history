@@ -7,17 +7,23 @@ import com.metoo.nspm.entity.nspm.Accessory;
 import com.metoo.nspm.entity.nspm.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import java.io.*;
+import java.util.*;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * <p>
@@ -39,88 +45,101 @@ import java.util.UUID;
  *
  * </p>
  */
+
 @Api("文件管理")
 @RestController
-@RequestMapping("/admin/file")
+@RequestMapping({"/admin/file"})
 public class FileUploadManagerController {
-
     @Autowired
     private IAccessoryService accessoryService;
     @Autowired
     private ISysConfigService configService;
+    private static final String utf8 = "utf-8";
+
+    public FileUploadManagerController() {
+    }
 
     @ApiOperation("图片上传")
-    @RequestMapping("/photo/upload")
-    public Object photo(@RequestParam(value = "file", required = false) MultipartFile file){
-       /* FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        String type = fileNameMap.getContentTypeFor(file.getName());
-        return type;*/
+    @RequestMapping({"/photo/upload"})
+    public Object photo(@RequestParam(value = "file",required = false) MultipartFile file) {
         Map data = this.upload(file, 0);
-        if(data.get("accessory") != null){
-            Map map =  new HashMap();
-            Accessory accessory = (Accessory) data.get("accessory");
+        if (data.get("accessory") != null) {
+            Map map = new HashMap();
+            Accessory accessory = (Accessory)data.get("accessory");
             map.put("id", accessory.getId());
             return ResponseUtil.ok(map);
+        } else {
+            return ResponseUtil.badArgument((String)data.get("msg"));
         }
-        return ResponseUtil.badArgument((String) data.get("msg"));
     }
 
     @ApiOperation("视频上传")
-    @RequestMapping("/video/upload")
-    public Object upload(@RequestParam(value = "file", required = false) MultipartFile file){
-       /* FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        String type = fileNameMap.getContentTypeFor(file.getName());
-        return type;*/
+    @RequestMapping({"/video/upload"})
+    public Object upload(@RequestParam(value = "file",required = false) MultipartFile file) {
         Map data = this.upload(file, 1);
-        if(data.get("accessory") != null){
-            Map map =  new HashMap();
-            Accessory accessory = (Accessory) data.get("accessory");
+        if (data.get("accessory") != null) {
+            Map map = new HashMap();
+            Accessory accessory = (Accessory)data.get("accessory");
             map.put("id", accessory.getId());
             return ResponseUtil.ok(map);
+        } else {
+            return ResponseUtil.badArgument((String)data.get("msg"));
         }
-        return ResponseUtil.badArgument((String) data.get("msg"));
     }
 
-
-
-    public Map upload(@RequestParam(required = false) MultipartFile file, int type){
+    public Map upload(@RequestParam(required = false) MultipartFile file, int type) {
         Map map = new HashMap();
         SysConfig configs = this.configService.select();
         String uploaFilePath = configs.getUploadFilePath();
         String path = configs.getVideoFilePath();
         String originalName = file.getOriginalFilename();
         String fileName = UUID.randomUUID().toString().replace("-", "");
-        String ext = originalName.substring(originalName.lastIndexOf("."));
-        String picNewName = fileName + ext;
-        boolean flag = false;
-        if(ext != null){
-            if(type == 0){
-                // 判断图片后缀
-                String[] extendes = new String[] { "jpg", "jpeg", "gif", "bmp", "tbi", "png" };
-                for(String extend : extendes){
-                    if(("." + extend.toLowerCase()).equals(ext.toLowerCase())){
-                        flag = true;
+        Integer indexof = originalName.lastIndexOf(".");
+        if (indexof >= 0) {
+            String ext = originalName.substring(indexof);
+            String picNewName = fileName + ext;
+            boolean flag = false;
+            if (ext != null) {
+                String[] extendes;
+                String[] var14;
+                int var15;
+                int var16;
+                String extend;
+                if (type == 0) {
+                    extendes = new String[]{"jpg", "jpeg", "gif", "bmp", "tbi", "png"};
+                    var14 = extendes;
+                    var15 = extendes.length;
+
+                    for(var16 = 0; var16 < var15; ++var16) {
+                        extend = var14[var16];
+                        if (("." + extend.toLowerCase()).equals(ext.toLowerCase())) {
+                            flag = true;
+                        }
                     }
-                }
-                path = configs.getPhotoFilePath();
-                uploaFilePath = uploaFilePath + File.separator + "photo";
-            }else{
-                // 判断视频后缀
-                String[] extendes = new String[] { "wmv", "asf", "asx", "rm", "rmvb", "mpg", "mpeg", "mpe",
-                        "mp4", "3gp", "mov", "m4v", "avi", "dat", "mkv", "flv", "vob", "3gp", "mov" };
-                for(String extend : extendes){
-                    if(("." + extend.toLowerCase()).equals(ext)){
-                        flag = true;
+
+                    path = configs.getPhotoFilePath();
+                    uploaFilePath = uploaFilePath + File.separator + "photo";
+                } else {
+                    extendes = new String[]{"wmv", "asf", "asx", "rm", "rmvb", "mpg", "mpeg", "mpe", "mp4", "3gp", "mov", "m4v", "avi", "dat", "mkv", "flv", "vob", "3gp", "mov"};
+                    var14 = extendes;
+                    var15 = extendes.length;
+
+                    for(var16 = 0; var16 < var15; ++var16) {
+                        extend = var14[var16];
+                        if (("." + extend.toLowerCase()).equals(ext)) {
+                            flag = true;
+                        }
                     }
+
+                    uploaFilePath = uploaFilePath + File.separator + "video";
                 }
-                uploaFilePath = uploaFilePath + File.separator + "video";
-            }
-            String imgRealPath = path + File.separator + picNewName;
-            if(flag){
-                java.io.File imageFile = new File(imgRealPath);
+
+                String imgRealPath = path + File.separator + picNewName;
+                File imageFile = new File(imgRealPath);
                 if (!imageFile.getParentFile().exists() && !imageFile.getParentFile().isDirectory()) {
                     imageFile.getParentFile().mkdirs();
                 }
+
                 try {
                     file.transferTo(imageFile);
                     Accessory accessory = new Accessory();
@@ -131,18 +150,133 @@ public class FileUploadManagerController {
                     accessory.setType(type);
                     this.accessoryService.save(accessory);
                     map.put("accessory", accessory);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException var18) {
+                    var18.printStackTrace();
                     map.put("msg", "上传失败");
                 }
-            }else{
+            } else {
                 map.put("msg", "不允许的扩展名");
             }
-        }else{
+        } else {
             map.put("msg", "不允许的扩展名");
         }
 
         return map;
+    }
+
+    @RequestMapping({"/burst_upload"})
+    public Object burstUpload(HttpServletRequest request, HttpServletResponse response) {
+        String name = request.getParameter("fileName");
+        response.setCharacterEncoding("utf-8");
+        String fileSize = "0";
+        Integer schunk = null;
+        Integer schunks = null;
+        String fileName = null;
+        SysConfig configs = this.configService.select();
+        String uploadPath = configs.getVideoFilePath();
+        BufferedOutputStream os = null;
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        factory.setSizeThreshold(1048576);
+        factory.setRepository(new File(uploadPath));
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        upload.setFileSizeMax(54760833024L);
+        upload.setSizeMax(108447924224L);
+        try {
+            try {
+                List<FileItem> items = upload.parseRequest(request);
+                Iterator var14 = items.iterator();
+
+                FileItem item;
+                while(var14.hasNext()) {
+                    item = (FileItem)var14.next();
+                    if (item.isFormField()) {
+                        if ("chunk".equals(item.getFieldName())) {
+                            schunk = Integer.parseInt(item.getString("utf-8"));
+                        }
+
+                        if ("chunks".equals(item.getFieldName())) {
+                            schunks = Integer.parseInt(item.getString("utf-8"));
+                        }
+
+                        if ("fileName".equals(item.getFieldName())) {
+                            fileName = item.getString("utf-8");
+                        }
+                    }
+                }
+
+                var14 = items.iterator();
+
+                String temFileName;
+                while(var14.hasNext()) {
+                    item = (FileItem)var14.next();
+                    if (!item.isFormField()) {
+                        temFileName = fileName;
+                        if (fileName != null) {
+                            if (schunk != null) {
+                                temFileName = schunk + "_" + fileName;
+                            }
+
+                            File temFile = new File(uploadPath, temFileName);
+                            if (!temFile.exists()) {
+                                item.write(temFile);
+                            }
+                        }
+                    }
+                }
+
+                if (schunk == null || schunk != schunks - 1) {
+                    Object var39 = ResponseUtil.ok("上传中");
+                    return var39;
+                }
+
+                File tempFile = new File(uploadPath, fileName);
+                os = new BufferedOutputStream(new FileOutputStream(tempFile));
+
+                for(int i = 0; i < schunks; ++i) {
+                    File file = new File(uploadPath, i + "_" + fileName);
+
+                    while(!file.exists()) {
+                        Thread.sleep(500L);
+                    }
+
+                    byte[] bytes = FileUtils.readFileToByteArray(file);
+                    os.write(bytes);
+                    os.flush();
+                    file.delete();
+                }
+
+                os.flush();
+                Integer indexof = fileName.lastIndexOf(".");
+                temFileName = fileName.substring(indexof);
+                String uploaFilePath = configs.getUploadFilePath();
+                uploaFilePath = uploaFilePath + File.separator + "video";
+                Accessory accessory = new Accessory();
+                accessory.setA_name(fileName);
+                accessory.setA_path(uploaFilePath);
+                accessory.setA_ext(temFileName);
+                accessory.setA_size(Integer.parseInt(fileSize));
+                accessory.setType(2);
+                this.accessoryService.save(accessory);
+                Object var19 = ResponseUtil.ok(accessory.getId());
+                return var19;
+            } catch (FileUploadException var34) {
+                var34.printStackTrace();
+            } catch (UnsupportedEncodingException var35) {
+                var35.printStackTrace();
+            } catch (Exception var36) {
+                var36.printStackTrace();
+            }
+
+            return ResponseUtil.error();
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException var33) {
+                    var33.printStackTrace();
+                }
+            }
+
+        }
     }
 }

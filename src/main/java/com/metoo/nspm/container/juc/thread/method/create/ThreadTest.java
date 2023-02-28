@@ -1,11 +1,15 @@
 package com.metoo.nspm.container.juc.thread.method.create;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ThreadTest {
+
+    Logger log = LoggerFactory.getLogger(ThreadTest.class);
 
     public static void main(String[] args) {
         System.out.println("JVM启动main线程，main线程执行main方法：打印当前县城名称" + Thread.currentThread().getName());
@@ -35,9 +39,9 @@ public class ThreadTest {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println(Thread.currentThread().getName() + " number " + finalI);
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(4000);
+                            System.out.println(Thread.currentThread().getName() + " number " + finalI);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -45,11 +49,27 @@ public class ThreadTest {
                 })
             );
         }
-        exe.shutdown();
-        System.out.println("END");
+        if(exe != null){
+            exe.shutdown();
+        }
+        while (true) {
+            if (exe.isTerminated()) {
+                break;
+            }
+        }
     }
 
+    @Test
     public void threadTest(){
-        Thread thread = new Thread();
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+//                System.out.println("runing");
+                log.info("running");
+            }
+        };
+        thread.start();
+//        System.out.println("running");
+        log.info("running");
     }
 }
