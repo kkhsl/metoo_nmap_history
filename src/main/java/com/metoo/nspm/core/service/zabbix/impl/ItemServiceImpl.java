@@ -27,9 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
+
+import static java.lang.Thread.sleep;
 
 @Service
 //@Transactional
@@ -1225,6 +1226,289 @@ public class ItemServiceImpl implements ItemService {
                                 ArrayList::new));
 
                 this.macTempService.batchInsert(list);
+            }
+        }
+    }
+
+    @Override
+    public void gatherMacThreadPool(Date time) {
+        StopWatch watch = StopWatch.createStarted();
+        List<MacTemp> batchInsert = new ArrayList();
+        List<Map> devices = this.topoNodeService.queryNetworkElement();
+        if (devices != null && devices.size() > 0) {
+
+            final CountDownLatch latch = new CountDownLatch(devices.size());
+
+            ExecutorService exe = Executors.newFixedThreadPool(devices.size());
+
+            Map params = new HashMap();
+            this.macTempService.truncateTable();
+            devices.stream().forEach(map ->{
+                exe.execute(new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println(Thread.currentThread().getName());
+                        //            ipList.stream().forEach(map -> {
+                        //            for (Map map : devices) {
+                        //                devices.forEach(map -> {
+                        String deviceName = String.valueOf(map.get("deviceName"));
+                        String deviceType = String.valueOf(map.get("deviceType"));
+                        String ip = String.valueOf(map.get("ip"));
+                        String uuid = String.valueOf(map.get("uuid"));
+                        params.clear();
+                        params.put("ip", ip);
+                        params.put("tag", "macvlan");
+                        List<Item> vlanMacList = itemMapper.gatherItemByTag(params);
+                        Map<String, String> macMap = null;
+                        if(vlanMacList.size() > 0){
+                            macMap = macVlan(vlanMacList);
+                        }
+                        // 采集：ifbasic
+                        params.clear();
+                        params.put("ip", ip);
+                        params.put("tag", "ifbasic");
+                        params.put("tag_relevance", "ifbasic");
+                        params.put("index", "ifindex");
+                        params.put("index_relevance", "ifindex");
+                        params.put("name_relevance", "ifname");
+                        List<Item> items = itemMapper.gatherItemByTag(params);
+                        if (items.size() > 0) {
+                            final  Map<String, String> macVlan = macMap;
+                            items.parallelStream().forEach(item -> {
+                                List<ItemTag> tags = item.getItemTags();
+                                MacTemp macTemp = new MacTemp();
+                                macTemp.setAddTime(time);
+                                macTemp.setDeviceName(deviceName);
+                                macTemp.setDeviceType(deviceType);
+                                macTemp.setUuid(uuid);
+                                macTemp.setDeviceIp(ip);
+                                macTemp.setTag("L");
+                                if (tags != null && tags.size() > 0) {
+                                    for (ItemTag tag : tags) {
+                                        String value = tag.getValue();
+                                        if (tag.getTag().equals("ifmac")) {
+//                                    格式化mac
+                                            if(!value.contains(":")){
+                                                value = value.trim().replaceAll(" ", ":");
+                                            }
+                                            String mac = macUtil.supplement(value);
+                                            macTemp.setMac(mac);
+                                            if(macVlan != null && !macVlan.isEmpty()){
+                                                String vlan = macVlan.get(value);
+                                                macTemp.setVlan(vlan);
+                                            }
+                                            if(StringUtils.isNotEmpty(value)){
+                                                macTemp.setType("local");
+                                            }
+                                        }
+                                        if (tag.getTag().equals("ifname")) {
+                                            macTemp.setInterfaceName(value);
+                                        }
+                                        if (tag.getTag().equals("ifindex")) {
+                                            macTemp.setIndex(value);
+                                        }
+                                    }
+                                    // 保存Mac条目
+                                    if (macTemp.getInterfaceName() != null && !macTemp.getInterfaceName().equals("")
+                                            && macTemp.getMac() != null && !macTemp.getMac().equals("{#MAC}")
+                                            && !macTemp.getMac().equals("{#IFMAC}")) {
+                                        macTemp.setTag("L");
+                                        macTemp.setAddTime(time);
+                                        batchInsert.add(macTemp);
+                                    }
+                                }
+                            });
+                        }
+
+                        // 采集Mac(Zabbix)(obj：mac)
+                        params.clear();
+                        params.put("ip", ip);
+                        params.put("tag", "mac");
+                        params.put("index", "portindex");
+                        params.put("tag_relevance", "ifbasic");
+                        params.put("index_relevance", "ifindex");
+                        params.put("name_relevance", "ifname");
+                        List<Item> itemTagList = itemMapper.gatherItemByTag(params);
+                        // Begin(item)
+                        if (itemTagList.size() > 0) {
+                            final  Map<String, String> macVlan = macMap;
+                            itemTagList.parallelStream().forEach(item -> {
+                                List<ItemTag> tags = item.getItemTags();
+                                MacTemp macTemp = new MacTemp();
+                                macTemp.setAddTime(time);
+                                macTemp.setDeviceName(deviceName);
+                                macTemp.setDeviceType(deviceType);
+                                macTemp.setUuid(uuid);
+                                macTemp.setDeviceIp(ip);
+                                if (tags != null && tags.size() > 0) {
+                                    for (ItemTag tag : tags) {
+                                        String value = tag.getValue();
+                                        if (tag.getTag().equals("mac")) {
+                                            // 格式化Mac
+                                            if(!value.contains(":")){
+                                                value = value.trim().replaceAll(" ", ":");
+                                            }
+                                            String mac = macUtil.supplement(value);
+                                            macTemp.setMac(mac);
+                                            if(macVlan != null && !macVlan.isEmpty()){
+                                                String vlan = macVlan.get(value);
+                                                macTemp.setVlan(vlan);
+                                            }
+                                        }
+                                        if (tag.getTag().equals("portindex")) {
+                                            macTemp.setInterfaceName(tag.getName());
+                                            macTemp.setIndex(value);
+                                        }
+                                        if (tag.getTag().equals("attr")) {
+                                            switch (value){
+                                                case "5":
+                                                    value = "static";
+                                                    break;
+                                                case "4":
+                                                    value = "local";
+                                                    break;
+                                                case "3":
+                                                    value = "dynamic";
+                                                    break;
+                                                case "2":
+                                                    value = "invalid";
+                                                    break;
+                                                case "1":
+                                                    value = "other";
+                                                    break;
+                                                default:
+                                                    value = null;
+                                                    break;
+                                            }
+                                            macTemp.setType(value);
+                                        }
+                                    }
+                                    // 保存Mac条目
+                                    if(macTemp.getInterfaceName() != null && !macTemp.getInterfaceName().equals("")
+                                            && macTemp.getMac() != null && !macTemp.getMac().equals("{#MAC}")
+                                            && !macTemp.getMac().equals("{#IFMAC}")){
+                                        if(macTemp.getTag() == null || "".equals(macTemp.getTag())){
+                                            if(macTemp.getType() != null && "local".equals(macTemp.getType())
+                                                    && macTemp.getMac().contains("0:0:5e:0")){
+                                                macTemp.setTag("LV");
+                                            }else if(macTemp.getMac().contains("0:0:5e:0")){
+                                                macTemp.setTag("V");
+                                            }
+                                        }
+                                        batchInsert.add(macTemp);
+                                    }
+                                }
+                            });
+                        }else{
+                            params.put("ip", ip);
+                            params.put("tag", "arp");
+                            params.put("index", "ifindex");
+                            params.put("tag_relevance", "ifbasic");
+                            params.put("index_relevance", "ifindex");
+                            params.put("name_relevance", "ifname");
+                            List<Item> arpList = itemMapper.gatherItemByTag(params);
+                            if (arpList.size() > 0) {
+                                arpList.parallelStream().forEach(item -> {
+                                    List<ItemTag> tags = item.getItemTags();
+                                    ArpTemp arpTemp = new ArpTemp();
+                                    arpTemp.setDeviceName(deviceName);
+                                    arpTemp.setDeviceType(deviceType);
+                                    arpTemp.setUuid(uuid);
+                                    arpTemp.setDeviceIp(ip);
+                                    arpTemp.setTag("S");
+                                    if (tags != null && tags.size() > 0) {
+                                        for (ItemTag tag : tags) {
+                                            String value = tag.getValue();
+                                            if (tag.getTag().equals("ip")) {
+                                                arpTemp.setIp(IpUtil.ipConvertDec(value));
+                                            }
+                                            if (tag.getTag().equals("mac")) {
+                                                String mac = macUtil.supplement(value);
+                                                arpTemp.setMac(mac);
+                                            }
+                                            if (tag.getTag().equals("type")) {
+                                                switch (value){
+                                                    case "4":
+                                                        value = "static";
+                                                        break;
+                                                    case "3":
+                                                        value = "dynamic";
+                                                        break;
+                                                    case "1":
+                                                        value = "other";
+                                                        break;
+                                                    default:
+                                                        value = null;
+                                                        break;
+                                                }
+                                                arpTemp.setType(value);
+                                            }
+                                            if (tag.getTag().equals("ifindex")) {
+                                                if(value != null){
+                                                    arpTemp.setInterfaceName(tag.getName());
+                                                    arpTemp.setIndex(value);
+                                                }else{
+                                                    //
+                                                    switch (value){
+                                                        case "1":
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        // 获取arp，写入mac
+                                        if (arpTemp.getIp() != null
+                                                && !arpTemp.getIp().equals("")
+                                                && "dynamic".equals(arpTemp.getType())) {
+                                            MacTemp macTemp = new MacTemp();
+                                            macTemp.setAddTime(time);
+                                            macTemp.setMac(arpTemp.getMac());
+                                            macTemp.setIndex(arpTemp.getIndex());
+                                            macTemp.setType(arpTemp.getType());
+                                            macTemp.setDeviceName(deviceName);
+                                            macTemp.setDeviceType(deviceType);
+                                            macTemp.setInterfaceName(arpTemp.getInterfaceName());
+                                            macTemp.setUuid(uuid);
+                                            macTemp.setDeviceIp(ip);
+                                            batchInsert.add(macTemp);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                        System.out.println("采集中");
+                    }
+                }));
+            });
+            if(exe != null){
+                exe.shutdown();
+            }
+            watch.stop();
+            log.info("Mac-采集 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+            while (true) {
+                if (exe.isTerminated()) {
+                    if(batchInsert.size() > 0){
+                        watch.reset();
+                        watch.start();
+                        try {
+                            List<MacTemp> list2 = batchInsert.parallelStream().collect(
+                                    Collectors.collectingAndThen(
+                                            Collectors.toCollection(() -> new TreeSet<>(Comparator
+                                                    .comparing(MacTemp::getDeviceName, Comparator.nullsLast(String::compareTo))
+                                                    .thenComparing(MacTemp::getInterfaceName, Comparator.nullsLast(String::compareTo))
+                                                    .thenComparing(MacTemp::getMac, Comparator.nullsLast(String::compareTo)))),
+                                            ArrayList::new));
+                            System.out.println("批量插入");
+                            this.macTempService.batchInsert(list2);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            log.info("Mac采集异常：" + e.getMessage());
+                        }
+                        watch.stop();
+                        log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+                        // 等待并发Stream处理完成
+                    }
+                    break;
+                }
             }
         }
     }

@@ -127,10 +127,40 @@ public class GatherServiceImpl implements IGatherService {
 
     @Override
     public void gatherMacBatchStream(Date time) {
-
         StopWatch watch = new StopWatch();
         watch.start();
         this.itemService.gatherMacBatchStream(time);
+        watch.stop();
+        System.out.println("Mac采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        watch.reset();
+        watch.start();
+        this.zabbixItemService.labelTheMac();
+        watch.stop();
+        System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        watch.reset();
+        watch.start();
+        this.itemService.topologySyncToMacBatch(time);
+        watch.stop();
+        System.out.println("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        watch.reset();
+        watch.start();
+        // 同步网元数据到Mac
+        this.macService.truncateTable();
+        this.macService.copyMacTemp();
+        // 记录历史
+        this.macHistoryService.copyMacTemp();
+        watch.stop();
+        System.out.println("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+    }
+
+    @Override
+    public void gatherMacThreadPool(Date time) {
+        StopWatch watch = new StopWatch();
+        watch.start();
+        this.itemService.gatherMacThreadPool(time);
         watch.stop();
         System.out.println("Mac采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 

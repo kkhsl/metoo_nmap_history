@@ -28,6 +28,13 @@ public interface IGatherService {
     void gatherMacBatchStream(Date time);
 
     /**
+     * 使用线程池
+     * @param time
+     * @throws InterruptedException
+     */
+    void gatherMacThreadPool(Date time);
+
+    /**
      * 采集路由
      * @param time
      */

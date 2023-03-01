@@ -16,6 +16,8 @@ public interface ItemService {
 
     void gatherMacBatchStream(Date time);
 
+    void gatherMacThreadPool(Date time);
+
     void gatherRouteItem(Date time);
 
     void gatherIpaddressItem(Date time);
