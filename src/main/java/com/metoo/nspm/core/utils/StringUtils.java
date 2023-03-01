@@ -20,18 +20,29 @@ public class StringUtils {
      */
 
     public static void main(String[] args) {
-        String value = "f1234";
-        String value1 = "abasd";
-        // 方式一：
-        boolean flag = isInteger(value);
-        boolean flag1 = isInteger(value1);
-        System.out.println(flag);
-        System.out.println(flag1);
+//        String value = "f1234";
+//        String value1 = "abasd";
+//        // 方式一：
+//        boolean flag = isInteger(value);
+//        boolean flag1 = isInteger(value1);
+//        System.out.println(flag);
+//        System.out.println(flag1);
+//
+//        boolean isDigitInt = isDigit(value);
+//        boolean isDigitStr = isDigit(value1);
+//        System.out.println(isDigitInt);
+//        System.out.println(isDigitStr);
 
-        boolean isDigitInt = isDigit(value);
-        boolean isDigitStr = isDigit(value1);
-        System.out.println(isDigitInt);
-        System.out.println(isDigitStr);
+        String param = "192.168.5.1";
+        String symbol = "\\.";
+//        Pattern pattern = Pattern.compile(symbol);
+//        Matcher findMatcher = pattern.matcher(param);
+//        List<Integer> list = new ArrayList();
+//        while(findMatcher.find()) {
+//            list.add(findMatcher.start());
+//        }
+        int a = acquireCharacterPosition(param, symbol, 3);
+        System.out.println(a);
 
     }
 
@@ -88,7 +99,14 @@ public class StringUtils {
      * @return
      */
     public static int acquireCharacterPosition(String param, String symbol, int num){
+        boolean flag = false;
+        if(symbol.equals("\\.")){
+            flag = true;
+        }
         if(param.contains(symbol) && param.indexOf(symbol) != -1){
+            flag = true;
+        }
+        if(flag){
             Pattern pattern = Pattern.compile(symbol);
             Matcher findMatcher = pattern.matcher(param);
             List<Integer> list = new ArrayList();

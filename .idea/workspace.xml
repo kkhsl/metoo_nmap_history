@@ -4,10 +4,11 @@
     <list default="true" id="7426ef73-f003-46a6-9c1f-b19a308fd544" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_fileupload_commons_fileupload_1_3_3.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/metoo_nmap.iml" beforeDir="false" afterPath="$PROJECT_DIR$/metoo_nmap.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/thread/method/create/ThreadTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/thread/method/create/ThreadTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/FileUploadManagerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/FileUploadManagerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/data/structure/IfElseEnumDemo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/data/structure/IfElseEnumDemo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/MacManagerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/MacManagerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.properties" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -88,7 +89,7 @@
           <entry key="project.open.time.13" value="13" />
           <entry key="project.open.time.14" value="7" />
           <entry key="project.open.time.15" value="9" />
-          <entry key="project.open.time.16" value="5" />
+          <entry key="project.open.time.16" value="6" />
           <entry key="project.open.time.17" value="7" />
           <entry key="project.open.time.18" value="5" />
           <entry key="project.open.time.19" value="7" />
@@ -115,7 +116,7 @@
           <entry key="project.open.time.7" value="13" />
           <entry key="project.open.time.8" value="23" />
           <entry key="project.open.time.9" value="28" />
-          <entry key="project.opened" value="203" />
+          <entry key="project.opened" value="204" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -127,13 +128,13 @@
           <entry key="ftl" value="5" />
           <entry key="iml" value="4" />
           <entry key="ini" value="3" />
-          <entry key="java" value="6327" />
+          <entry key="java" value="6339" />
           <entry key="log" value="2" />
           <entry key="md" value="1" />
           <entry key="metoo_sysconfig" value="2" />
           <entry key="png" value="1" />
           <entry key="pom" value="1" />
-          <entry key="properties" value="809" />
+          <entry key="properties" value="812" />
           <entry key="sql" value="4" />
           <entry key="xml" value="1000" />
           <entry key="yml" value="5" />
@@ -147,10 +148,10 @@
           <entry key="IDEA_MODULE" value="4" />
           <entry key="Image" value="1" />
           <entry key="Ini" value="3" />
-          <entry key="JAVA" value="6327" />
+          <entry key="JAVA" value="6339" />
           <entry key="Markdown" value="1" />
           <entry key="PLAIN_TEXT" value="21" />
-          <entry key="Properties" value="809" />
+          <entry key="Properties" value="812" />
           <entry key="SQL" value="1" />
           <entry key="Scratch" value="3" />
           <entry key="XML" value="1001" />
@@ -161,11 +162,11 @@
         <counts>
           <entry key="class" value="8" />
           <entry key="dummy" value="315" />
-          <entry key="java" value="200082" />
+          <entry key="java" value="200349" />
           <entry key="md" value="24" />
           <entry key="properties" value="1502" />
           <entry key="sql" value="23" />
-          <entry key="txt" value="128" />
+          <entry key="txt" value="138" />
           <entry key="xml" value="37964" />
           <entry key="yml" value="69" />
         </counts>
@@ -173,9 +174,9 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="CLASS" value="8" />
-          <entry key="JAVA" value="200082" />
+          <entry key="JAVA" value="200349" />
           <entry key="Markdown" value="24" />
-          <entry key="PLAIN_TEXT" value="443" />
+          <entry key="PLAIN_TEXT" value="453" />
           <entry key="Properties" value="1502" />
           <entry key="SQL" value="2536" />
           <entry key="Scratch" value="23" />
@@ -258,14 +259,91 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/FileUploadManagerController.java">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/data/structure/IfElseEnumDemo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="787">
-              <caret line="274" column="27" selection-start-line="274" selection-start-column="27" selection-end-line="274" selection-end-column="27" />
+            <state relative-caret-position="194">
+              <caret line="10" selection-start-line="10" selection-end-line="10" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/StringUtils.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="25">
+              <caret line="102" column="29" selection-start-line="102" selection-start-column="29" selection-end-line="102" selection-end-column="29" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/application-centos.properties">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="9" column="26" lean-forward="true" selection-start-line="9" selection-start-column="26" selection-end-line="9" selection-end-column="26" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/application-dev.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="17" column="11" lean-forward="true" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="66" column="31" lean-forward="true" selection-start-line="66" selection-start-column="31" selection-end-line="66" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/UserManagerApi.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="166">
+              <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/TopologyManagerApi.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="524">
+              <caret line="103" column="21" lean-forward="true" selection-start-line="103" selection-start-column="21" selection-end-line="103" selection-end-column="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/MacManagerController.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="428">
+              <caret line="60" column="114" selection-start-line="60" selection-start-column="113" selection-end-line="60" selection-end-column="114" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/MacUtil.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-50">
+              <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -299,7 +377,6 @@
       <find>deleteObjByUserId</find>
       <find>routTableService</find>
       <find>layer_2_device</find>
-      <find>4</find>
       <find>queryRoutePath</find>
       <find>select</find>
       <find>selectObjBy</find>
@@ -316,6 +393,7 @@
       <find>文件</find>
       <find>file</find>
       <find>fileupload</find>
+      <find>4</find>
     </findStrings>
     <replaceStrings>
       <replace>oppositeEquipmentInterface</replace>
@@ -364,14 +442,12 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/nspm/impl/IpAddressHistoryServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/mapper/nspm/zabbix/IpAddressHistoryMapper.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/myzabbix/zabbixapi/ZabbixItemManagerController.java" />
         <option value="$PROJECT_DIR$/src/main/resources/mapper/nspm/IpAddressMapper.xml" />
         <option value="$PROJECT_DIR$/src/main/resources/mapper/nspm/IpAddressHistoryMapper.xml" />
         <option value="$PROJECT_DIR$/src/main/resources/mapper/nspm/IpAddressTempMapper.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/UserManagerApi.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/java/util/Collection.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/java/util/Stream.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/quartz/SaticScheduleTask.java" />
@@ -394,19 +470,15 @@
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/nspm/impl/RoutTableServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/main/resources/mapper/nspm/RouteTableMapper.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/rsms/RackManagerController.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/application-dev.properties" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/api/zabbix/impl/ZabbixItemServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/zabbix/impl/GatherServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/main/resources/mapper/nspm/MacTempMapper.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/entity/nspm/RouteTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/RoutTool.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/MacManagerController.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/StringUtils.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/MacUtil.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/zabbix/impl/CompareUtils.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/zabbix/impl/ItemServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/TopologyManagerController.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/application.properties" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/ThreadPool/MyRejectedExecutionHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/quartz/StaticScheduleTask.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/thread/method/create/ThreadTest.java" />
@@ -415,6 +487,12 @@
         <option value="$APPLICATION_CONFIG_DIR$/consoles/db/74880856-0f9f-45ac-9cba-e68f2144a506/console.sql" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/FileUploadManagerController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/data/structure/IfElseEnumDemo.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/application.properties" />
+        <option value="$PROJECT_DIR$/src/main/resources/application-dev.properties" />
+        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/StringUtils.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/MacManagerController.java" />
       </list>
     </option>
   </component>
@@ -749,6 +827,16 @@
               <item name="metoo_nspm" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="nspm" type="462c0819:PsiDirectoryNode" />
+              <item name="core" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="metoo_nspm" type="b2602c69:ProjectViewProjectNode" />
+              <item name="metoo_nspm" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -772,7 +860,7 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1677591968014" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1677675424936" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="SQL" />
     <property name="database.console.LAST_STATE" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/lib/self-0.0.2.jar!/" />
@@ -784,7 +872,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
   </component>
   <component name="RecentsManager">
     <key name="OPEN_URL_DIALOG">
@@ -830,7 +918,34 @@
     </option>
   </component>
   <component name="RunManager" selected="Spring Boot.NspmApplication">
-    <configuration name="ApacheTimeUtils.test2" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="MainTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.metoo.nspm.container.data.structure.MainTest" />
+      <module name="metoo_nmap" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.metoo.nspm.container.data.structure.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NetWorkManagerApi" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.metoo.nspm.core.websocket.api.NetWorkManagerApi" />
+      <module name="metoo_nmap" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.metoo.nspm.core.websocket.api.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StringUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.metoo.nspm.core.utils.StringUtils" />
       <module name="metoo_nmap" />
       <extension name="coverage">
         <pattern>
@@ -838,10 +953,6 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.metoo.nspm.core.utils" />
-      <option name="MAIN_CLASS_NAME" value="com.metoo.nspm.core.utils.ApacheTimeUtils" />
-      <option name="METHOD_NAME" value="test2" />
-      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -878,38 +989,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ThreadTest.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="metoo_nmap" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.metoo.nspm.container.juc.thread.method.create.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.metoo.nspm.container.juc.thread.method.create" />
-      <option name="MAIN_CLASS_NAME" value="com.metoo.nspm.container.juc.thread.method.create.ThreadTest" />
-      <option name="METHOD_NAME" value="test" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ThreadTest.threadTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="metoo_nmap" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.metoo.nspm.container.juc.thread.method.create.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.metoo.nspm.container.juc.thread.method.create" />
-      <option name="MAIN_CLASS_NAME" value="com.metoo.nspm.container.juc.thread.method.create.ThreadTest" />
-      <option name="METHOD_NAME" value="threadTest" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="NspmApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="metoo_nmap" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.metoo.nspm.NspmApplication" />
@@ -920,19 +999,19 @@
     </configuration>
     <list>
       <item itemvalue="Spring Boot.NspmApplication" />
-      <item itemvalue="JUnit.ThreadTest.threadTest" />
-      <item itemvalue="JUnit.ThreadTest.test" />
-      <item itemvalue="JUnit.ApacheTimeUtils.test2" />
       <item itemvalue="JUnit.TestThread.testJoin" />
       <item itemvalue="JUnit.TestThread.testLog" />
+      <item itemvalue="Application.MainTest" />
+      <item itemvalue="Application.StringUtils" />
+      <item itemvalue="Application.NetWorkManagerApi" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.StringUtils" />
+        <item itemvalue="Application.NetWorkManagerApi" />
+        <item itemvalue="Application.MainTest" />
         <item itemvalue="JUnit.TestThread.testLog" />
         <item itemvalue="JUnit.TestThread.testJoin" />
-        <item itemvalue="JUnit.ApacheTimeUtils.test2" />
-        <item itemvalue="JUnit.ThreadTest.test" />
-        <item itemvalue="JUnit.ThreadTest.threadTest" />
       </list>
     </recent_temporary>
   </component>
@@ -1163,7 +1242,8 @@
       <workItem from="1676861529257" duration="15721000" />
       <workItem from="1677424931100" duration="1806000" />
       <workItem from="1677499688439" duration="4143000" />
-      <workItem from="1677588333040" duration="4096000" />
+      <workItem from="1677588333040" duration="5351000" />
+      <workItem from="1677673098941" duration="2222000" />
     </task>
     <task id="LOCAL-00001" summary="2022-08-25 ipam">
       <created>1661409042951</created>
@@ -1298,7 +1378,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677425220977</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="HKK 2023/02/26/大文件上传（1）">
+      <created>1677594020923</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1677594020923</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1334,7 +1421,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3118112000" />
+    <option name="totallyTimeSpent" value="3121589000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1349,7 +1436,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6123499" visible="true" weight="0.23659517" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6123499" visible="true" weight="0.23994638" />
       <window_info id="Structure" order="1" sideWeight="0.38745388" side_tool="true" weight="0.21908316" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -1364,10 +1451,10 @@
       <window_info anchor="bottom" id="Run" order="4" sideWeight="0.6111825" weight="0.296034" />
       <window_info anchor="bottom" id="Cvs" order="5" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="6" weight="0.4" />
-      <window_info anchor="bottom" id="Debug" order="7" sideWeight="0.5924933" weight="0.32152975" />
+      <window_info anchor="bottom" id="Debug" order="7" sideWeight="0.5924933" weight="0.40934843" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.3888175" side_tool="true" weight="0.30592993" />
-      <window_info active="true" anchor="bottom" id="Version Control" order="10" visible="true" weight="0.39660057" />
+      <window_info anchor="bottom" id="Version Control" order="10" weight="0.11473088" />
       <window_info anchor="bottom" id="Messages" order="11" sideWeight="0.5740938" weight="0.3186969" />
       <window_info anchor="bottom" id="Java Enterprise" order="12" sideWeight="0.49865952" weight="0.46963122" />
       <window_info anchor="bottom" id="TODO" order="13" sideWeight="0.49865952" weight="0.24929178" />
@@ -1383,7 +1470,7 @@
       <window_info anchor="right" id="Database" order="7" sideWeight="0.49907234" weight="0.3150134" />
       <window_info anchor="right" id="Coverage" order="8" sideWeight="0.522293" side_tool="true" weight="0.23187633" />
       <window_info anchor="right" id="CDI" order="9" weight="0.32889125" />
-      <window_info anchor="right" id="Maven Projects" order="10" sideWeight="0.477707" visible="true" weight="0.13203754" />
+      <window_info anchor="right" id="Maven Projects" order="10" sideWeight="0.477707" weight="0.13203754" />
       <window_info anchor="right" id="JSF" order="11" weight="0.32889125" />
       <window_info anchor="right" x="0" y="0" width="337" height="638" id="Documentation" order="12" sideWeight="0.50329673" side_tool="true" weight="0.13069706" />
       <window_info anchor="right" id="Bean Validation" order="13" weight="0.3283582" />
@@ -1492,76 +1579,23 @@
     <MESSAGE value="metoo_合并-二层路径" />
     <MESSAGE value="metoo_多段二层路径完成" />
     <MESSAGE value="HKK 2023/02/26/JUC" />
-    <option name="LAST_COMMIT_MESSAGE" value="HKK 2023/02/26/JUC" />
+    <MESSAGE value="HKK 2023/02/26/大文件上传（1）" />
+    <option name="LAST_COMMIT_MESSAGE" value="HKK 2023/02/26/大文件上传（1）" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/RoutTool.java</url>
-          <line>1050</line>
+          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/MacManagerController.java</url>
+          <line>61</line>
           <properties />
-          <option name="timeStamp" value="2412" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/RoutTool.java</url>
-          <line>1053</line>
-          <properties />
-          <option name="timeStamp" value="2415" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/RoutTool.java</url>
-          <line>1083</line>
-          <properties />
-          <option name="timeStamp" value="2416" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/MacUtil.java</url>
-          <line>42</line>
-          <properties />
-          <option name="timeStamp" value="2438" />
+          <option name="timeStamp" value="2458" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/StringUtils.java</url>
-          <line>43</line>
+          <line>101</line>
           <properties />
-          <option name="timeStamp" value="2440" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/MacUtil.java</url>
-          <line>19</line>
-          <properties />
-          <option name="timeStamp" value="2441" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/zabbix/impl/ItemServiceImpl.java</url>
-          <line>1049</line>
-          <properties />
-          <option name="timeStamp" value="2448" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/TopologyManagerController.java</url>
-          <line>1104</line>
-          <properties />
-          <option name="timeStamp" value="2450" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/TopologyManagerController.java</url>
-          <line>1040</line>
-          <properties />
-          <option name="timeStamp" value="2451" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/TopologyManagerController.java</url>
-          <line>1005</line>
-          <properties />
-          <option name="timeStamp" value="2452" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/FileUploadManagerController.java</url>
-          <line>168</line>
-          <properties />
-          <option name="timeStamp" value="2453" />
+          <option name="timeStamp" value="2460" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -1597,53 +1631,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/network/IpUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3300">
-          <caret line="141" selection-start-line="141" selection-end-line="141" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/RoutTool.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="21175">
-          <caret line="859" column="11" selection-start-line="859" selection-start-column="11" selection-end-line="859" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/service/zabbix/IGatherService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="16" column="9" selection-start-line="16" selection-start-column="9" selection-end-line="16" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/TopologyManagerController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="311">
-          <caret line="1162" column="41" lean-forward="true" selection-start-line="1162" selection-start-column="41" selection-end-line="1162" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/thread/method/priority/Test.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/thread/method/priority/PriorityThreadA.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/thread/method/isalive/IsAliveThread.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/thread/method/priority/PriorityThreadB.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/ThreadPool/ExtendingThreadPoolExecutor.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/thread/method/isalive/IsAliveTest.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/juc/ThreadPool/MyRejectedExecutionHandler.java">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -1720,16 +1707,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/StringUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="675">
-          <caret line="35" column="5" selection-start-line="35" selection-start-column="5" selection-end-line="35" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/quartz/StaticScheduleTask.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1850">
@@ -1748,13 +1725,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="53825">
           <caret line="2187" column="41" selection-start-line="2183" selection-start-column="12" selection-end-line="2187" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/feature/GenericityDemo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="403">
-          <caret line="107" column="7" lean-forward="true" selection-start-line="107" selection-start-column="7" selection-end-line="107" selection-end-column="7" />
         </state>
       </provider>
     </entry>
@@ -1789,24 +1759,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../5，metoo_联凯/8，项目/直播/version/2022-06-20/WEB-INF/classes/com/cloud/tv/core/manager/admin/action/RootManagerController.class">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../5，metoo_联凯/8，项目/直播/version/2022-06-20/WEB-INF/classes/com/cloud/tv/core/manager/admin/action/ApiVersionController.class">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../5，metoo_联凯/8，项目/直播/version/2022-06-20/WEB-INF/classes/com/cloud/tv/core/manager/admin/action/AdminAuthorController.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-525" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../5，metoo_联凯/8，项目/直播/version/2022-06-20/WEB-INF/classes/com/cloud/tv/core/manager/admin/action/RtmpCallBackController.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-277">
-          <caret line="40" column="25" selection-start-line="40" selection-start-column="19" selection-end-line="40" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../5，metoo_联凯/8，项目/直播/version/2022-06-20/WEB-INF/classes/com/cloud/tv/core/manager/admin/action/RootManagerController.class" />
+    <entry file="file://$PROJECT_DIR$/../../../../5，metoo_联凯/8，项目/直播/version/2022-06-20/WEB-INF/classes/com/cloud/tv/core/manager/admin/action/ApiVersionController.class" />
+    <entry file="file://$PROJECT_DIR$/../../../../5，metoo_联凯/8，项目/直播/version/2022-06-20/WEB-INF/classes/com/cloud/tv/core/manager/admin/action/AdminAuthorController.class" />
+    <entry file="file://$PROJECT_DIR$/../../../../5，metoo_联凯/8，项目/直播/version/2022-06-20/WEB-INF/classes/com/cloud/tv/core/manager/admin/action/RtmpCallBackController.class" />
     <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/file/FileUtil.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="208">
@@ -1825,9 +1781,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="111">
           <caret line="325" column="8" selection-start-line="202" selection-start-column="21" selection-end-line="202" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#12203#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1866,9 +1819,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3300">
           <caret line="156" column="56" selection-start-line="156" selection-start-column="49" selection-end-line="156" selection-end-column="56" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1876,20 +1826,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
           <caret line="503" selection-start-line="503" selection-end-line="503" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-350">
-          <caret column="26" selection-start-column="26" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/application-dev.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-350">
-          <caret line="7" column="36" selection-start-line="7" selection-start-column="36" selection-end-line="7" selection-end-column="36" />
         </state>
       </provider>
     </entry>
@@ -1919,13 +1855,114 @@
         <state relative-caret-position="-2450" />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/data/structure/GetFlowers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="3" selection-start-column="3" selection-end-column="3" />
+          <folding>
+            <element signature="e#151#152#0" expanded="true" />
+            <element signature="e#199#200#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/FileUploadManagerController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="787">
-          <caret line="274" column="27" selection-start-line="274" selection-start-column="27" selection-end-line="274" selection-end-column="27" />
+        <state relative-caret-position="237">
+          <caret line="252" column="54" selection-start-line="252" selection-start-column="54" selection-end-line="252" selection-end-column="54" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/feature/StreamDemo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="257">
+          <caret line="54" column="5" selection-start-line="54" selection-start-column="5" selection-end-line="54" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/feature/GenericityDemo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="427">
+          <caret line="107" column="7" selection-start-line="107" selection-start-column="7" selection-end-line="107" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/data/structure/MainTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-75">
+          <caret line="11" column="31" selection-start-line="11" selection-start-column="31" selection-end-line="11" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/UserManagerApi.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="166">
+          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/container/data/structure/IfElseEnumDemo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="194">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/TopologyManagerApi.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="524">
+          <caret line="103" column="21" lean-forward="true" selection-start-line="103" selection-start-column="21" selection-end-line="103" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/application-centos.properties">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="9" column="26" lean-forward="true" selection-start-line="9" selection-start-column="26" selection-end-line="9" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/application-dev.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="17" column="11" lean-forward="true" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/websocket/api/NetWorkManagerApi.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="66" column="31" lean-forward="true" selection-start-line="66" selection-start-column="31" selection-end-line="66" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/utils/StringUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="25">
+          <caret line="102" column="29" selection-start-line="102" selection-start-column="29" selection-end-line="102" selection-end-column="29" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/tools/MacUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-50">
+          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/metoo/nspm/core/manager/admin/action/MacManagerController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="428">
+          <caret line="60" column="114" selection-start-line="60" selection-start-column="113" selection-end-line="60" selection-end-column="114" />
         </state>
       </provider>
     </entry>

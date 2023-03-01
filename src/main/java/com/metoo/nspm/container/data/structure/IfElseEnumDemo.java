@@ -23,7 +23,7 @@ public enum IfElseEnumDemo {
     };
 
     public abstract String getFlowers(String ip, Integer mask);
-
+    
 
 
 }

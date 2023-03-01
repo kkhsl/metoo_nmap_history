@@ -64,6 +64,12 @@ public class NetWorkManagerApi {
     @Autowired
     private MacUtil macUtil;
 
+    public static void main(String[] args) {
+        String i = "\\.";
+        String ii = i;
+        System.out.println(ii);
+    }
+
 
     @RequestMapping("/list")
     public NoticeWebsocketResp testApi(@RequestParam(value = "requestParams") String param){
