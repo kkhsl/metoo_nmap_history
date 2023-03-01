@@ -35,8 +35,8 @@ public class MacServiceImpl implements IMacService{
     }
 
     @Override
-    public List<Mac> selectByMap(Map map) {
-        return this.macMapper.selectByMap(map);
+    public List<Mac> selectByMap(Map params) {
+        return this.macMapper.selectByMap(params);
     }
 
     @Override

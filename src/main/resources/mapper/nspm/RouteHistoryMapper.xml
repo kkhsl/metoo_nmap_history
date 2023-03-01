@@ -16,15 +16,15 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, mask, destination, cost, proto, flags, next_hop, interface_name, device_name, device_uuid
+       id, mask, mask_bit, INET_NTOA(destination) AS destination, cost, proto, flags, INET_NTOA(next_hop) next_hop, interface_name, device_name, device_uuid, concat(inet_ntoa(destination), "/", mask_bit) AS cidr
     </sql>
 
     <sql id="INET_Column_List">
-        id, addTime, mask, INET_NTOA(destination) AS destination, cost, proto, flags, INET_NTOA(next_hop) next_hop, interface_name, device_name, device_uuid
+        id, addTime, mask, INET_NTOA(destination) AS destination, cost, proto, flags, INET_NTOA(next_hop) next_hop, interface_name, device_name, device_uuid, concat(inet_ntoa(destination), "/", mask_bit) AS cidr
     </sql>
 
     <sql id="Copy_Column_List">
-         addTime, mask, destination, cost, proto, flags, next_hop, interface_name, device_name, device_uuid
+         addTime, mask, destination, cost, proto, flags, next_hop, interface_name, device_name, device_uuid, mask_bit
     </sql>
 
     <select id="selectObjById" parameterType="java.lang.Long" resultMap="Base_Result_Map">

@@ -21,6 +21,8 @@ public class PresetPath extends IdEntity {
 
         private String srcIp;
         private String srcMask;
+        private String srcGateway;
         private String destIp;
         private String destMask;
+        private String destGateway;
 }

@@ -1,6 +1,7 @@
 package com.metoo.nspm.core.manager.admin.action;
 
 import com.github.pagehelper.Page;
+import com.metoo.nspm.core.service.nspm.IArpHistoryService;
 import com.metoo.nspm.core.service.nspm.IArpService;
 import com.metoo.nspm.core.service.nspm.IDeviceService;
 import com.metoo.nspm.core.service.nspm.INetworkElementService;
@@ -28,6 +29,8 @@ public class ArpManagerController {
     @Autowired
     private IArpService arpService;
     @Autowired
+    private IArpHistoryService arpHistoryService;
+    @Autowired
     private INetworkElementService networkElementService;
 
     @RequestMapping("/list")
@@ -41,7 +44,12 @@ public class ArpManagerController {
                 dto.setOrderType("ASC");
             }
             dto.setMacFilter("1");
-            Page<Arp> page = this.arpService.selectObjConditionQuery(dto);
+            Page<Arp> page = null;
+            if(dto != null){
+                page = this.arpHistoryService.selectObjConditionQuery(dto);
+            }else{
+                page = this.arpService.selectObjConditionQuery(dto);
+            }
             if(page.getResult().size() > 0){
                 return ResponseUtil.ok(new PageInfo<Arp>(page));
             }

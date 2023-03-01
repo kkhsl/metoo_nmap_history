@@ -41,7 +41,7 @@ public class PresetPathManagerController {
 
     @ApiOperation("列表")
     @PostMapping("/list")
-    public Object list(@RequestBody(required = false) PresetPathDTO dto){
+    public Object list(@RequestBody PresetPathDTO dto){
         if(dto == null){
             dto = new PresetPathDTO();
         }

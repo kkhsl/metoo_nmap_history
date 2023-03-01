@@ -19,7 +19,9 @@ public class PresetPathDTO extends PageDto<PresetPath> {
     private String userName;
     private String srcIp;
     private String srcMask;
+    private String srcGateway;
     private String destIp;
     private String destMask;
+    private String destGateway;
 
 }

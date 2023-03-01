@@ -103,12 +103,15 @@ public class DateTools {
     }
 
     public static Date parseDate(String date, String format) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat(format);
-            return sdf.parse(date);
-        } catch (Exception var3) {
-            return null;
+        if(date != null && !date.equals("")){
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(format);
+                return sdf.parse(date);
+            } catch (Exception var3) {
+                return null;
+            }
         }
+        return null;
     }
 
     // 时间转时间戳

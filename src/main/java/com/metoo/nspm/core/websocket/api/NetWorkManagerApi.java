@@ -457,9 +457,11 @@ public class NetWorkManagerApi {
     @ApiOperation("9：网元|端口列表")
     @GetMapping("/ne/interface/all")
     public NoticeWebsocketResp neInterfaces(@RequestParam(value = "requestParams", required = false) String requestParams){
-        Map params = JSONObject.parseObject(requestParams, Map.class);
-        if(!params.isEmpty()){
+        Map requestParam = JSONObject.parseObject(requestParams, Map.class);
+        if(!requestParam.isEmpty()){
             Map subarea = new HashMap();
+            Date time = DateTools.parseDate(String.valueOf(requestParam.get("time")), "yyyy-MM-dd HH:mm");
+            Map params = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
             for(Object key : params.keySet()){
                 String value = params.get(key).toString();
                 JSONArray ary = JSONArray.parseArray(value);
@@ -468,7 +470,6 @@ public class NetWorkManagerApi {
                     for (Object param : ary) {
                         JSONObject ele = JSONObject.parseObject(param.toString());
                         String uuid = ele.getString("uuid");
-                        String time = ele.getString("time");
                         NetworkElement ne = this.networkElementService.selectObjByUuid(uuid);
                         if(ne != null){
                             // 端口列表
@@ -487,8 +488,7 @@ public class NetWorkManagerApi {
                                     args.put("orderType", "ASC");
                                     List<Mac> macs = null;
                                     if(time != null && !"".equals(time)){
-                                        Date date = DateTools.parseDate(time, "yyyy-MM-dd HH:mm");
-                                        args.put("time", date);
+                                        args.put("time", time);
                                         macs = this.macHistoryService.selectObjByMap(args);
                                     }else{
                                         macs = this.macService.selectByMap(args);

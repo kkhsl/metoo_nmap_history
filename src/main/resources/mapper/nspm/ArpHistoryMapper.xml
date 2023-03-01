@@ -40,7 +40,7 @@
         SELECT
          DISTINCT ip, mac
         FROM
-          rsms_arp
+          rsms_arp_history
           <where>
               <if test="time != null">
                   AND addTime = (
@@ -51,15 +51,58 @@
                   AND ip = #{ip}
               </if>
           </where>
-        WHERE
+    </select>
 
+    <select id="selectObjConditionQuery" parameterType="com.metoo.nspm.dto.ArpDTO" resultMap="Base_Result_Map">
+        SELECT
+          <include refid="Ntoa_Column_List"/>
+        FROM
+          rsms_arp_history
+        <where>
+            <if test="filter != null and filter != ''">
+                AND ip = inet_aton(#{filter})
+                <bind name="pattern" value="'%' + filter + '%'"/>
+                or CONCAT(mac, interface_name) LIKE #{pattern}
+            </if>
+            <if test="deviceName != null and deviceName != ''">
+                AND device_name = #{deviceName}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND ip = #{ip}
+            </if>
+            <if test="macFilter != null and macFilter != ''">
+                AND mac != ''
+            </if>
+            <if test="time != null">
+                AND addTime = (
+                  SELECT
+                    addTime
+                  FROM
+                    rsms_arp_history
+                  WHERE
+                    addTime &lt;=#{time}
+                  ORDER BY
+                    addTime
+                  DESC limit 1
+                )
+            </if>
+        </where>
+        <if test = "orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test = "orderType != null and orderType != ''">
+            ${orderType}
+        </if>
     </select>
 
     <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
         SELECT
           <include refid="Base_Column_List" />
         FROM
-        rsms_arp_history
+          rsms_arp_history
         <where>
             <if test="time != null">
                 AND addTime = (
@@ -115,7 +158,7 @@
         SELECT
           <include refid="Ntoa_Column_List"/>
         FROM
-        rsms_arp_history
+          rsms_arp_history
         <where>
             <if test="time != null">
                 AND addTime = (
@@ -153,7 +196,10 @@
     </select>
 
     <delete id="batchDelete" parameterType="com.metoo.nspm.entity.nspm.Arp">
-        DELETE FROM rsms_arp_history where
+        DELETE
+        FROM
+          rsms_arp_history
+        where
         <foreach collection="list" item="arp"  separator="or">
             id = #{arp.id}
         </foreach>
@@ -161,7 +207,8 @@
 
     <insert id="copyArpTemp">
         INSERT INTO
-              rsms_arp_history(<include refid="Copy_Column_List"/>)
+              rsms_arp_history
+          (<include refid="Copy_Column_List"/>)
         SELECT
           <include refid="Copy_Column_List"/>
         FROM rsms_arp_temp

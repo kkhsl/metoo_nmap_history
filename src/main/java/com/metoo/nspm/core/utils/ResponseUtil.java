@@ -103,7 +103,7 @@ public class ResponseUtil {
 
     public static Object ok(){return new Result(200, "Successfully");}
 
-    public static Object ok(Object data){return new Result(200, "Successfully", data);}
+    public static Result ok(Object data){return new Result(200, "Successfully", data);}
 
     public static Object notFound(){return new Result(400, "请求异常");}
 

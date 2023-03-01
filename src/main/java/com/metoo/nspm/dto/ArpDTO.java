@@ -1,15 +1,17 @@
 package com.metoo.nspm.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.metoo.nspm.dto.page.PageDto;
-import com.metoo.nspm.dto.page.PageInfo;
 import com.metoo.nspm.entity.nspm.Arp;
-import com.metoo.nspm.entity.nspm.NetworkElement;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 @ApiModel("ARP")
 @Data
@@ -55,5 +57,6 @@ public class ArpDTO extends PageDto<Arp> {
     private String uuid;
     private String filter;
     private String macFilter;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm",timezone = "GMT+8")
+    private Date time;
 }

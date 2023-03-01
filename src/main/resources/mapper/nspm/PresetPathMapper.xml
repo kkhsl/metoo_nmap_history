@@ -14,11 +14,13 @@
         <result column="src_mask" property="srcMask"></result>
         <result column="dest_ip" property="destIp"></result>
         <result column="dest_mask" property="destMask"></result>
+        <result column="src_gateway" property="srcGateway"></result>
+        <result column="dest_gateway" property="destGateway"></result>
     </resultMap>
 
     <sql id="Base_Column_List">
         id, `name`, topology_id, topology_name, content, user_id, user_name,
-        src_ip, src_mask, dest_ip, dest_mask
+        src_ip, src_mask, src_gateway, dest_ip, dest_mask, dest_gateway
     </sql>
 
     <select id="selectObjById" parameterType="java.lang.Long" resultMap="Base_Result_Map">
@@ -99,6 +101,12 @@
             <if test="destMask != null and destMask != ''">
                 `dest_mask`,
             </if>
+            <if test="srcGateway != null and srcGateway != ''">
+                src_gateway,
+            </if>
+            <if test="destGateway != null and destGateway != ''">
+                `dest_gateway`,
+            </if>
         </trim>
         <trim prefix="VALUES(" suffixOverrides="," suffix=")">
             <if test="addTime != null">
@@ -134,9 +142,14 @@
             <if test="destMask != null and destMask != ''">
                   #{destMask},
             </if>
+            <if test="srcGateway != null and srcGateway != ''">
+                #{srcGateway},
+            </if>
+            <if test="destGateway != null and destGateway != ''">
+                #{destGateway},
+            </if>
         </trim>
     </insert>
-
 
     <update id="update" parameterType="com.metoo.nspm.entity.nspm.PresetPath">
         UPDATE metoo_preset_path
@@ -173,6 +186,12 @@
             </if>
             <if test="destMask != null and destMask != ''">
                 `dest_mask` = #{destMask},
+            </if>
+            <if test="srcGateway != null and srcGateway != ''">
+                src_gateway = #{srcGateway},
+            </if>
+            <if test="destGateway != null and destGateway != ''">
+                `dest_gateway` = #{destGateway},
             </if>
         </set>
         where id = #{id}

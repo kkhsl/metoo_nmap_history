@@ -30,13 +30,55 @@
 
     <sql id="Ntoa_Column_List">
         id, addTime, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
-        remote_device_ip, remote_device_type,  remote_uuid, interface_index, INET_NTOA(ip) AS ip, device_ip, device_type, vlan
+        remote_device_ip, remote_device_type,  remote_uuid, interface_index, ip, device_ip, device_type, vlan
     </sql>
 
     <sql id="Copy_Column_List">
          addTime, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
          remote_device_ip, remote_device_type, remote_uuid, interface_index, ip, device_ip, device_type, vlan
     </sql>
+
+    <select id="selectObjConditionQuery" parameterType="com.metoo.nspm.dto.MacDTO" resultMap="Base_Result_Map">
+        SELECT
+          <include refid="Base_Column_List" />
+        FROM rsms_mac_history
+        <where>
+            <if test="filter != null and filter != ''">
+                <bind name="pattern" value="'%' + filter + '%'"/>
+                OR CONCAT(ip, mac, interface_name) LIKE #{pattern}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid}
+            </if>
+            <if test="interfaceName != null and interfaceName != ''">
+                AND `interface_name` = #{interfaceName}
+            </if>
+            <if test="mac != null and mac != ''">
+                AND mac = #{mac}
+            </if>
+            <if test="macFilter != null and macFilter != ''">
+                AND mac != ''
+            </if>
+            <if test="time != null">
+                AND addTime = (
+                    SELECT
+                      addTime
+                    FROM
+                     rsms_mac_history
+                    WHERE
+                      addTime &lt;= #{time}
+                    ORDER BY addTime
+                    DESC limit 1
+                )
+            </if>
+        </where>
+        <if test = "orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test = "orderType != null and orderType != ''">
+            ${orderType}
+        </if>
+    </select>
 
     <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
         SELECT <include refid="Ntoa_Column_List" />
@@ -82,6 +124,71 @@
             </if>
             <if test="macId != null and macId != ''">
                 AND id != #{macId}
+            </if>
+        </where>
+        <if test = "orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test = "orderType != null and orderType != ''">
+            ${orderType}
+        </if>
+    </select>
+
+    <select id="selectByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+        SELECT <include refid="Ntoa_Column_List" />
+        FROM rsms_mac_history
+        <where>
+            <if test="mac != null">
+                AND mac = #{mac}
+            </if>
+            <if test="deviceName != null">
+                AND device_name = #{deviceName}
+            </if>
+            <if test="interfaceName != null">
+                AND interface_name = #{interfaceName}
+            </if>
+            <if test="tag != null">
+                AND tag = #{tag}
+            </if>
+            <if test="other != null">
+                AND tag != #{other}
+            </if>
+            <if test="uuid != null">
+                AND uuid = #{uuid}
+            </if>
+            <if test="uuids != null">
+                AND uuid in
+                <foreach collection="uuids" index="index" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="tags != null">
+                AND tag in
+                <foreach collection="tags" index = "index" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="ip != null">
+                AND ip = #{ip}
+            </if>
+            <if test="acquisitionTime != null">
+                AND addTime = #{acquisitionTime}
+            </if>
+            <if test="macId != null and macId != ''">
+                AND id != #{macId}
+            </if>
+            <if test="time != null">
+                AND addTime = (
+                  SELECT
+                    addTime
+                  FROM
+                    rsms_mac_history
+                  WHERE
+                    addTime &lt;= #{time}
+                  ORDER BY
+                    addTime
+                  DESC limit 1
+                )
             </if>
         </where>
         <if test = "orderBy != null and orderBy != ''">
