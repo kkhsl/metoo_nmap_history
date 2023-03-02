@@ -26,7 +26,7 @@
 
     <select id="selectObjById" parameterType="java.lang.Long" resultMap="Base_Result_Map">
         SELECT *
-        FROM rsms_rout
+        FROM rsms_route
         WHERE
           id = #{id, jdbcType=BIGINT}
     </select>
@@ -34,7 +34,7 @@
     <select id="selectConditionQuery" parameterType="com.metoo.nspm.dto.zabbix.RoutDTO" resultMap="Base_Result_Map">
         SELECT
           <include refid="INET_Column_List" />
-        FROM rsms_rout
+        FROM rsms_route
         <where>
             <if test="destination != ''">
                 AND destination = #{destination}
@@ -60,7 +60,7 @@
     <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
         SELECT
           <include refid="Base_Column_List" />
-        FROM rsms_rout
+        FROM rsms_route
         <where>
             <if test="mask != null and mask != ''">
                 AND mask = #{mask}
@@ -115,13 +115,13 @@
         SELECT
              id, INET_NTOA(destination) destination, mask,
              cost, proto, flags, INET_NTOA(next_hop) next_hop, interface_name, device_name, device_uuid
-            FROM rsms_rout
+            FROM rsms_route
             where
                     (destination, mask) = (
                             SELECT
                                 destination, mask
                             FROM
-                            rsms_rout
+                            rsms_route
                             WHERE
                                 destination
                             BETWEEN
@@ -144,7 +144,7 @@
         SELECT
          destination, mask
         FROM
-        rsms_rout
+        rsms_route
         <where>
             <if test="network != null and broadcast != null">
                 destination
@@ -175,7 +175,7 @@
         SELECT
           id, cost, proto, flags, INET_NTOA(next_hop) next_hop, interface_name, device_name, device_uuid
         FROM
-        rsms_rout
+        rsms_route
         <where>
             <if test = "deviceUuid != null">
                 AND device_uuid = #{deviceUuid}
@@ -196,7 +196,7 @@
     </select>
 
     <insert id="save" parameterType="com.metoo.nspm.entity.nspm.Route">
-        INSERT INTO rsms_rout
+        INSERT INTO rsms_route
         <trim prefix="(" suffixOverrides="," suffix=")">
             <if test="addTime != null">
                 addTime,
@@ -264,7 +264,7 @@
     </insert>
 
     <update id="update" parameterType="com.metoo.nspm.entity.nspm.Route">
-        UPDATE rsms_rout
+        UPDATE rsms_route
         <set>
             <if test="mask != null">
                 mask = #{mask},
@@ -298,18 +298,18 @@
     </update>
 
     <delete id="delete" parameterType="java.lang.Long">
-        DELETE FROM rsms_rout
+        DELETE FROM rsms_route
         WHERE
           id = #{id}
     </delete>
 
     <update id="truncateTable">
-        TRUNCATE TABLE rsms_rout
+        TRUNCATE TABLE rsms_route
     </update>
 
     <insert id="copyRoutTemp">
-        INSERT INTO rsms_rout
-        SELECT * FROM rsms_rout_temp
+        INSERT INTO rsms_route
+        SELECT * FROM rsms_route_temp
     </insert>
 
 </mapper>

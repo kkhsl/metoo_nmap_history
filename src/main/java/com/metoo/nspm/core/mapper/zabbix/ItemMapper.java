@@ -16,6 +16,8 @@ public interface ItemMapper {
 
     List<Item> gatherItemByTag(Map params);
 
+    List<Item> gatherItemByTagAndClock(Map params);
+
     List<Item> gatherItemByTagAndIndex(Map params);
 
     List<Item> selectTagByMap(Map params);// 根据条件查询itemtag

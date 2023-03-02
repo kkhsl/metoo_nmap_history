@@ -7,7 +7,7 @@ import com.metoo.nspm.core.manager.admin.tools.SubnetTool;
 import com.metoo.nspm.core.service.nspm.IIPAddressService;
 import com.metoo.nspm.core.service.nspm.IRoutService;
 import com.metoo.nspm.core.service.nspm.IRoutTableService;
-import com.metoo.nspm.core.service.nspm.ZabbixSubnetService;
+import com.metoo.nspm.core.service.nspm.ISubnetService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
@@ -27,7 +27,7 @@ public class RoutManagerController {
     @Autowired
     private IIPAddressService ipAddressServie;
     @Autowired
-    private ZabbixSubnetService subnetService;
+    private ISubnetService subnetService;
     @Autowired
     private SubnetTool subnetTool;
     @Autowired

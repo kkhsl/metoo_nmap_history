@@ -29,7 +29,7 @@
 
     <select id="selectObjById" parameterType="java.lang.Long" resultMap="Base_Result_Map">
         SELECT <include refid="Base_Column_List"/>
-        FROM rsms_rout_history
+        FROM rsms_route_history
         WHERE
           id = #{id, jdbcType=BIGINT}
     </select>
@@ -37,7 +37,7 @@
     <select id="selectConditionQuery" parameterType="com.metoo.nspm.dto.zabbix.RoutDTO" resultMap="Base_Result_Map">
         SELECT
           <include refid="INET_Column_List" />
-        FROM rsms_rout_history
+        FROM rsms_route_history
         <where>
             <if test="destination != null and destination != ''">
                 AND destination = #{destination}
@@ -50,7 +50,7 @@
             </if>
             <if test="time != null">
                 AND addTime = (
-                SELECT addTime FROM rsms_rout_history WHERE addTime &lt;= #{time} ORDER BY addTime DESC limit 1
+                SELECT addTime FROM rsms_route_history WHERE addTime &lt;= #{time} ORDER BY addTime DESC limit 1
                 )
             </if>
         </where>
@@ -65,14 +65,14 @@
     <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
         SELECT
           <include refid="Base_Column_List" />
-        FROM rsms_rout_history
+        FROM rsms_route_history
         <where>
             <if test="time != null">
                 AND addTime = (
                   SELECT
                     addTime
                   FROM
-                    rsms_rout_history
+                    rsms_route_history
                   WHERE
                     addTime &lt;= #{time}
                   ORDER BY
@@ -135,7 +135,7 @@
         <where>
             <if test="time != null">
                 AND addTime = (
-                SELECT addTime FROM rsms_rout_history WHERE addTime &lt;= #{time} ORDER BY addTime DESC limit 1
+                SELECT addTime FROM rsms_route_history WHERE addTime &lt;= #{time} ORDER BY addTime DESC limit 1
                 )
             </if>
             <if test="beforeTime != null">
@@ -164,14 +164,14 @@
     </select>
 
     <delete id="batchDelete" parameterType="com.metoo.nspm.entity.nspm.Route">
-        DELETE FROM rsms_rout_history where
+        DELETE FROM rsms_route_history where
         <foreach collection="list" item="item"  separator="or">
             id = #{item.id}
         </foreach>
     </delete>
 
     <insert id="copyRoutTemp">
-        INSERT INTO rsms_rout_history (<include refid="Copy_Column_List"/>)
+        INSERT INTO rsms_route_history (<include refid="Copy_Column_List"/>)
         SELECT <include refid="Copy_Column_List"/> FROM rsms_rout_temp
     </insert>
 

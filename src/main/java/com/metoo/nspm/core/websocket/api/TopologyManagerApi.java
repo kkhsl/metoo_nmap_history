@@ -5,20 +5,19 @@ import com.metoo.nspm.core.config.websocket.demo.NoticeWebsocketResp;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.MacUtil;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixService;
-import com.metoo.nspm.core.service.nspm.IMacHistoryService;
-import com.metoo.nspm.core.service.nspm.IMacService;
-import com.metoo.nspm.core.service.nspm.IMacVendorService;
-import com.metoo.nspm.core.service.nspm.INetworkElementService;
+import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.service.zabbix.ItemService;
+import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.Mac;
 import com.metoo.nspm.entity.nspm.NetworkElement;
+import com.metoo.nspm.entity.nspm.Subnet;
+import com.metoo.nspm.entity.nspm.Vlan;
 import com.metoo.nspm.entity.zabbix.Item;
 import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.crypto.hash.Hash;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 @RequestMapping("/websocket/api/zabbix")
@@ -39,6 +38,10 @@ public class TopologyManagerApi {
     private ZabbixService zabbixService;
     @Autowired
     private MacUtil macUtil;
+    @Autowired
+    private ISubnetService subnetService;
+    @Autowired
+    private IVlanService vlanService;
 
     @ApiOperation("设备 Mac (DT))")
     @GetMapping(value = {"/mac/dt"})
@@ -65,6 +68,22 @@ public class TopologyManagerApi {
                 args.put("uuid", uuid);
                 args.put("tag", "DT");
                 List<Mac> macs = this.macService.selectByMap(args);
+                macs.stream().forEach(item -> {
+                    String terminalIp = item.getIp();
+                    if(StringUtils.isNotEmpty(terminalIp) && StringUtils.isEmpty(item.getVlan())){
+                        // 获取网络地址
+                        String network = IpUtil.getNBIP(terminalIp,"255.255.255.255", 0);
+                        Subnet subnet = this.subnetService.selectObjByIp(network);
+                        if(subnet != null){
+                            if(subnet.getVlanId() != null && !subnet.getVlanId().equals("")){
+                                Vlan vlan = this.vlanService.selectObjById(subnet.getVlanId());
+                                if(vlan != null){
+                                    item.setVlan(vlan.getName());
+                                }
+                            }
+                        }
+                    }
+                });
                 this.macUtil.macJoint(macs);
                 flux_terminal.put("terminal", macs);
                 // 流量

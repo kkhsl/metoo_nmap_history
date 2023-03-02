@@ -88,7 +88,7 @@ public class ZabbixServiceImpl implements ZabbixService {
     @Autowired
     private IIPAddressTempService ipaddressTempService;
     @Autowired
-    private ZabbixSubnetService zabbixSubnetService;
+    private ISubnetService zabbixSubnetService;
     @Autowired
     private IAddressService addressService;
 

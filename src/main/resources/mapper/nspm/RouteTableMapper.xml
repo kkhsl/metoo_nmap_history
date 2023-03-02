@@ -34,13 +34,13 @@
 
     <select id="selectObjByMac" parameterType="java.lang.String" resultMap="Base_Result_Map">
         SELECT <include refid="Base_Column_List"/>
-        FROM rsms_rout_table
+        FROM rsms_route_table
         where mac = #{mac}
     </select>
 
     <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
         SELECT <include refid="Base_Column_List"/>
-        FROM rsms_rout_table
+        FROM rsms_route_table
         <where>
             <if test="ipSegment != null">
                 AND ip_segment = #{ipSegment}
@@ -73,7 +73,7 @@
     </select>
 
     <insert id="save" parameterType="com.metoo.nspm.entity.nspm.RouteTable">
-        INSERT INTO rsms_rout_table
+        INSERT INTO rsms_route_table
         <trim prefix="(" suffixOverrides="," suffix=")">
             <if test="addTime != null">
                  addTime,
@@ -177,7 +177,7 @@
     </insert>
 
     <update id="update" parameterType="com.metoo.nspm.entity.nspm.RouteTable">
-        UPDATE rsms_rout_table
+        UPDATE rsms_route_table
         <set>
             <if test="addTime != null">
                 addTime = #{addTime},
@@ -232,15 +232,15 @@
     </update>
 
     <update id="truncateTable">
-        TRUNCATE TABLE rsms_rout_table
+        TRUNCATE TABLE rsms_route_table
     </update>
 
     <delete id="deleteObjByUserId" parameterType="java.lang.Long">
-        DELETE FROM rsms_rout_table where user_id = #{userId}
+        DELETE FROM rsms_route_table where user_id = #{userId}
     </delete>
 
     <update id="truncateTableByMap" parameterType="java.util.Map">
-        TRUNCATE TABLE rsms_rout_table
+        TRUNCATE TABLE rsms_route_table
         <where>
             <if test = "userId != null and userId != ''">
                 AND user_id = #{userId}

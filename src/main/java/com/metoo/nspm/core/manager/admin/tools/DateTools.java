@@ -235,4 +235,17 @@ public class DateTools {
 
     }
 
+    @Test
+    public void testGetMinTime(){
+        Long time = this.getMinTime(-1);
+        System.out.println(time / 1000);
+    }
+    // 获取前N分钟时间
+    public static Long getMinTime(int min){
+        Calendar cal = Calendar.getInstance();
+//        cal.add(Calendar.MINUTE, Math.negateExact(min));
+        cal.add(Calendar.MINUTE, min);
+        return cal.getTime().getTime() / 1000;
+    }
+
 }

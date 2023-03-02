@@ -2,7 +2,7 @@ package com.metoo.nspm.core.manager.admin.action;
 
 import com.metoo.nspm.core.service.nspm.IAddressService;
 import com.metoo.nspm.core.service.nspm.IpDetailService;
-import com.metoo.nspm.core.service.nspm.ZabbixSubnetService;
+import com.metoo.nspm.core.service.nspm.ISubnetService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.Address;
@@ -19,7 +19,7 @@ public class AddressManagerController {
     @Autowired
     private IAddressService addressService;
     @Autowired
-    private ZabbixSubnetService zabbixSubnetService;
+    private ISubnetService zabbixSubnetService;
     @Autowired
     private IpDetailService ipDetailService;
 

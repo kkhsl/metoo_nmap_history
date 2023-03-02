@@ -162,7 +162,7 @@ public class GatherServiceImpl implements IGatherService {
         watch.start();
         this.itemService.gatherMacThreadPool(time);
         watch.stop();
-        System.out.println("Mac采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+        System.out.println("Mac采集-写入 耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
         watch.reset();
         watch.start();

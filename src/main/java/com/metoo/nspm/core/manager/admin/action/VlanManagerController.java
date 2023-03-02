@@ -5,13 +5,10 @@ import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
 import com.metoo.nspm.core.service.nspm.IDomainService;
 import com.metoo.nspm.core.service.nspm.IGroupService;
 import com.metoo.nspm.core.service.nspm.IVlanService;
-import com.metoo.nspm.core.service.nspm.ZabbixSubnetService;
-import com.metoo.nspm.core.service.phpipam.IpamSubnetService;
+import com.metoo.nspm.core.service.nspm.ISubnetService;
 import com.metoo.nspm.core.utils.ResponseUtil;
-import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +36,7 @@ public class VlanManagerController {
     @Autowired
     private IGroupService groupService;
     @Autowired
-    private ZabbixSubnetService subnetService;
+    private ISubnetService subnetService;
     @Autowired
     private GroupTools groupTools;
 

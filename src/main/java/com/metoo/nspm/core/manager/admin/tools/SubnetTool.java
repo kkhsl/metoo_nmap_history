@@ -1,6 +1,6 @@
 package com.metoo.nspm.core.manager.admin.tools;
 
-import com.metoo.nspm.core.service.nspm.ZabbixSubnetService;
+import com.metoo.nspm.core.service.nspm.ISubnetService;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.Subnet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +14,9 @@ import java.util.Map;
 public class SubnetTool {
 
     @Autowired
-    private ZabbixSubnetService subnetService;
+    private ISubnetService subnetService;
     @Autowired
-    private ZabbixSubnetService zabbixSubnetService;
+    private ISubnetService zabbixSubnetService;
 
     /**
      * 验证Ip是否属于子网

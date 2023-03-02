@@ -318,6 +318,9 @@ public class IpUtil {
         String network = new String();
         String broadcast = new String();
         String[] addresses = ip.split("\\.");
+        if(netmask == null){
+            netmask = "255.255.255.255";
+        }
         String[] masks = netmask.split("\\.");
         for(int i = 0; i < 4; i++) {
             int opmasksegement = ~Integer.parseInt(masks[i]) & 0xFF;

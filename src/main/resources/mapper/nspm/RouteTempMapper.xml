@@ -26,7 +26,7 @@
 
     <select id="selectObjById" parameterType="java.lang.Long" resultMap="Base_Result_Map">
         SELECT *
-        FROM rsms_rout_temp
+        FROM rsms_route_temp
         WHERE
           id = #{id, jdbcType=BIGINT}
     </select>
@@ -34,7 +34,7 @@
     <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
         SELECT
           <include refid="Base_Column_List" />
-        FROM rsms_rout_temp
+        FROM rsms_route_temp
         <where>
             <if test="mask != null">
                 AND mask = #{mask}
@@ -86,13 +86,13 @@
         SELECT
              id, INET_NTOA(destination) destination, mask,
              cost, proto, flags, INET_NTOA(next_hop) next_hop, interface_name, device_name, device_uuid
-            FROM rsms_rout_temp
+            FROM rsms_route_temp
             where
                     (destination, mask) = (
                             SELECT
                                 destination, mask
                             FROM
-                            rsms_rout_temp
+                            rsms_route_temp
                             WHERE
                                 destination
                             BETWEEN
@@ -115,7 +115,7 @@
         SELECT
          destination, mask
         FROM
-        rsms_rout_temp
+        rsms_route_temp
         <where>
             <if test="network != null and broadcast != null">
                 destination
@@ -143,7 +143,7 @@
         SELECT
           id, cost, proto, flags, INET_NTOA(next_hop) next_hop, interface_name, device_name, device_uuid
         FROM
-        rsms_rout_temp
+        rsms_route_temp
         <where>
             <if test = "deviceName != null">
                 AND device_name = #{deviceName}
@@ -158,7 +158,7 @@
     </select>
 
     <insert id="save" parameterType="com.metoo.nspm.entity.nspm.RouteTemp">
-        INSERT INTO rsms_rout_temp
+        INSERT INTO rsms_route_temp
         <trim prefix="(" suffixOverrides="," suffix=")">
             <if test="addTime != null">
                 addTime,
@@ -232,7 +232,7 @@
     </insert>
 
     <update id="update" parameterType="com.metoo.nspm.entity.nspm.RouteTemp">
-        UPDATE rsms_rout_temp
+        UPDATE rsms_route_temp
         <set>
             <if test="mask != null">
                 mask = #{mask},
@@ -269,13 +269,13 @@
     </update>
 
     <delete id="delete" parameterType="java.lang.Long">
-        DELETE FROM rsms_rout_temp
+        DELETE FROM rsms_route_temp
         WHERE
           id = #{id}
     </delete>
 
     <update id="truncateTable">
-        TRUNCATE TABLE rsms_rout_temp
+        TRUNCATE TABLE rsms_route_temp
     </update>
     
 </mapper>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.metoo.nspm.core.mapper.nspm.zabbix.ZabbixSubnetMapper">
+<mapper namespace="com.metoo.nspm.core.mapper.nspm.SubnetMapper">
 
     <resultMap id="Base_Result_Map" type="com.metoo.nspm.entity.nspm.Subnet">
         <id column="id" property="id"></id>
@@ -13,7 +13,6 @@
         <result column="description" property="description"></result>
         <result column="vlan_id" property="vlanId"></result>
         <result column="vlan_name" property="vlanName"></result>
-
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -53,16 +52,23 @@
         ORDER BY ip + 0 ASC
     </select>
 
-    <select id="selectObjByIp" resultMap="Base_Result_Map">
-        SELECT *
-        FROM metoo_subnet
-        WHERE ip = #{ip} and mask = #{mask}
-    </select>
 
     <select id="selectObjById" parameterType="java.lang.Long" resultMap="Base_Result_Map">
         SELECT <include refid="Inet_Column_List" />
         FROM metoo_subnet
         WHERE id = #{id}
+    </select>
+
+    <select id="selectObjByIp" resultMap="Base_Result_Map">
+        SELECT *
+        FROM metoo_subnet
+        WHERE ip = #{ip}
+    </select>
+
+    <select id="selectObjByIpAndMask" resultMap="Base_Result_Map">
+        SELECT *
+        FROM metoo_subnet
+        WHERE ip = #{ip} and mask = #{mask}
     </select>
 
     <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">

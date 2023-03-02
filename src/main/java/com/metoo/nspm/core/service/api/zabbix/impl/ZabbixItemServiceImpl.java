@@ -47,8 +47,6 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
     @Autowired
     private IArpTempService arpTempService;
     @Autowired
-    private IMacService macService;
-    @Autowired
     private IMacTempService macTempService;
     @Autowired
     private IArpService arpService;
@@ -534,8 +532,8 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         for (IpAddress ipAddress : ipList){
             String ip = ipAddress.getIp();
             Integer mask = Integer.parseInt(ipAddress.getMask());
-            String mask2 = IpUtil.bitMaskConvertMask(mask);
-            Map networkMap = IpUtil.getNetworkIp(ip, mask2);
+            String maskBit = IpUtil.bitMaskConvertMask(mask);
+            Map networkMap = IpUtil.getNetworkIp(ip, maskBit);
             map.put(networkMap.get("network").toString(), mask);
             masks.add(mask);
         }
@@ -557,25 +555,27 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         // 提取
         Map<String, List<Object>> parentMap = new HashMap<>();
         for (Map.Entry<String, Integer> entry : firstMap.entrySet()) {
-            Integer mask = entry.getValue();
+            Integer maskBit = entry.getValue();
             String ip = entry.getKey();
             Integer parentMask = null;
-            if (mask > 24) {
+            if (maskBit > 24) {
                 parentMask = 24;
-            } else if (24 >= mask && mask > 16) {
+            } else if (24 >= maskBit && maskBit > 16) {
                 parentMask = 16;
-            } else if (16 >= mask && mask > 8) {
+            } else if (16 >= maskBit && maskBit > 8) {
                 parentMask = 8;
+            }else if(maskBit <= 8){
+                parentMask = maskBit;
             }
             String parentIp = this.getParentIp(ip, parentMask);
             parentIp = parentIp + "/" + parentMask;
             if (parentMap.get(parentIp) == null) {
                 List<Object> list = new ArrayList<>();
-                list.add(ip + "/" + mask);
+                list.add(ip + "/" + maskBit);
                 parentMap.put(parentIp, list);
             } else {
                 List<Object> list = parentMap.get(parentIp);
-                list.add(ip + "/" + mask);
+                list.add(ip + "/" + maskBit);
             }
         }
 //        遍历

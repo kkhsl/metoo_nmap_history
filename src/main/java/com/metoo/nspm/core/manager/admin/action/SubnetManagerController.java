@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 public class SubnetManagerController {
 
     @Autowired
-    private ZabbixSubnetService zabbixSubnetService;
+    private ISubnetService subnetService;
     @Autowired
     private IAddressService addressService;
     @Autowired
@@ -98,7 +98,7 @@ public class SubnetManagerController {
 //                        // 插入本地数据库 and 同步ipam
 //                        // 插如一级ip网段
 //                        Long firstSubnetId = null;
-//                        Subnet firstSubnet = this.zabbixSubnetService.selectObjByIp(firstIp, firstMask);
+//                        Subnet firstSubnet = this.subnetService.selectObjByIp(firstIp, firstMask);
 //                        if(firstSubnet != null){
 //                            firstSubnetId = firstSubnet.getId();
 //                        }
@@ -106,7 +106,7 @@ public class SubnetManagerController {
 //                            Subnet subnet = new Subnet();
 //                            subnet.setIp(IpUtil.ipConvertDec(firstIp));
 //                            subnet.setMask(firstMask);
-//                            this.zabbixSubnetService.save(subnet);
+//                            this.subnetService.save(subnet);
 //                            firstSubnetId = subnet.getId();
 //                        }
 //                        // 获取二级网段
@@ -117,14 +117,14 @@ public class SubnetManagerController {
 //                                int sequence = second.indexOf("/");
 //                                String ip = second.substring(0, sequence);
 //                                int secondMask = Integer.parseInt(second.substring(sequence + 1));
-//                                Subnet secondSubnet = this.zabbixSubnetService.selectObjByIp(ip, secondMask);
+//                                Subnet secondSubnet = this.subnetService.selectObjByIp(ip, secondMask);
 //                                if(secondSubnet == null){
 //                                    Subnet subnet = new Subnet();
 //                                    subnet.setIp(IpUtil.ipConvertDec(ip));
 //                                    subnet.setMask(secondMask);
 //                                    subnet.setParentIp(IpUtil.ipConvertDec(firstIp));
 //                                    subnet.setParentId(firstSubnetId);
-//                                    this.zabbixSubnetService.save(subnet);
+//                                    this.subnetService.save(subnet);
 //                                }
 //                            }
 //                            if(obj instanceof JSONObject){
@@ -135,7 +135,7 @@ public class SubnetManagerController {
 //                                    String secondIp = second.substring(0, sequence);
 //                                    int secondMask = Integer.parseInt(second.substring(sequence + 1));
 //                                    Long secondSubnetId = null;
-//                                    Subnet secondSubnet = this.zabbixSubnetService.selectObjByIp(secondIp, secondMask);
+//                                    Subnet secondSubnet = this.subnetService.selectObjByIp(secondIp, secondMask);
 //                                    if(secondSubnet != null){
 //                                        secondSubnetId = secondSubnet.getId();
 //                                    }
@@ -145,7 +145,7 @@ public class SubnetManagerController {
 //                                        subnet.setMask(secondMask);
 //                                        subnet.setParentIp(IpUtil.ipConvertDec(firstIp));
 //                                        subnet.setParentId(firstSubnetId);
-//                                        this.zabbixSubnetService.save(subnet);
+//                                        this.subnetService.save(subnet);
 //                                        secondSubnetId = subnet.getId();
 //                                    }
 //                                    JSONArray thirdArray = JSONArray.parseArray(object.get(okey).toString());
@@ -155,14 +155,14 @@ public class SubnetManagerController {
 //                                            int thirdSequence = third.indexOf("/");
 //                                            String thirdIp = third.substring(0, thirdSequence);
 //                                            int thirdMask = Integer.parseInt(third.substring(thirdSequence + 1));
-//                                            Subnet thirdSubnet = this.zabbixSubnetService.selectObjByIp(thirdIp, thirdMask);
+//                                            Subnet thirdSubnet = this.subnetService.selectObjByIp(thirdIp, thirdMask);
 //                                            if(thirdSubnet == null){
 //                                                Subnet subnet = new Subnet();
 //                                                subnet.setIp(IpUtil.ipConvertDec(thirdIp));
 //                                                subnet.setMask(thirdMask);
 //                                                subnet.setParentIp(IpUtil.ipConvertDec(secondIp));
 //                                                subnet.setParentId(secondSubnetId);
-//                                                this.zabbixSubnetService.save(subnet);
+//                                                this.subnetService.save(subnet);
 //                                            }
 //                                        }
 //                                    }
@@ -172,7 +172,7 @@ public class SubnetManagerController {
 //                    }
 //                    // 同步子网ip
 //                    // 获取所有子网一级
-//                    List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(null);
+//                    List<Subnet> subnets = this.subnetService.selectSubnetByParentId(null);
 //                    List<IpDetail> ipdetails = this.ipDetailService.selectObjByMap(null);
 //                    if(subnets.size() > 0){
 //                        for(IpDetail ipDetail : ipdetails){
@@ -211,7 +211,7 @@ public class SubnetManagerController {
             // 插入本地数据库 and 同步ipam
             // 插如一级ip网段
             Long firstSubnetId = null;
-            Subnet firstSubnet = this.zabbixSubnetService.selectObjByIp(firstIp, firstMask);
+            Subnet firstSubnet = this.subnetService.selectObjByIpAndMask(firstIp, firstMask);
             if(firstSubnet != null){
                 firstSubnetId = firstSubnet.getId();
             }
@@ -219,7 +219,7 @@ public class SubnetManagerController {
                 Subnet subnet = new Subnet();
                 subnet.setIp(IpUtil.ipConvertDec(firstIp));
                 subnet.setMask(firstMask);
-                this.zabbixSubnetService.save(subnet);
+                this.subnetService.save(subnet);
                 firstSubnetId = subnet.getId();
             }
             // 获取二级网段
@@ -230,25 +230,25 @@ public class SubnetManagerController {
                     int sequence = second.indexOf("/");
                     String ip = second.substring(0, sequence);
                     int secondMask = Integer.parseInt(second.substring(sequence + 1));
-                    Subnet secondSubnet = this.zabbixSubnetService.selectObjByIp(ip, secondMask);
+                    Subnet secondSubnet = this.subnetService.selectObjByIpAndMask(ip, secondMask);
                     if(secondSubnet == null){
                         Subnet subnet = new Subnet();
                         subnet.setIp(IpUtil.ipConvertDec(ip));
                         subnet.setMask(secondMask);
                         subnet.setParentIp(IpUtil.ipConvertDec(firstIp));
                         subnet.setParentId(firstSubnetId);
-                        this.zabbixSubnetService.save(subnet);
+                        this.subnetService.save(subnet);
                     }
                 }
                 if(obj instanceof JSONObject){
                     JSONObject object = (JSONObject) obj;
                     for (String okey : object.keySet()){
-                        String second = ((String) okey).trim();
+                        String second = okey.trim();
                         int sequence = second.indexOf("/");
                         String secondIp = second.substring(0, sequence);
                         int secondMask = Integer.parseInt(second.substring(sequence + 1));
                         Long secondSubnetId = null;
-                        Subnet secondSubnet = this.zabbixSubnetService.selectObjByIp(secondIp, secondMask);
+                        Subnet secondSubnet = this.subnetService.selectObjByIpAndMask(secondIp, secondMask);
                         if(secondSubnet != null){
                             secondSubnetId = secondSubnet.getId();
                         }
@@ -258,7 +258,7 @@ public class SubnetManagerController {
                             subnet.setMask(secondMask);
                             subnet.setParentIp(IpUtil.ipConvertDec(firstIp));
                             subnet.setParentId(firstSubnetId);
-                            this.zabbixSubnetService.save(subnet);
+                            this.subnetService.save(subnet);
                             secondSubnetId = subnet.getId();
                         }
                         JSONArray thirdArray = JSONArray.parseArray(object.get(okey).toString());
@@ -268,14 +268,14 @@ public class SubnetManagerController {
                                 int thirdSequence = third.indexOf("/");
                                 String thirdIp = third.substring(0, thirdSequence);
                                 int thirdMask = Integer.parseInt(third.substring(thirdSequence + 1));
-                                Subnet thirdSubnet = this.zabbixSubnetService.selectObjByIp(thirdIp, thirdMask);
+                                Subnet thirdSubnet = this.subnetService.selectObjByIpAndMask(thirdIp, thirdMask);
                                 if(thirdSubnet == null){
                                     Subnet subnet = new Subnet();
                                     subnet.setIp(IpUtil.ipConvertDec(thirdIp));
                                     subnet.setMask(thirdMask);
                                     subnet.setParentIp(IpUtil.ipConvertDec(secondIp));
                                     subnet.setParentId(secondSubnetId);
-                                    this.zabbixSubnetService.save(subnet);
+                                    this.subnetService.save(subnet);
                                 }
                             }
                         }
@@ -285,8 +285,7 @@ public class SubnetManagerController {
         }
         // 同步子网ip
         // 获取所有子网一级
-        List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(null);
-
+        List<Subnet> subnets = this.subnetService.selectSubnetByParentId(null);
         List<IpDetail> ipdetails = this.ipDetailService.selectObjByMap(null);
         if(subnets.size() > 0) {
             ExecutorService exe = Executors.newFixedThreadPool(subnets.size());
@@ -317,7 +316,7 @@ public class SubnetManagerController {
     @RequestMapping("/list")
     public Object list(){
         // 获取所有子网一级
-        List<Subnet> parentList = this.zabbixSubnetService.selectSubnetByParentId(null);
+        List<Subnet> parentList = this.subnetService.selectSubnetByParentId(null);
         if(parentList.size() > 0){
             for (Subnet subnet : parentList) {
                 this.genericSubnet(subnet);
@@ -340,7 +339,7 @@ public class SubnetManagerController {
      */
     @GetMapping("/update")
     public Object update(@RequestParam Long id){
-        Subnet subnet = this.zabbixSubnetService.selectObjById(id);
+        Subnet subnet = this.subnetService.selectObjById(id);
         if(subnet.getVlanId() != null){
             Vlan vlan = vlanService.selectObjById(subnet.getVlanId());
             if(vlan != null){
@@ -371,7 +370,7 @@ public class SubnetManagerController {
                 subnet.setVlanName(vlan.getName());
             }
         }
-        int i = this.zabbixSubnetService.update(subnet);
+        int i = this.subnetService.update(subnet);
         if(i >= 1){
             return ResponseUtil.ok();
         }else{
@@ -406,7 +405,7 @@ public class SubnetManagerController {
 //        // Subnet is not within boundaries of its master subnet
 //
 //        if(subnet.getParentId() != null){
-//            Subnet parentSbunet = this.zabbixSubnetService.selectObjById(subnet.getParentId());
+//            Subnet parentSbunet = this.subnetService.selectObjById(subnet.getParentId());
 //            // 此处IP为网段
 //            boolean flag = IpUtil.ipIsInNet(subnet.getIp(), parentSbunet.getIp()+"/"+parentSbunet.getMask());
 //            if(!flag){
@@ -422,7 +421,7 @@ public class SubnetManagerController {
     public Object getSubnet(@PathVariable(value = "id", required = false) Long id){
         if(id == null){
             // 获取所有子网一级
-            List<Subnet> parentList = this.zabbixSubnetService.selectSubnetByParentId(null);
+            List<Subnet> parentList = this.subnetService.selectSubnetByParentId(null);
             if(parentList.size() > 0){
                 for (Subnet subnet : parentList) {
                     this.genericSubnet(subnet);
@@ -431,13 +430,13 @@ public class SubnetManagerController {
             }
         }else{
             // 校验子网是否存在
-            Subnet subnet = this.zabbixSubnetService.selectObjById(id);
+            Subnet subnet = this.subnetService.selectObjById(id);
             if(subnet != null){
                 // 当前网段
                 Map map = new HashMap();
                 map.put("subnet", subnet);
                 // 获取从子网列表
-                List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(id);
+                List<Subnet> subnets = this.subnetService.selectSubnetByParentId(id);
                 //
                 map.put("subnets", subnets);
                 // 查询IP addresses in subnets
@@ -483,7 +482,7 @@ public class SubnetManagerController {
     @ApiOperation("删除网段")
     @DeleteMapping
     public Object delete(@RequestParam(value = "id") Long id){
-        Subnet subnet = this.zabbixSubnetService.selectObjById(id);
+        Subnet subnet = this.subnetService.selectObjById(id);
         if(subnet != null){
             // 查询子网ip地址列表
             Map params = new HashMap();
@@ -498,7 +497,7 @@ public class SubnetManagerController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-//            List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(subnet.getId());
+//            List<Subnet> subnets = this.subnetService.selectSubnetByParentId(subnet.getId());
 //            for (Subnet obj : subnets){
 //                params.clear();
 //                params.put("subnetId", obj.getId());
@@ -506,19 +505,19 @@ public class SubnetManagerController {
 //                for (Address address1 : addresses){
 //                    this.addressService.delete(address1.getId());
 //                }
-//                this.zabbixSubnetService.delete(obj.getId());
+//                this.subnetService.delete(obj.getId());
 //            }
             // 批量
 //            if(subnet != null){
 //                this.genericSubnet(subnet);
 //            }
-//            this.zabbixSubnetService.delete(id);
+//            this.subnetService.delete(id);
         }
         return ResponseUtil.ok();
     }
 
     public List<Subnet> genericSubnet(Subnet subnet){
-        List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(subnet.getId());
+        List<Subnet> subnets = this.subnetService.selectSubnetByParentId(subnet.getId());
         if(subnets.size() > 0){
             for(Subnet child : subnets){
                 List<Subnet> subnetList = genericSubnet(child);
@@ -533,7 +532,7 @@ public class SubnetManagerController {
 
 
     public void genericDel(Subnet subnet){
-        List<Subnet> childs = this.zabbixSubnetService.selectSubnetByParentId(subnet.getId());
+        List<Subnet> childs = this.subnetService.selectSubnetByParentId(subnet.getId());
         if(childs.size() > 0){
             for(Subnet child : childs){
                 genericDel(child);
@@ -546,13 +545,13 @@ public class SubnetManagerController {
         for (Address address : addresses){
             this.addressService.delete(address.getId());
         }
-        this.zabbixSubnetService.delete(subnet.getId());
+        this.subnetService.delete(subnet.getId());
     }
 
     @GetMapping("/address")
     public Object subnet(){
         // 获取所有子网一级
-        List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(null);
+        List<Subnet> subnets = this.subnetService.selectSubnetByParentId(null);
         List<IpDetail> ipdetails = this.ipDetailService.selectObjByMap(null);
             if(subnets.size() > 0){
                 for(IpDetail ipDetail : ipdetails){
@@ -573,7 +572,7 @@ public class SubnetManagerController {
     }
 
     public void genericNoSubnet(Subnet subnet, IpDetail ipDetail){
-        List<Subnet> childs = this.zabbixSubnetService.selectSubnetByParentId(subnet.getId());
+        List<Subnet> childs = this.subnetService.selectSubnetByParentId(subnet.getId());
         if(childs.size() > 0){
             for(Subnet child : childs){
                 genericNoSubnet(child, ipDetail);
@@ -603,7 +602,7 @@ public class SubnetManagerController {
     public Object picture2(){
         // 根据子网查询address
         List subnetList = new ArrayList();
-        List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(null);
+        List<Subnet> subnets = this.subnetService.selectSubnetByParentId(null);
         for(Subnet subnet : subnets){
             Set<Long> ids = this.genericSubnet(subnet.getId());
             Map params = new HashMap();
@@ -732,10 +731,10 @@ public class SubnetManagerController {
      */
     public Set<Long> genericSubnet(Long id){
         Set<Long> ids = new HashSet();
-        Subnet subnet = this.zabbixSubnetService.selectObjById(id);
+        Subnet subnet = this.subnetService.selectObjById(id);
         if(subnet != null){
             ids.add(id);
-            List<Subnet> childs = this.zabbixSubnetService.selectSubnetByParentId(subnet.getId());
+            List<Subnet> childs = this.subnetService.selectSubnetByParentId(subnet.getId());
             if(childs.size() > 0){
                 for (Subnet obj : childs){
                     Set<Long> cids = genericSubnet(obj.getId());
@@ -754,15 +753,15 @@ public class SubnetManagerController {
      */
     public List<Integer> genericSubnetIps(Long id){
         List<Integer> list = new ArrayList();
-        Subnet subnet = this.zabbixSubnetService.selectObjById(id);
+        Subnet subnet = this.subnetService.selectObjById(id);
         if(subnet != null){
             // 从属子网
-            List<Subnet> subnets = this.zabbixSubnetService.selectSubnetByParentId(subnet.getId());
+            List<Subnet> subnets = this.subnetService.selectSubnetByParentId(subnet.getId());
             if(subnets.size() > 0){
                 for (Subnet obj : subnets){
                     List<Integer> clengs = genericSubnetIps(obj.getId());
                     list.addAll(clengs);
-                    List<Subnet> csunets = this.zabbixSubnetService.selectSubnetByParentId(subnet.getId());
+                    List<Subnet> csunets = this.subnetService.selectSubnetByParentId(subnet.getId());
                     // 查询IP addresses in subnets
                     if(csunets.size() <= 0 && obj.getMask() >= 21){
                         // 获取地址列表

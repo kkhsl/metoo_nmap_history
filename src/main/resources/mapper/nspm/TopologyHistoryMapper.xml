@@ -34,6 +34,9 @@
         SELECT <include refid="Content_Column_List" />
         FROM metoo_topology_history
         <where>
+            <if test="id != null and id != ''">
+                AND  `id` = #{id}
+            </if>
             <if test="time != null">
                AND addTime = (SELECT addTime FROM metoo_topology_history WHERE addTime &lt;=#{time} ORDER BY addTime DESC limit 1)
             </if>
@@ -48,6 +51,9 @@
                 <foreach collection="groupIds" index = "index" item="item" separator="," open="(" close=")">
                     #{item}
                 </foreach>
+            </if>
+            <if test="topologyId != null and topologyId != ''">
+                AND  `id` != #{topologyId}
             </if>
         </where>
         ORDER BY is_default desc, addTime desc

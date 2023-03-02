@@ -16,9 +16,6 @@ import com.github.pagehelper.Page;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
 import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.beanutils.BeanMap;
-import org.apache.commons.lang3.StringUtils;
-import org.nutz.json.Json;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -61,7 +58,7 @@ public class TopologyManagerController {
     @Autowired
     private IRoutHistoryService routHistoryService;
     @Autowired
-    private ZabbixSubnetService zabbixSubnetService;
+    private ISubnetService zabbixSubnetService;
     @Autowired
     private INetworkElementService networkElementService;
     @Autowired

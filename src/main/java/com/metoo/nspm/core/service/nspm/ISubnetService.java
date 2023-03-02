@@ -5,11 +5,13 @@ import com.metoo.nspm.entity.nspm.Subnet;
 import java.util.List;
 import java.util.Map;
 
-public interface ZabbixSubnetService {
+public interface ISubnetService {
 
     Subnet selectObjById(Long id);
 
-    Subnet selectObjByIp(String ip, Integer mask);
+    Subnet selectObjByIp(String ip);
+
+    Subnet selectObjByIpAndMask(String ip, Integer mask);
 
     List<Subnet> selectSubnetByParentId(Long id);
 

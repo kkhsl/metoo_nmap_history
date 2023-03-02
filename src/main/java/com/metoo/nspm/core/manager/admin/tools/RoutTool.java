@@ -3,7 +3,6 @@ package com.metoo.nspm.core.manager.admin.tools;
 import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.util.StringUtil;
 import com.metoo.nspm.core.service.nspm.*;
-import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.*;
 import org.apache.commons.lang3.StringUtils;
@@ -27,13 +26,13 @@ public class RoutTool {
     @Autowired
     private IIPAddressService ipAddressServie;
     @Autowired
-    private ZabbixSubnetService subnetService;
+    private ISubnetService subnetService;
     @Autowired
     private IMacService macService;
     @Autowired
     private IMacHistoryService macHistoryService;
     @Autowired
-    private ZabbixSubnetService zabbixSubnetService;
+    private ISubnetService zabbixSubnetService;
     @Autowired
     private IIPAddressHistoryService ipAddressHistoryServie;
     @Autowired
