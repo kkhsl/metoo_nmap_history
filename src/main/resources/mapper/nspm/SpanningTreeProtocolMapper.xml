@@ -43,7 +43,7 @@
                 AND device_uuid = #{deviceUuid}
             </if>
             <if test="vlan != null and vlan != ''">
-                AND vlan = #{vlan}
+                AND vlan =  '%{vlan}%'
             </if>
             <if test="ifRoot != null and ifRoot != ''">
                 AND if_root = #{ifRoot}

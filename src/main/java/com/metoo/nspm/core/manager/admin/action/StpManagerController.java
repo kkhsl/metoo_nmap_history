@@ -7,6 +7,7 @@ import com.metoo.nspm.entity.nspm.MacTemp;
 import com.metoo.nspm.entity.nspm.SpanningTreeProtocol;
 import io.swagger.annotations.ApiOperation;
 import javafx.scene.SnapshotParameters;
+import org.apache.commons.lang3.StringUtils;
 import org.nutz.lang.random.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -48,10 +49,23 @@ public class StpManagerController {
     @GetMapping("/get/root/info")
     public Object getRootInfo(@RequestParam String vlan){
         Map params = new HashMap();
-        params.put("vlan", vlan);
         List<SpanningTreeProtocol> snapshotParametersList = this.spanningTreeProtocolService.selectObjByMap(params);
-        if(snapshotParametersList.size() > 0){
-            SpanningTreeProtocol spanningTreeProtocol = snapshotParametersList.get(0);
+        boolean flag = false;
+        SpanningTreeProtocol instance = null;
+        for(SpanningTreeProtocol spanningTreeProtocol : snapshotParametersList){
+            if(StringUtils.isNotEmpty(spanningTreeProtocol.getVlan())){
+                String[] vlans = spanningTreeProtocol.getVlan().split(",");
+                for (String s : vlans) {
+                    if(s.equals(vlan)){
+                        flag = true;
+                        instance = spanningTreeProtocol;
+                    }
+                }
+            }
+        }
+        if(/*snapshotParametersList.size() > 0*/ instance != null && flag){
+//            SpanningTreeProtocol spanningTreeProtocol = snapshotParametersList.get(0);
+            SpanningTreeProtocol spanningTreeProtocol = instance;
             params.clear();
             params.put("instance", spanningTreeProtocol.getInstance());
             params.put("ifRoot", 1);
