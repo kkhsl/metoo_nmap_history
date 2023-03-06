@@ -5,6 +5,7 @@ import com.metoo.nspm.core.service.nspm.IMacHistoryService;
 import com.metoo.nspm.core.service.nspm.IMacService;
 import com.metoo.nspm.core.service.nspm.IMacVendorService;
 import com.metoo.nspm.core.service.nspm.INetworkElementService;
+import com.metoo.nspm.core.utils.MyStringUtils;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.MacDTO;
@@ -58,7 +59,7 @@ public class MacManagerController {
                     params.clear();
                     if (mac.getMac() != null && !mac.getMac().equals("")) {
                         String macAddr = mac.getMac();
-                        int index = com.metoo.nspm.core.utils.StringUtils.acquireCharacterPosition(macAddr, ":", 3);
+                        int index = MyStringUtils.acquireCharacterPosition(macAddr, ":", 3);
                         if(index != -1){
                             macAddr = macAddr.substring(0, index);
                             params.put("mac", macAddr);

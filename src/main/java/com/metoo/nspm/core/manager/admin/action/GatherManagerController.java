@@ -102,6 +102,23 @@ public class GatherManagerController {
         }
     }
 
+    @RequestMapping("gatherSpanningTreeProtocol")
+    public void gatherStp(){
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        Date date = cal.getTime();
+        try {
+            System.out.println("采集开始");
+            StopWatch watch = StopWatch.createStarted();
+            this.gatherService.gatherSpanningTreeProtocol(date);
+            watch.stop();
+            System.out.println("采集总耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

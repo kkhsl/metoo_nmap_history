@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.metoo.nspm.core.mapper.nspm.SpanningTreeProtocolMapper">
+
+    <resultMap id="Base_Result_Map" type="com.metoo.nspm.entity.nspm.SpanningTreeProtocol">
+        <id column="id" property="id"></id>
+        <result column="device_name" property="deviceName"></result>
+        <result column="device_uuid" property="deviceUuid"></result>
+        <result column="instance" property="instance"></result>
+        <result column="vlan" property="vlan"></result>
+        <result column="root" property="root"></result>
+        <result column="if_root" property="ifRoot"></result>
+        <result column="port_index" property="portIndex"></result>
+        <result column="port_name" property="portName"></result>
+        <result column="port_role" property="portRole"></result>
+        <result column="port_status" property="portStatus"></result>
+        <result column="remote_device" property="remoteDevice"></result>
+        <result column="remote_uuid" property="remoteUuid"></result>
+        <result column="remote_port" property="remotePort"></result>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+         id, addTime, deleteStatus, device_name, device_uuid, instance, vlan, root, if_root, port_index, port_name,
+         port_role, port_status, remote_device, remote_uuid, remote_port
+    </sql>
+
+    <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_stp
+        <where>
+            <if test="deviceName != null and deviceName != ''">
+                AND device_name = #{deviceName}
+            </if>
+            <if test="portName != null and portName != ''">
+                AND port_name = #{portName}
+            </if>
+            <if test="instance != null and instance != ''">
+                AND instance = #{instance}
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND device_uuid = #{deviceUuid}
+            </if>
+            <if test="vlan != null and vlan != ''">
+                AND vlan = #{vlan}
+            </if>
+            <if test="ifRoot != null and ifRoot != ''">
+                AND if_root = #{ifRoot}
+            </if>
+            <if test="portRole != null and portRole != ''">
+                AND port_role = #{portRole}
+            </if>
+        </where>
+    </select>
+
+    <update id="truncateTable">
+        TRUNCATE TABLE metoo_stp;
+    </update>
+
+    <insert id="copyMacTemp">
+        INSERT INTO metoo_stp SELECT * FROM metoo_stp_temp
+    </insert>
+
+</mapper>

@@ -12,7 +12,7 @@ import com.metoo.nspm.core.service.api.zabbix.ZabbixItemService;
 import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.service.topo.ITopoNodeService;
 import com.metoo.nspm.core.service.zabbix.ItemService;
-import com.metoo.nspm.core.utils.SystemOutputLogUtils;
+import com.metoo.nspm.core.utils.MyStringUtils;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.core.utils.network.IpV4Util;
 import com.metoo.nspm.entity.nspm.*;
@@ -21,7 +21,6 @@ import com.metoo.nspm.entity.zabbix.ItemTag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Test;
-import org.nutz.lang.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.lang.Thread.sleep;
@@ -67,6 +68,10 @@ public class ItemServiceImpl implements ItemService {
     private ITopologyService topologyService;
     @Autowired
     private MacUtil macUtil;
+    @Autowired
+    private ISpanningTreeProtocolTempService spanningTreeProtocolTempService;
+    @Autowired
+    private IMacService macService;
 
     public static void main(String[] args) throws Exception {
         List<String> strList = Arrays.asList("a", "b", "c", "d", "e");
@@ -616,9 +621,9 @@ public class ItemServiceImpl implements ItemService {
                                 if(macs.size() == 0){
                                     if(macTemp.getTag() == null || "".equals(macTemp.getTag())){
                                         if(macTemp.getType() != null && "local".equals(macTemp.getType())
-                                                && macTemp.getMac().contains("0:0:5e:0")){
+                                                && macTemp.getMac().contains("00:00:5e")){
                                             macTemp.setTag("LV");
-                                        }else if(macTemp.getMac().contains("0:0:5e:0")){
+                                        }else if(macTemp.getMac().contains("00:00:5e")){
                                             macTemp.setTag("V");
                                         }
                                     }
@@ -728,8 +733,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void gatherMacBatch(Date time){
         StopWatch watch = StopWatch.createStarted();
-//        List<MacTemp> batchInsert = new ArrayList<>();
-        List<MacTemp> batchInsert = Collections.synchronizedList(new ArrayList<>());
+        List<MacTemp> batchInsert = new ArrayList<>();
+//        List<MacTemp> batchInsert = Collections.synchronizedList(new ArrayList<>());
         List<Map> devices = this.topoNodeService.queryNetworkElement();
         if (devices != null && devices.size() > 0) {
             Map params = new HashMap();
@@ -746,7 +751,7 @@ public class ItemServiceImpl implements ItemService {
                 params.clear();
                 params.put("ip", ip);
                 params.put("tag", "macvlan");
-                List<Item> vlanMacList = itemMapper.gatherItemByTag(params);
+                List<Item> vlanMacList = itemMapper.gatherItemByTagAndRtdata(params);
                 Map<String, String> macMap = null;
                 if(vlanMacList.size() > 0){
                     macMap = this.macVlan(vlanMacList);
@@ -760,7 +765,7 @@ public class ItemServiceImpl implements ItemService {
                 params.put("index_relevance", "ifindex");
                 params.put("name_relevance", "ifname");
                 params.put("clock", DateTools.getMinTime(-1));
-                List<Item> items = itemMapper.gatherItemByTagAndClock(params);
+                List<Item> items = itemMapper.gatherItemByTagAndRtdata(params);
 //                List<Item> items = itemMapper.gatherItemByTag(params);
                 if (items.size() > 0) {
                     final  Map<String, String> macVlan = macMap;
@@ -820,7 +825,7 @@ public class ItemServiceImpl implements ItemService {
                 params.put("index_relevance", "ifindex");
                 params.put("name_relevance", "ifname");
                 params.put("clock", DateTools.getMinTime(-1));
-                List<Item> itemTagList = itemMapper.gatherItemByTagAndClock(params);
+                List<Item> itemTagList = itemMapper.gatherItemByTagAndRtdata(params);
 //                List<Item> itemTagList = itemMapper.gatherItemByTag(params);
                 // Begin(item)
                 if (itemTagList.size() > 0) {
@@ -883,9 +888,9 @@ public class ItemServiceImpl implements ItemService {
                                     && !macTemp.getMac().equals("{#IFMAC}")){
                                 if(macTemp.getTag() == null || "".equals(macTemp.getTag())){
                                     if(macTemp.getType() != null && "local".equals(macTemp.getType())
-                                            && macTemp.getMac().contains("0:0:5e:0")){
+                                            && macTemp.getMac().contains("00:00:5e")){
                                         macTemp.setTag("LV");
-                                    }else if(macTemp.getMac().contains("0:0:5e:0")){
+                                    }else if(macTemp.getMac().contains("00:00:5e")){
                                         macTemp.setTag("V");
                                     }
                                 }
@@ -901,7 +906,7 @@ public class ItemServiceImpl implements ItemService {
                     params.put("index_relevance", "ifindex");
                     params.put("name_relevance", "ifname");
                     params.put("clock", DateTools.getMinTime(-1));
-                    List<Item> arpList = itemMapper.gatherItemByTagAndClock(params);
+                    List<Item> arpList = itemMapper.gatherItemByTagAndRtdata(params);
 //                    List<Item> arpList = itemMapper.gatherItemByTag(params);
                     if (arpList.size() > 0) {
                         arpList.parallelStream().forEach(item -> {
@@ -1142,9 +1147,9 @@ public class ItemServiceImpl implements ItemService {
                                 && !macTemp.getMac().equals("{#IFMAC}")) {
                             if (macTemp.getTag() == null || "".equals(macTemp.getTag())) {
                                 if (macTemp.getType() != null && "local".equals(macTemp.getType())
-                                        && macTemp.getMac().contains("0:0:5e:0")) {
+                                        && macTemp.getMac().contains("00:00:5e")) {
                                     macTemp.setTag("LV");
-                                } else if (macTemp.getMac().contains("0:0:5e:0")) {
+                                } else if (macTemp.getMac().contains("00:00:5e")) {
                                     macTemp.setTag("V");
                                 }
                             }
@@ -1553,7 +1558,7 @@ public class ItemServiceImpl implements ItemService {
                         params.clear();
                         params.put("ip", ip);
                         params.put("tag", "macvlan");
-                        List<Item> vlanMacList = itemMapper.gatherItemByTag(params);
+                        List<Item> vlanMacList = itemMapper.gatherItemByTagAndRtdata(params);
                         Map<String, String> macMap = null;
                         if(vlanMacList.size() > 0){
                             macMap = macVlan(vlanMacList);
@@ -1566,7 +1571,7 @@ public class ItemServiceImpl implements ItemService {
                         params.put("index", "ifindex");
                         params.put("index_relevance", "ifindex");
                         params.put("name_relevance", "ifname");
-                        List<Item> items = itemMapper.gatherItemByTag(params);
+                        List<Item> items = itemMapper.gatherItemByTagAndRtdata(params);
                         if (items.size() > 0) {
                             final  Map<String, String> macVlan = macMap;
                             items.parallelStream().forEach(item -> {
@@ -1624,7 +1629,7 @@ public class ItemServiceImpl implements ItemService {
                         params.put("tag_relevance", "ifbasic");
                         params.put("index_relevance", "ifindex");
                         params.put("name_relevance", "ifname");
-                        List<Item> itemTagList = itemMapper.gatherItemByTag(params);
+                        List<Item> itemTagList = itemMapper.gatherItemByTagAndRtdata(params);
                         // Begin(item)
                         if (itemTagList.size() > 0) {
                             final  Map<String, String> macVlan = macMap;
@@ -1686,9 +1691,9 @@ public class ItemServiceImpl implements ItemService {
                                             && !macTemp.getMac().equals("{#IFMAC}")){
                                         if(macTemp.getTag() == null || "".equals(macTemp.getTag())){
                                             if(macTemp.getType() != null && "local".equals(macTemp.getType())
-                                                    && macTemp.getMac().contains("0:0:5e:0")){
+                                                    && macTemp.getMac().contains("00:00:5e")){
                                                 macTemp.setTag("LV");
-                                            }else if(macTemp.getMac().contains("0:0:5e:0")){
+                                            }else if(macTemp.getMac().contains("00:00:5e")){
                                                 macTemp.setTag("V");
                                             }
                                         }
@@ -1703,7 +1708,7 @@ public class ItemServiceImpl implements ItemService {
                             params.put("tag_relevance", "ifbasic");
                             params.put("index_relevance", "ifindex");
                             params.put("name_relevance", "ifname");
-                            List<Item> arpList = itemMapper.gatherItemByTag(params);
+                            List<Item> arpList = itemMapper.gatherItemByTagAndRtdata(params);
                             if (arpList.size() > 0) {
                                 arpList.parallelStream().forEach(item -> {
                                     List<ItemTag> tags = item.getItemTags();
@@ -1901,7 +1906,7 @@ public class ItemServiceImpl implements ItemService {
                                     }
                                     routedest = dest.toString();
                                     routTemp.setDestination(IpUtil.ipConvertDec(dest.toString()));
-                                    if(com.metoo.nspm.core.utils.StringUtils.isInteger(mask)){
+                                    if(com.metoo.nspm.core.utils.MyStringUtils.isInteger(mask)){
                                         routTemp.setMaskBit(Integer.parseInt(mask));
                                         String mk = IpUtil.bitMaskConvertMask(Integer.parseInt(mask));
                                         routTemp.setMask(mk);
@@ -2127,6 +2132,263 @@ public class ItemServiceImpl implements ItemService {
             }
         }
     }
+
+    @Override
+    public void gatherStp(Date time) {
+//        StopWatch watch = StopWatch.createStarted();
+        List<Map> devices = this.topoNodeService.queryNetworkElement();
+        if (devices != null && devices.size() > 0) {
+
+            this.spanningTreeProtocolTempService.truncateTable();
+
+            ExecutorService exe = Executors.newFixedThreadPool(devices.size());
+            List<SpanningTreeProtocol> batchInsert = new Vector<>();
+            Map params = new HashMap();
+            devices.stream().forEach(item -> {
+                String deviceName = String.valueOf(item.get("deviceName"));
+                String deviceIp = String.valueOf(item.get("ip"));
+                String deviceUuid = String.valueOf(item.get("uuid"));
+                params.clear();
+                params.put("ip", deviceIp);
+                params.put("tag", "mstpport");
+                params.put("index", "portindex");
+                params.put("tag_relevance", "ifbasic");
+                params.put("index_relevance", "ifindex");
+                params.put("name_relevance", "ifname");
+                List<Item> items = this.itemMapper.gatherItemBySTP(params);
+                if(items.size() > 0){
+                   exe.execute(new Thread(() -> {
+                       synchronized (this){
+                           items.stream().forEach(mstpport ->{
+                               SpanningTreeProtocol stp = new SpanningTreeProtocol();
+                               stp.setAddTime(time);
+                               stp.setDeviceName(deviceName);
+                               stp.setDeviceUuid(deviceUuid);
+                               List<ItemTag> tags = mstpport.getItemTags();
+                               if(tags != null && tags.size() > 0){
+                                   tags.stream().forEach(tag -> {
+                                       String value = tag.getValue();
+                                       if(tag.getTag().equals("portindex")){
+                                           int i = MyStringUtils.acquireCharacterPosition(value, "\\.", 1);
+                                           if(i != -1){
+                                               String instance = value.substring(0, i);
+                                               String portindex = value.substring(i + 1);
+                                               stp.setInstance(instance);
+                                               stp.setPortIndex(portindex);
+                                               stp.setPortName(tag.getName());
+                                           }
+                                       }
+                                       if(tag.getTag().equals("portrole")){
+                                           stp.setPortRole(value);
+                                       }
+                                       if(tag.getTag().equals("portstatus")){
+                                           stp.setPortStatus(value);
+                                       }
+                                   });
+                               }
+                               batchInsert.add(stp);
+                           });
+                       }
+                   }));
+                }
+            });
+            if(exe != null){
+                exe.shutdown();
+            }
+            while (true) {
+                if (exe.isTerminated()) {
+                    // 写入
+                    if(batchInsert.size() > 0){
+                        // 批量
+                        this.spanningTreeProtocolTempService.batchInsert(batchInsert);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void gathermstpinstance(Date time) {
+//        StopWatch watch = StopWatch.createStarted();
+        List<Map> devices = this.topoNodeService.queryNetworkElement();
+        if (devices != null && devices.size() > 0) {
+
+            ExecutorService exe = Executors.newFixedThreadPool(devices.size());
+//            List<SpanningTreeProtocol> list = new Vector<>();
+            Map params = new HashMap();
+            devices.stream().forEach(item -> {
+                String deviceIp = String.valueOf(item.get("ip"));
+                String deviceUuid = String.valueOf(item.get("uuid"));
+                params.clear();
+                params.put("ip", deviceIp);
+                params.put("tag", "mstpinstance");
+                List<Item> items = this.itemMapper.selectItemTagByMap(params);
+                if (items.size() > 0) {
+//                    exe.execute(new Thread(() -> {
+//                        synchronized (this) {
+                            items.stream().forEach(mstpport -> {
+                                List<SpanningTreeProtocol> list = new Vector<>();
+                                List<ItemTag> tags = mstpport.getItemTags();
+                                if (tags != null && tags.size() > 0) {
+                                    SpanningTreeProtocol stp = new SpanningTreeProtocol();
+                                    tags.stream().forEach(tag -> {
+                                        String value = tag.getValue();
+                                        if (tag.getTag().equals("instance")) {
+                                            stp.setInstance(value);
+                                        }
+                                        if (tag.getTag().equals("vlan")) {
+                                            stp.setVlan(value);
+                                        }
+                                    });
+//                                    List<SpanningTreeProtocol> instances = this.spanningTreeProtocolTempService.selectObjByInstance(stp.getInstance());
+                                    params.clear();
+                                    params.put("deviceUuid", deviceUuid);
+                                    params.put("instance", stp.getInstance());
+                                    List<SpanningTreeProtocol> instances = this.spanningTreeProtocolTempService.selectObjByMap(params);
+                                    if(instances.size() > 0){
+                                        instances.stream().forEach(e ->{
+                                            if(StringUtils.isNotEmpty(e.getVlan())){
+                                                e.setVlan(e.getVlan() + "," +stp.getVlan());
+                                            }else{
+                                                e.setVlan(stp.getVlan());
+                                            }
+                                        });
+                                        list.addAll(instances);
+                                        this.spanningTreeProtocolTempService.batchUpdate(list);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                  );
+// );
+//                }
+//            });
+//            if(exe != null){
+//                exe.shutdown();
+//            }
+//            while (true) {
+//                if (exe.isTerminated()) {
+//                    // 写入
+//                    if(list.size() > 0){
+//                        // 批量
+//                        this.spanningTreeProtocolTempService.batchUpdate(list);
+//                    }
+//                    break;
+//                }
+//            }
+        }
+    }
+
+    @Override
+    public void gathermstpDR(Date time) {
+//        StopWatch watch = StopWatch.createStarted();
+        List<Map> devices = this.topoNodeService.queryNetworkElement();
+        if (devices != null && devices.size() > 0) {
+
+            ExecutorService exe = Executors.newFixedThreadPool(devices.size());
+            List<SpanningTreeProtocol> list = new Vector<>();
+            Map params = new HashMap();
+            devices.stream().forEach(item -> {
+                String deviceIp = String.valueOf(item.get("ip"));
+                String deviceUuid = String.valueOf(item.get("uuid"));
+                params.clear();
+                params.put("ip", deviceIp);
+                params.put("tag", "mstpDR");
+                List<Item> items = this.itemMapper.selectItemTagByMap(params);
+                if (items.size() > 0) {
+                    exe.execute(new Thread(() -> {
+                        synchronized (this) {
+                            items.stream().forEach(mstpport -> {
+                                List<ItemTag> tags = mstpport.getItemTags();
+                                if (tags != null && tags.size() > 0) {
+                                    SpanningTreeProtocol stp = new SpanningTreeProtocol();
+                                    tags.stream().forEach(tag -> {
+                                        String value = tag.getValue();
+                                        if (tag.getTag().equals("instance")) {
+                                            stp.setInstance(value);
+                                        }
+                                        if (tag.getTag().equals("rootid")) {
+                                            if(StringUtils.isNotEmpty(value)){
+                                                int n = MyStringUtils.appearNumber(value, " ");
+                                                if(n >= 7){
+                                                    int i = MyStringUtils.acquireCharacterPosition(value, " ", 2);
+                                                    String mac = value.trim().substring(i +1);
+                                                    mac = mac.replaceAll(" ", ":");
+                                                    stp.setRoot(mac);
+                                                }
+                                            }
+                                        }
+                                    });
+                                    params.clear();
+                                    params.put("deviceUuid", deviceUuid);
+                                    params.put("instance", stp.getInstance());
+                                    List<SpanningTreeProtocol> instances = this.spanningTreeProtocolTempService.selectObjByMap(params);
+                                    if(instances.size() > 0){
+                                        instances.stream().forEach(e ->{
+                                            String mac = stp.getRoot();
+                                            params.clear();
+                                            params.put("mac", mac);
+                                            params.put("tag", "L");
+                                            params.put("uuid", deviceUuid);
+                                            List<Mac> macs = this.macMapper.selectByMap(params);
+                                            if(macs.size() > 0){
+                                                e.setIfRoot("1");
+                                            }else{
+                                                e.setIfRoot("0");
+                                            }
+                                            e.setRoot(mac);
+                                        });
+                                        list.addAll(instances);
+                                    }
+                                }
+                            });
+                        }
+                    }));
+                }
+            });
+            if(exe != null){
+                exe.shutdown();
+            }
+            while (true) {
+                if (exe.isTerminated()) {
+                    // 写入
+                    if(list.size() > 0){
+                        // 批量
+                        this.spanningTreeProtocolTempService.batchUpdate(list);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void writeStpRemote() {
+        // remote
+        Map params = new HashMap();
+        List<SpanningTreeProtocol> stps = this.spanningTreeProtocolTempService.selectObjByMap(params);
+        List list = new Vector();
+        stps.stream().forEach(e -> {
+            params.clear();
+            params.put("uuid", e.getDeviceUuid());
+            params.put("interfaceName", e.getPortName());
+            params.put("tag", "DE");
+            List<Mac> macs = this.macService.selectByMap(params);
+            if(macs.size() > 0){
+                Mac mac = macs.get(0);
+                e.setRemoteDevice(mac.getRemoteDevice());
+                e.setRemoteUuid(mac.getRemoteUuid());
+                e.setRemotePort(mac.getRemoteInterface());
+                list.add(e);
+            }
+        });
+        if(list.size() > 0){
+            this.spanningTreeProtocolTempService.batchUpdate(list);
+        }
+    }
+
 
     @Override
     public List<Item> selectTagByMap(Map params) {

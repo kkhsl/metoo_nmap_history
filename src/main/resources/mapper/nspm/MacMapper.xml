@@ -127,16 +127,16 @@
         SELECT <include refid="Ntoa_Column_List" />
         FROM rsms_mac
         <where>
-            <if test="mac != null">
+            <if test="mac != null and mac != ''">
                 AND mac = #{mac}
             </if>
-            <if test="deviceName != null">
+            <if test="deviceName != null and deviceName != ''">
                 AND device_name = #{deviceName}
             </if>
-            <if test="interfaceName != null">
+            <if test="interfaceName != null and interfaceName != ''">
                 AND interface_name = #{interfaceName}
             </if>
-            <if test="tag != null">
+            <if test="tag != null and tag != ''">
                 AND tag = #{tag}
             </if>
             <if test="other != null">

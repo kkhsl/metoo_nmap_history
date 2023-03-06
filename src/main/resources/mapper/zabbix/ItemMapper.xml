@@ -136,10 +136,79 @@
                     '{#IFINDEX}', '{#IPADDR}','{#IPARP}', '{#IFOPERSTATUS}',
                     '{#IFALIAS}', '{#IFSPEED}', '{#RTIF}',
                     '{#RTPROTO}','{#RTDEST}', '{#RTMETRIC}','{#RTNH}',
-                   '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}')
+                   '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}', '{#SNMPINDEX}')
             )
         )tag
           on tag.itemid = item_tag.itemid
+    </select>
+
+    <select id="gatherItemBySTP" parameterType="java.util.Map" resultMap="ItemArp_Result_Map">
+        SELECT
+        item_external.*,
+                IF(item_external.tag = #{index},(
+                    SELECT `value`
+                    FROM item_tag tag_inner
+                    WHERE itemid in (
+                        SELECT item_tag.itemid
+                        FROM (
+                                SELECT *
+                                FROM item_tag
+                                WHERE itemid
+                                IN (
+                                    SELECT itemid
+                                    FROM interface
+                                    JOIN items
+                                    ON
+                                        interface.hostid = items.hostid
+                            WHERE interface.ip = #{ip})
+                            AND `value` = #{tag_relevance}
+                            GROUP BY itemid
+                            ORDER BY itemid
+                            DESC
+                        ) items
+                        JOIN item_tag
+                        ON item_tag.itemid = items.itemid
+                        WHERE item_tag.`value` = substring_index(item_external.`value`, '.', -1)
+                        AND item_tag.tag = #{index_relevance}
+                )
+                AND tag_inner.tag = #{name_relevance}
+            ), NULL) AS name
+        FROM (
+            SELECT *
+            FROM item_tag
+            WHERE itemid
+            IN (
+                SELECT itemid
+                FROM interface
+                JOIN items
+                ON
+									interface.hostid = items.hostid
+								where
+									interface.ip = #{ip}
+                )
+                AND `value` = #{tag}
+                GROUP BY itemid
+                ORDER BY itemid
+                DESC
+           )items
+        JOIN
+					item_tag item_external
+        ON
+					item_external.itemid = items.itemid
+        WHERE
+          item_external.itemid
+        NOT IN(
+            SELECT DISTINCT(itemid)
+            FROM item_tag
+            WHERE
+             item_tag.`value`
+            IN(
+                '{#IFMASK}', '{#IFNAME}', '{#IFMAC}',
+                '{#IFINDEX}', '{#IPADDR}','{#IPARP}', '{#IFOPERSTATUS}',
+                '{#IFALIAS}', '{#IFSPEED}', '{#RTIF}',
+                '{#RTPROTO}','{#RTDEST}', '{#RTMETRIC}','{#RTNH}',
+                '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}', '{#SNMPINDEX}')
+            )
     </select>
 
 
@@ -192,7 +261,8 @@
                 '{#IFINDEX}', '{#IPADDR}','{#IPARP}', '{#IFOPERSTATUS}',
                 '{#IFALIAS}', '{#IFSPEED}', '{#RTIF}',
                 '{#RTPROTO}','{#RTDEST}', '{#RTMETRIC}','{#RTNH}',
-                '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}')
+                '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}',
+                '{#SNMPINDEX}')
             )
     </select>
 
@@ -308,53 +378,55 @@
     </select>
 
     <select id="gatherItemByTagAndClock" parameterType="java.util.Map" resultMap="ItemArp_Result_Map">
-            SELECT item_external.*,
-                IF(item_external.tag = #{index},(
-                    SELECT `value`
-                    FROM item_tag tag_inner
-                    WHERE itemid in (
-                        SELECT item_tag.itemid
-                        FROM (
-                                SELECT *
-                                FROM item_tag
-                                WHERE itemid
-                                IN (
-                                    SELECT itemid
-                                    FROM interface
-                                    JOIN items
-                                    ON
-                                        interface.hostid = items.hostid
-                            WHERE interface.ip = #{ip})
-                            AND `value` = #{tag_relevance}
-                            GROUP BY itemid
-                            ORDER BY itemid
-                            DESC
-                        ) items
-                        JOIN item_tag
-                        ON item_tag.itemid = items.itemid
-                        WHERE item_tag.`value` = item_external.`value`
-                        AND item_tag.tag = #{index_relevance}
-                )
-                AND tag_inner.tag = #{name_relevance}
-            ), NULL) AS name
-        FROM (
-                SELECT *
-                FROM item_tag
-                WHERE itemid
-                IN (
-                    SELECT itemid
-                    FROM interface
-                    JOIN items
-                    ON
-                        interface.hostid = items.hostid
-            WHERE interface.ip = #{ip}	AND available = 1)
-            AND `value` = #{tag}
-            GROUP BY itemid
-            ORDER BY itemid
-            DESC
-        ) items
-        JOIN item_tag item_external
-        ON item_external.itemid = items.itemid
+            SELECT item_tag* FROM(
+                SELECT item_external.*,
+                    IF(item_external.tag = #{index},(
+                        SELECT `value`
+                        FROM item_tag tag_inner
+                        WHERE itemid in (
+                            SELECT item_tag.itemid
+                            FROM (
+                                    SELECT *
+                                    FROM item_tag
+                                    WHERE itemid
+                                    IN (
+                                        SELECT itemid
+                                        FROM interface
+                                        JOIN items
+                                        ON
+                                            interface.hostid = items.hostid
+                                WHERE interface.ip = #{ip})
+                                AND `value` = #{tag_relevance}
+                                GROUP BY itemid
+                                ORDER BY itemid
+                                DESC
+                            ) items
+                            JOIN item_tag
+                            ON item_tag.itemid = items.itemid
+                            WHERE item_tag.`value` = item_external.`value`
+                            AND item_tag.tag = #{index_relevance}
+                    )
+                    AND tag_inner.tag = #{name_relevance}
+                ), NULL) AS name
+            FROM (
+                    SELECT *
+                    FROM item_tag
+                    WHERE itemid
+                    IN (
+                        SELECT itemid
+                        FROM interface
+                        JOIN items
+                        ON
+                            interface.hostid = items.hostid
+                WHERE interface.ip = #{ip}	AND available = 1)
+                AND `value` = #{tag}
+                GROUP BY itemid
+                ORDER BY itemid
+                DESC
+            ) items
+            JOIN item_tag item_external
+            ON item_external.itemid = items.itemid
+            )item_tag
         JOIN
             (
                 SELECT
@@ -378,9 +450,9 @@
                   asc
             )str
         ON
-            str.itemid = items.itemid
+            str.itemid = item_tag.itemid
         WHERE
-          item_external.itemid
+          item_tag.itemid
             NOT IN(
                     SELECT DISTINCT(itemid) FROM item_tag
                     WHERE
@@ -388,6 +460,81 @@
                     IN('{#IFMASK}', '{#IFNAME}', '{#IFMAC}', '{#IFINDEX}', '{#IPADDR}','{#IPARP}', '{#IFOPERSTATUS}', '{#IFALIAS}', '{#IFRECEIVED}', '{#IFSPEED}', '{#RTIF}', '{#RTPROTO}','{#RTDEST}', '{#RTMETRIC}','{#RTNH}',
                 '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}', '{#SNMPINDEX}')
                 )
+    </select>
+
+    <select id="gatherItemByTagAndRtdata" parameterType="java.util.Map" resultMap="ItemArp_Result_Map">
+             SELECT item_tag.* FROM(
+                SELECT item_external.*,
+                            IF(item_external.tag = #{index},(
+                                SELECT `value`
+                                FROM item_tag tag_inner
+                                WHERE itemid in (
+                                    SELECT item_tag.itemid
+                                    FROM (
+                                            SELECT *
+                                            FROM item_tag
+                                            WHERE itemid
+                                            IN (
+                                                SELECT itemid
+                                                FROM interface
+                                                JOIN items
+                                                ON
+                                                    interface.hostid = items.hostid
+                                        WHERE interface.ip = #{ip})
+                                        AND `value` = #{tag_relevance}
+                                        GROUP BY itemid
+                                        ORDER BY itemid
+                                        DESC
+                                    ) items
+                                    JOIN item_tag
+                                    ON item_tag.itemid = items.itemid
+                                    WHERE item_tag.`value` = item_external.`value`
+                                    AND item_tag.tag = #{index_relevance}
+                            )
+                            AND tag_inner.tag = #{name_relevance}
+                        ), NULL) AS name
+                    FROM (
+                            SELECT *
+                            FROM item_tag
+                            WHERE itemid
+                            IN (
+                                SELECT itemid
+                                FROM interface
+                                JOIN items
+                                ON
+                                    interface.hostid = items.hostid
+                        WHERE interface.ip = #{ip}	AND available = 1)
+                        AND `value` = #{tag}
+                        GROUP BY itemid
+                        ORDER BY itemid
+                        DESC
+                    ) items
+                    JOIN item_tag item_external
+                    ON item_external.itemid = items.itemid
+            )item_tag
+
+                    JOIN
+                            (
+                                SELECT
+                                    itemid
+                                FROM
+                                    item_rtdata
+                                WHERE
+                                    error = ''
+
+                            )rtdata
+                    ON
+                        rtdata.itemid = item_tag.itemid
+
+                    WHERE
+                      item_tag.itemid
+                        NOT IN(
+                                SELECT DISTINCT(itemid) FROM item_tag
+                                WHERE
+                                 item_tag.`value`
+                                IN('{#IFMASK}', '{#IFNAME}', '{#IFMAC}', '{#IFINDEX}', '{#IPADDR}','{#IPARP}', '{#IFOPERSTATUS}', '{#IFALIAS}', '{#IFRECEIVED}', '{#IFSPEED}', '{#RTIF}', '{#RTPROTO}','{#RTDEST}', '{#RTMETRIC}','{#RTNH}',
+                            '{#PORTINDEX}', '{#MAC}', '{#IFIPADDR}', '{#IFSENT}', '{#SNMPINDEX}')
+                            )
     </select>
 
     <select id="gatherItemByTagAndIndex" parameterType="java.util.Map" resultMap="ItemArp_Result_Map">

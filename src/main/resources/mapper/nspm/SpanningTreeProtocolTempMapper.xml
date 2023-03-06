@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.metoo.nspm.core.mapper.nspm.SpanningTreeProtocolTempMapper">
+
+    <resultMap id="Base_Result_Map" type="com.metoo.nspm.entity.nspm.SpanningTreeProtocol">
+        <id column="id" property="id"></id>
+        <result column="device_name" property="deviceName"></result>
+        <result column="device_uuid" property="deviceUuid"></result>
+        <result column="instance" property="instance"></result>
+        <result column="vlan" property="vlan"></result>
+        <result column="root" property="root"></result>
+        <result column="if_root" property="ifRoot"></result>
+        <result column="port_index" property="portIndex"></result>
+        <result column="port_name" property="portName"></result>
+        <result column="port_role" property="portRole"></result>
+        <result column="port_status" property="portStatus"></result>
+        <result column="remote_device" property="remoteDevice"></result>
+        <result column="remote_uuid" property="remoteUuid"></result>
+        <result column="remote_port" property="remotePort"></result>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+         id, addTime, deleteStatus, device_name, device_uuid, instance, vlan, root, if_root, port_index, port_name,
+         port_role, port_status, remote_device, remote_uuid, remote_port
+    </sql>
+
+    <select id="selectObjByInstance" parameterType="java.lang.String" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_stp_temp
+        WHERE
+          instance = #{instance}
+    </select>
+
+    <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_stp_temp
+        <where>
+            <if test="deviceName != null and deviceName != ''">
+                AND device_name = #{deviceName}
+            </if>
+            <if test="portName != null and portName != ''">
+                AND port_name = #{portName}
+            </if>
+            <if test="instance != null and instance != ''">
+                AND instance = #{instance}
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND device_uuid = #{deviceUuid}
+            </if>
+        </where>
+    </select>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+          INSERT INTO metoo_stp_temp (
+                    addTime,
+                    device_name,
+                    device_uuid,
+                    instance,
+                    port_index,
+                    port_name,
+                    port_role,
+                    port_status
+        )
+        VALUES
+        <foreach collection ="list" item="item" separator ="," >
+            (
+                #{item.addTime},
+                #{item.deviceName},
+                #{item.deviceUuid},
+                #{item.instance},
+                #{item.portIndex},
+                #{item.portName},
+                #{item.portRole},
+                #{item.portStatus}
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdate" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE metoo_stp_temp
+            <set>
+                <if test="item.vlan != null and item.vlan != ''">
+                    vlan = #{item.vlan},
+                </if>
+                <if test="item.root != null and item.root != ''">
+                    `root` = #{item.root},
+                </if>
+                <if test="item.ifRoot != null and item.ifRoot != ''">
+                    if_root = #{item.ifRoot},
+                </if>
+                <if test="item.remoteDevice != null and item.remoteDevice != ''">
+                    remote_device = #{item.remoteDevice},
+                </if>
+                <if test="item.remoteUuid != null and item.remoteUuid != ''">
+                    remote_uuid = #{item.remoteUuid},
+                </if>
+                <if test="item.remotePort != null and item.remotePort != ''">
+                    remote_port = #{item.remotePort},
+                </if>
+            </set>
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+
+    <update id="truncateTable">
+       TRUNCATE TABLE metoo_stp_temp;
+    </update>
+
+</mapper>

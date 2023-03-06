@@ -52,3 +52,64 @@ ALTER TABLE rsms_rout RENAME rsms_route;
 ALTER TABLE rsms_rout_temp RENAME rsms_route_temp;
 ALTER TABLE rsms_rout_history RENAME rsms_route_history;
 ALTER TABLE rsms_rout_table RENAME rsms_route_table;
+
+# 2023/03/03
+CREATE TABLE IF NOT EXISTS metoo_stp(
+	`id` BIGINT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '主键，自增',
+	`addTime` TIMESTAMP NULL DEFAULT NULL COMMENT '添加时间',
+	`deleteStatus` INT(3) DEFAULT 0 COMMENT '逻辑删除',
+	`device_name` VARCHAR(255) COMMENT '设备名',
+	`device_uuid` VARCHAR(255) COMMENT '设备uUID',
+	`instance` VARCHAR(255) COMMENT '设备uUID',
+	`vlan` VARCHAR(255) COMMENT '设备Vlan',
+	`root` VARCHAR(255) COMMENT '设备uUID',
+	`if_root` VARCHAR(255) COMMENT '设备uUID',
+	`port_index` VARCHAR(255) COMMENT '设备uUID',
+	`port_name` VARCHAR(255) COMMENT '设备uUID',
+	`port_role` VARCHAR(255) COMMENT '设备uUID',
+	`port_status` VARCHAR(255) COMMENT '设备uUID',
+	`remote_device` VARCHAR(255) COMMENT '设备uUID',
+	`remote_uuid` VARCHAR(255) COMMENT '设备uUID',
+	`remote_port` VARCHAR(255) COMMENT '设备uUID'
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;
+
+CREATE TABLE IF NOT EXISTS metoo_stp_temp(
+	`id` BIGINT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '主键，自增',
+	`addTime` TIMESTAMP NULL DEFAULT NULL COMMENT '添加时间',
+	`deleteStatus` INT(3) DEFAULT 0 COMMENT '逻辑删除',
+	`device_name` VARCHAR(255) COMMENT '设备名',
+	`device_uuid` VARCHAR(255) COMMENT '设备uUID',
+	`instance` VARCHAR(255) COMMENT '设备uUID',
+	`vlan` VARCHAR(255) COMMENT '设备Vlan',
+	`root` VARCHAR(255) COMMENT '设备uUID',
+	`if_root` VARCHAR(255) COMMENT '设备uUID',
+	`port_index` VARCHAR(255) COMMENT '设备uUID',
+	`port_name` VARCHAR(255) COMMENT '设备uUID',
+	`port_role` VARCHAR(255) COMMENT '设备uUID',
+	`port_status` VARCHAR(255) COMMENT '设备uUID',
+	`remote_device` VARCHAR(255) COMMENT '设备uUID',
+	`remote_uuid` VARCHAR(255) COMMENT '设备uUID',
+	`remote_port` VARCHAR(255) COMMENT '设备uUID'
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;
+
+CREATE TABLE IF NOT EXISTS metoo_stp_history(
+	`id` BIGINT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '主键，自增',
+	`addTime` TIMESTAMP NULL DEFAULT NULL COMMENT '添加时间',
+	`deleteStatus` INT(3) DEFAULT 0 COMMENT '逻辑删除',
+	`device_name` VARCHAR(255) COMMENT '设备名',
+	`device_uuid` VARCHAR(255) COMMENT '设备uUID',
+	`instance` VARCHAR(255) COMMENT '设备uUID',
+	`vlan` VARCHAR(255) COMMENT '设备Vlan',
+	`root` VARCHAR(255) COMMENT '设备uUID',
+	`if_root` VARCHAR(255) COMMENT '设备uUID',
+	`port_index` VARCHAR(255) COMMENT '设备uUID',
+	`port_name` VARCHAR(255) COMMENT '设备uUID',
+	`port_role` VARCHAR(255) COMMENT '设备uUID',
+	`port_status` VARCHAR(255) COMMENT '设备uUID',
+	`remote_device` VARCHAR(255) COMMENT '设备uUID',
+	`remote_uuid` VARCHAR(255) COMMENT '设备uUID',
+	`remote_port` VARCHAR(255) COMMENT '设备uUID'
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;
+
+ALTER TABLE metoo_stp ADD INDEX unique_instance(instance);
+ALTER TABLE metoo_stp ADD INDEX unique_vlan(vlan);

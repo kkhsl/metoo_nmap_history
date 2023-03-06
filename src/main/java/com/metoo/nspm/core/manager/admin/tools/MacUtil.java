@@ -1,6 +1,7 @@
 package com.metoo.nspm.core.manager.admin.tools;
 
 import com.metoo.nspm.core.service.nspm.IMacVendorService;
+import com.metoo.nspm.core.utils.MyStringUtils;
 import com.metoo.nspm.entity.nspm.Mac;
 import com.metoo.nspm.entity.nspm.MacVendor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class MacUtil {
             for (Mac mac : macs) {
                 if (mac.getMac() != null && !mac.getMac().equals("")) {
                     String macAddr = mac.getMac();
-                    int index = com.metoo.nspm.core.utils.StringUtils.acquireCharacterPosition(macAddr, ":", 3);
+                    int index = MyStringUtils.acquireCharacterPosition(macAddr, ":", 3);
                     if(index != -1){
                         macAddr = macAddr.substring(0, index);
                         Map params = new HashMap();

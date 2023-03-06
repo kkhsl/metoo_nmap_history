@@ -13,6 +13,7 @@ import com.metoo.nspm.core.service.api.zabbix.ZabbixService;
 import com.metoo.nspm.core.service.zabbix.IProblemService;
 import com.metoo.nspm.core.service.zabbix.IProblemTempService;
 import com.metoo.nspm.core.service.topo.ITopoNodeService;
+import com.metoo.nspm.core.utils.MyStringUtils;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.core.utils.network.IpV4Util;
 import com.metoo.nspm.dto.zabbix.HistoryDTO;
@@ -563,7 +564,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                             ipAddress.setMask(IpUtil.getBitMask(tag.getString("value")));
                         }
                         if (tag.getString("tag").equals("ifindex")) {
-                            if(com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))){
+                            if(MyStringUtils.isInteger(tag.getString("value"))){
 //                                ipAddress.setIndex(Integer.parseInt(tag.getString("value")));
 //                                Map<String, String> detail = this.itemUtil.getInterfaceDetail(ip, tag.getString("value"));
 //                                if(detail != null && detail.size() > 0){
@@ -749,7 +750,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                                     arp.setMask(tag.getString("value"));
                                 }
                                 if (tag.getString("tag").equals("ifindex")) {
-                                    if(com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))){
+                                    if(MyStringUtils.isInteger(tag.getString("value"))){
                                         arp.setIndex(tag.getString("value"));
                                         arp.setInterfaceName(tag.getString("value"));
                                     }
@@ -809,7 +810,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                                         arp.setMask(tag.getString("value"));
                                     }
                                     if (tag.getString("tag").equals("ifindex")) {
-                                        if(com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))){
+                                        if(MyStringUtils.isInteger(tag.getString("value"))){
                                             arp.setIndex(String.valueOf(tag.get("value")));
                                             arp.setInterfaceName(String.valueOf(tag.get("value")));
                                         }
@@ -1131,7 +1132,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                             }
                         }
                         if (tag.get("tag").equals("portindex")) {
-                            if(com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))){
+                            if(MyStringUtils.isInteger(tag.getString("value"))){
                                 mac.setInterfaceName(tag.getString("value"));
 //                                try {
 ////                                    // 获取接口信息
@@ -2214,7 +2215,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                                                 arp.setMask(tag.getString("value"));
                                             }
                                             if (tag.getString("tag").equals("ifindex")) {
-                                                if (com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))) {
+                                                if (MyStringUtils.isInteger(tag.getString("value"))) {
                                                     arp.setIndex(String.valueOf(tag.get("value")));
                                                     String interfaceName = itemUtil.getInterfaceName(map.get("ip").toString(),
                                                             tag.getString("value"));
@@ -2365,7 +2366,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                                     arp.setMask(tag.getString("value"));
                                 }
                                 if (tag.getString("tag").equals("ifindex")) {
-                                    if (com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))) {
+                                    if (MyStringUtils.isInteger(tag.getString("value"))) {
                                         arp.setIndex(tag.getString("value"));
                                         String interfaceName = itemUtil.getInterfaceName(ip,
                                                 tag.getString("value"));
@@ -2427,7 +2428,7 @@ public class ZabbixServiceImpl implements ZabbixService {
 //                                        arp.setMask(tag.getString("value"));
 //                                    }
 //                                    if (tag.getString("tag").equals("ifindex")) {
-//                                        if (com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))) {
+//                                        if (MyStringUtils.isInteger(tag.getString("value"))) {
 //                                            arp.setIndex(Integer.parseInt(String.valueOf(tag.get("value"))));
 //                                            String interfaceName = itemUtil.getInterfaceName(ip,
 //                                                    arp.getInterfaceName());
@@ -2508,7 +2509,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                             arp.setMask(tag.getString("value"));
                         }
                         if (tag.getString("tag").equals("ifindex")) {
-                            if (com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))) {
+                            if (MyStringUtils.isInteger(tag.getString("value"))) {
                                 arp.setIndex(tag.getString("value"));
                                 String interfaceName = itemUtil.getInterfaceName(ip,
                                         tag.getString("value"));
@@ -2714,7 +2715,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                             }
                         }
                         if (tag.get("tag").equals("portindex")) {
-                            if(com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))){
+                            if(MyStringUtils.isInteger(tag.getString("value"))){
                                 try {
 //                                    // 获取接口信息
                                     String interfaceName = this.itemUtil.getInterfaceName(ip, tag.getString("value"));
@@ -2849,7 +2850,7 @@ public class ZabbixServiceImpl implements ZabbixService {
                             ipAddress.setMask(IpUtil.getBitMask(tag.getString("value")));
                         }
                         if (tag.getString("tag").equals("ifindex")) {
-                            if(com.metoo.nspm.core.utils.StringUtils.isInteger(tag.getString("value"))){
+                            if(MyStringUtils.isInteger(tag.getString("value"))){
                                 ipAddress.setIndex(Integer.parseInt(tag.getString("value")));
                                 Map<String, String> detail = this.itemUtil.getInterfaceDetail(ip, tag.getString("value"));
                                 if(detail != null && detail.size() > 0){

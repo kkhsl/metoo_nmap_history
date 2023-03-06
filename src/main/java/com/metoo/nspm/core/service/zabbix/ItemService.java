@@ -24,6 +24,14 @@ public interface ItemService {
 
     void gatherProblemItem(Date time);
 
+    void gatherStp(Date time);
+
+    void gathermstpinstance(Date time);
+
+    void gathermstpDR(Date time);
+
+    void writeStpRemote();
+
     /**
      * 根据条件查询Item 基础查询：根据Ip查询interface，确定一个hostid，根据hostid查询items表，确定itemids
      * 然后确定指定标签的itemid, 查询item_tag所有itemid相同的其他项

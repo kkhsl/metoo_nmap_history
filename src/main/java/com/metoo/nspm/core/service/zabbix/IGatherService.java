@@ -63,4 +63,6 @@ public interface IGatherService {
      * 采集主机状态
      */
 //    void gatherSnmpAvailable();
+
+    void gatherSpanningTreeProtocol(Date time);
 }

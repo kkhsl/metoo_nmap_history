@@ -128,7 +128,7 @@ public class StaticScheduleTask {
             try {
 
                 StopWatch watch = StopWatch.createStarted();
-                this.gatherService.gatherMacBatch(date);
+                this.gatherService.gatherMacThreadPool(date);
                 watch.stop();
                 System.out.println("采集总耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
             } catch (Exception e) {

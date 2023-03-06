@@ -362,7 +362,7 @@ public class RoutTool {
         Map map = new HashMap();
         Map params = new HashMap();
         List<Mac> srcDevices = new ArrayList<>();
-        if(srcMac.contains("0:0:5e")){
+        if(srcMac.contains("00:00:5e")){
             params.put("tag", "LV");
             params.put("mac", srcMac);
             srcDevices = this.macService.selectByMap(params);
@@ -381,7 +381,7 @@ public class RoutTool {
         }
         if(srcDevices.size() > 0){
             List<Mac> destDevices = new ArrayList<>();
-            if(destMac.contains("0:0:5e")){
+            if(destMac.contains("00:00:5e")){
                 params.put("tag", "LV");
                 params.put("mac", destMac);
                 destDevices = this.macService.selectByMap(params);
@@ -424,7 +424,7 @@ public class RoutTool {
         Map map = new HashMap();
         Map params = new HashMap();
         List<Mac> srcDevices = new ArrayList<>();
-        if(srcMac.contains("0:0:5e")){
+        if(srcMac.contains("00:00:5e")){
             params.put("tag", "LV");
             params.put("mac", srcMac);
             params.put("time", DateTools.getCurrentTimeNoSecond(time));
@@ -446,7 +446,7 @@ public class RoutTool {
         }
         if(srcDevices.size() > 0){
             List<Mac> destDevices = new ArrayList<>();
-            if(destMac.contains("0:0:5e")){
+            if(destMac.contains("00:00:5e")){
                 params.put("tag", "LV");
                 params.put("mac", destMac);
                 params.put("time", DateTools.getCurrentTimeNoSecond(time));
@@ -493,7 +493,7 @@ public class RoutTool {
         Map params = new HashMap();
         if(StringUtils.isNotEmpty(srcUuid)){
             List<Mac> destDevices = new ArrayList<>();
-            if(destMac.contains("0:0:5e")){
+            if(destMac.contains("00:00:5e")){
                 params.put("tag", "LV");
                 params.put("mac", destMac);
                 destDevices = this.macService.selectByMap(params);
@@ -533,7 +533,7 @@ public class RoutTool {
         Map params = new HashMap();
         if(StringUtils.isNotEmpty(srcUuid)){
             List<Mac> destDevices = new ArrayList<>();
-            if(destMac.contains("0:0:5e")){
+            if(destMac.contains("00:00:5e")){
                 params.put("tag", "LV");
                 params.put("mac", destMac);
                 params.put("time", DateTools.getCurrentTimeNoSecond(time));

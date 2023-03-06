@@ -18,6 +18,8 @@ public interface ItemMapper {
 
     List<Item> gatherItemByTagAndClock(Map params);
 
+    List<Item> gatherItemByTagAndRtdata(Map params);
+
     List<Item> gatherItemByTagAndIndex(Map params);
 
     List<Item> selectTagByMap(Map params);// 根据条件查询itemtag
@@ -27,5 +29,7 @@ public interface ItemMapper {
     List<Item> interfaceTable(Map params);
 
     List<Item> selectNameObjByIndex(String index);
+
+    List<Item> gatherItemBySTP(Map params);
 
 }

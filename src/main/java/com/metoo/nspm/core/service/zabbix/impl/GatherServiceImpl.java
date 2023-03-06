@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -47,6 +49,11 @@ public class GatherServiceImpl implements IGatherService {
     private IIPAddressService ipAddressService;
     @Autowired
     private IIPAddressHistoryService ipAddressHistoryService;
+    @Autowired
+    private ISpanningTreeProtocolService spanningTreeProtocolService;
+    @Autowired
+    private ISpanningTreeProtocolHistoryService spanningTreeProtocolHistoryService;
+
 
     @Override
     public void gatherArpItem(Date time) {
@@ -92,7 +99,6 @@ public class GatherServiceImpl implements IGatherService {
                 + (System.currentTimeMillis() - copyTime) / 1000 + "秒 ");
 
     }
-
 
     @Override
     public void gatherMacBatch(Date time)  {
@@ -220,5 +226,20 @@ public class GatherServiceImpl implements IGatherService {
         arpTemp.setDeviceName("a");
         this.arpTempService.save(arpTemp);
         this.itemService.testTransactional();
+    }
+
+    @Override
+    public void gatherSpanningTreeProtocol(Date time) {
+
+        this.itemService.gatherStp(time);// 采集 mstpport
+        this.itemService.gathermstpinstance(time);// 采集 mstpinstance
+        this.itemService.gathermstpDR(time);// 采集 mstpDR
+        this.itemService.writeStpRemote();
+
+        //
+        this.spanningTreeProtocolService.truncateTable();
+        this.spanningTreeProtocolService.copyMacTemp();
+        this.spanningTreeProtocolHistoryService.truncateTable();
+        this.spanningTreeProtocolHistoryService.copyMacTemp();
     }
 }
