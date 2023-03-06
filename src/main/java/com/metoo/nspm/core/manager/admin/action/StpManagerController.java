@@ -44,28 +44,49 @@ public class StpManagerController {
         return ResponseUtil.ok();
     }
 
+//    @ApiOperation("instance去重数据：加索引")
+//    @GetMapping("/get/root/info")
+//    public Object getRootInfo(@RequestParam String vlan){
+//        Map params = new HashMap();
+//        List<SpanningTreeProtocol> snapshotParametersList = this.spanningTreeProtocolService.selectObjByMap(params);
+//        boolean flag = false;
+//        SpanningTreeProtocol instance = null;
+//        for(SpanningTreeProtocol spanningTreeProtocol : snapshotParametersList){
+//            if(StringUtils.isNotEmpty(spanningTreeProtocol.getVlan())){
+//                String[] vlans = spanningTreeProtocol.getVlan().split(",");
+//                for (String s : vlans) {
+//                    if(s.equals(vlan)){
+//                        flag = true;
+//                        instance = spanningTreeProtocol;
+//                    }
+//                }
+//            }
+//        }
+//        if(/*snapshotParametersList.size() > 0*/ instance != null && flag){
+////            SpanningTreeProtocol spanningTreeProtocol = snapshotParametersList.get(0);
+//            SpanningTreeProtocol spanningTreeProtocol = instance;
+//            params.clear();
+//            params.put("instance", spanningTreeProtocol.getInstance());
+//            params.put("ifRoot", 1);
+//            List<SpanningTreeProtocol> spanningTreeProtocols = this.spanningTreeProtocolService.selectObjByMap(params);
+//            List<SpanningTreeProtocol> list = spanningTreeProtocols.stream().collect(
+//                    Collectors.collectingAndThen(
+//                            Collectors.toCollection(() -> new TreeSet<>(Comparator
+//                                    .comparing(SpanningTreeProtocol::getVlan, Comparator.nullsLast(String::compareTo)))),
+//                            ArrayList::new));
+//            return ResponseUtil.ok(list);
+//        }
+//        return ResponseUtil.ok();
+//    }
 
     @ApiOperation("instance去重数据：加索引")
     @GetMapping("/get/root/info")
     public Object getRootInfo(@RequestParam String vlan){
         Map params = new HashMap();
+        params.put("vlan", vlan);
         List<SpanningTreeProtocol> snapshotParametersList = this.spanningTreeProtocolService.selectObjByMap(params);
-        boolean flag = false;
-        SpanningTreeProtocol instance = null;
-        for(SpanningTreeProtocol spanningTreeProtocol : snapshotParametersList){
-            if(StringUtils.isNotEmpty(spanningTreeProtocol.getVlan())){
-                String[] vlans = spanningTreeProtocol.getVlan().split(",");
-                for (String s : vlans) {
-                    if(s.equals(vlan)){
-                        flag = true;
-                        instance = spanningTreeProtocol;
-                    }
-                }
-            }
-        }
-        if(/*snapshotParametersList.size() > 0*/ instance != null && flag){
-//            SpanningTreeProtocol spanningTreeProtocol = snapshotParametersList.get(0);
-            SpanningTreeProtocol spanningTreeProtocol = instance;
+        if(snapshotParametersList.size() > 0){
+            SpanningTreeProtocol spanningTreeProtocol = snapshotParametersList.get(0);
             params.clear();
             params.put("instance", spanningTreeProtocol.getInstance());
             params.put("ifRoot", 1);
