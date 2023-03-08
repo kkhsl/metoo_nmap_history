@@ -16,6 +16,7 @@ import com.github.pagehelper.Page;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
 import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -84,14 +85,14 @@ public class TopologyManagerController {
         }
         Page<Topology> page = this.topologyService.selectConditionQuery(dto);
         if(page.getResult().size() > 0) {
-           if(page.getResult().size() == 1){
-               // 设置默认拓扑
-               try {
-                   this.setTopologyDefualt();
-               } catch (Exception e) {
-                   e.printStackTrace();
-               }
-           }
+            if(page.getResult().size() == 1){
+                // 设置默认拓扑
+                try {
+                    this.setTopologyDefualt();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             return ResponseUtil.ok(new PageInfo<Topology>(page));
         }
         return ResponseUtil.ok();
@@ -223,7 +224,7 @@ public class TopologyManagerController {
             Topology topology = this.topologyService.selectObjBySuffix(name);
             if(topology != null){
                 number ++;
-               return this.changName(null, number);
+                return this.changName(null, number);
             }
             return name;
         }else{
@@ -246,11 +247,20 @@ public class TopologyManagerController {
     public Object save(@RequestBody(required = false) Topology instance){
         // 校验拓扑名称是否重复
         Map params = new HashMap();
-        params.put("topologyId", instance.getId());
-        params.put("name", instance.getName());
-        List<Topology> topologList = this.topologyService.selectObjByMap(params);
-        if(topologList.size() > 0){
-            return ResponseUtil.badArgument("拓扑名称重复");
+        if(instance.getId() == null
+                || instance.getId().equals("")
+                ){
+            if(StringUtils.isEmpty(instance.getName())){
+                return ResponseUtil.badArgument("拓扑名称不能为空");
+            }
+        }
+        if(StringUtils.isNotEmpty(instance.getName())){
+            params.put("topologyId", instance.getId());
+            params.put("name", instance.getName());
+            List<Topology> topologList = this.topologyService.selectObjByMap(params);
+            if(topologList.size() > 0){
+                return ResponseUtil.badArgument("拓扑名称重复");
+            }
         }
         // 校验分组
         if(instance.getGroupId() != null){
@@ -267,10 +277,11 @@ public class TopologyManagerController {
                 instance.setGroupName(group.getBranchName());
             }
         }
-        if(instance != null && !instance.getContent().equals("")){
+        if(instance.getContent() != null && !instance.getContent().equals("")){
             String str = JSONObject.toJSONString(instance.getContent());
             instance.setContent(str);
         }
+
         int result = this.topologyService.save(instance);
         if(result >= 1){
             // 设置默认拓扑
@@ -365,9 +376,9 @@ public class TopologyManagerController {
     @ApiOperation("拓扑信息")
     @GetMapping("/info")
     public Object info(
-                        @RequestParam(value = "id") Long id,
-                        @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-                        @RequestParam(value = "time", required = false) Date time){
+            @RequestParam(value = "id") Long id,
+            @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+            @RequestParam(value = "time", required = false) Date time){
         if(id == null){
             return  ResponseUtil.badArgument();
         }
@@ -416,17 +427,17 @@ public class TopologyManagerController {
     public Object path(@RequestParam(value = "id") Long id){
         // 是否改为当前用户所在组
         User user = ShiroUserHolder.currentUser();
-       if(id != null && !id.equals("")){
-           List<Topology> topologies = selectObjById(user, id, null);
-           if(topologies != null && topologies.size() > 0){
-               Map params = new HashMap();
-               Topology topology = this.topologyService.selectObjById(id);
-               params.put("topologyId", topology.getId());
-               List<PresetPath> presetPaths = this.presetPathService.selectObjByMap(params);
-               return ResponseUtil.ok(presetPaths);
-           }
-           return ResponseUtil.badArgument();
-       }
+        if(id != null && !id.equals("")){
+            List<Topology> topologies = selectObjById(user, id, null);
+            if(topologies != null && topologies.size() > 0){
+                Map params = new HashMap();
+                Topology topology = this.topologyService.selectObjById(id);
+                params.put("topologyId", topology.getId());
+                List<PresetPath> presetPaths = this.presetPathService.selectObjByMap(params);
+                return ResponseUtil.ok(presetPaths);
+            }
+            return ResponseUtil.badArgument();
+        }
         return ResponseUtil.ok();
     }
 
@@ -557,7 +568,7 @@ public class TopologyManagerController {
 
     @RequestMapping("/upload")
     public Object upload(
-                       @RequestParam(value = "file", required = false) MultipartFile file){
+            @RequestParam(value = "file", required = false) MultipartFile file){
         if(file != null && file.getSize() > 0){
             boolean accessory = this.uploadFile(file);
             if(accessory){
@@ -821,7 +832,7 @@ public class TopologyManagerController {
         String srcMac = "";// 起点Mac
         String destMac = "";// 终点Mac
         Arp srcArp = null;
-            if(type == 1){
+        if(type == 1){
             srcArp = this.queryArp(srcIp, time);
             if(srcArp == null){
                 return ResponseUtil.badArgument("起点Ip不存在");
@@ -1015,9 +1026,9 @@ public class TopologyManagerController {
         if(StringUtil.isEmpty(srcGateway) && StringUtil.isEmpty(destGateway)){
             boolean flag = CompareUtils.isSameNetWork(srcIp, destIp);
             queryFlag = flag;
-           if(!flag){
-               return ResponseUtil.badArgument("未输入网关");
-           }
+            if(!flag){
+                return ResponseUtil.badArgument("未输入网关");
+            }
         }else{
             if(StringUtil.isEmpty(srcGateway)){
                 return ResponseUtil.badArgument("未输入起点网关Ip");

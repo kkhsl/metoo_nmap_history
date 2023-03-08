@@ -50,7 +50,7 @@ ALTER TABLE rsms_mac_history ADD COLUMN mask_bit INT(3) COMMENT '掩码位';
 # 2023/03/02
 ALTER TABLE rsms_rout RENAME rsms_route;
 ALTER TABLE rsms_rout_temp RENAME rsms_route_temp;
-ALTER TABLE rsms_rout_history RENAME rsms_route_history;
+ALTER TABLE rsms_rout_history REANME rsms_route_history;
 ALTER TABLE rsms_rout_table RENAME rsms_route_table;
 
 # 2023/03/03

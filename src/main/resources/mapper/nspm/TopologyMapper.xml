@@ -20,21 +20,20 @@
         <result column="base_url" property="baseUrl"></result>
     </resultMap>
 
-
     <sql id="Base_Column_List">
         id, addTime, deleteStatus, `name`, updateTime, is_default, description, group_id,
-        group_name, user_id, user_name, base_url, suffix
+        group_name, user_id, user_name, base_url, suffix, st_x(point) latitude, st_y(point) longitude, nf, `location`
     </sql>
 
     <sql id="List_Column_List">
         id, addTime, deleteStatus, concat(ifnull(name, ''), if(suffix is null, '', ' '), ifnull(suffix, '')) as name, updateTime, is_default, description, group_id,
-        group_name, user_id, user_name, base_url, suffix
+        group_name, user_id, user_name, base_url, suffix, st_x(point) latitude, st_y(point) longitude, nf, `location`
     </sql>
 
 
     <sql id="Content_Column_List">
         id, addTime, deleteStatus, `name`, updateTime, is_default, description, group_id,
-        group_name, user_id, user_name, base_url, content, suffix
+        group_name, user_id, user_name, base_url, content, suffix, nf, `location`
     </sql>
 
     <sql id="Copy_Column_List">
@@ -157,6 +156,15 @@
               <if test="baseUrl != null and baseUrl != null">
                   base_url,
               </if>
+              <if test="nf != null">
+                  nf,
+              </if>
+              <if test="latitude != null and longitude != null">
+                  point,
+              </if>
+              <if test="location != null">
+                  `location`,
+              </if>
           </trim>
         <trim prefix="VALUES(" suffixOverrides="," suffix=")">
             <if test="addTime != null">
@@ -194,6 +202,15 @@
             </if>
             <if test="baseUrl != null and baseUrl != null">
                 #{baseUrl},
+            </if>
+            <if test="nf != null">
+                #{nf},
+            </if>
+            <if test="latitude != null and longitude != null">
+                GeomFromText('POINT(${latitude} ${longitude})'),
+            </if>
+            <if test="location != null">
+                #{location},
             </if>
         </trim>
     </insert>
@@ -239,6 +256,15 @@
             </if>
             <if test="suffix != ''">
                 suffix = #{suffix},
+            </if>
+            <if test="nf != null">
+                nf = #{nf},
+            </if>
+            <if test="latitude != null and longitude != null">
+                point = GeomFromText('POINT(${latitude} ${longitude})'),
+            </if>
+            <if test="location != null">
+               `location` = #{location},
             </if>
         </set>
         WHERE id = #{id}
