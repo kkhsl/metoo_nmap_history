@@ -1,7 +1,7 @@
 package com.metoo.nspm.core.manager.admin.tools;
 
 import com.metoo.nspm.core.service.nspm.IUserService;
-import com.metoo.nspm.core.shiro.tools.ApplicationContextUtils;
+import com.metoo.nspm.core.config.shiro.tools.ApplicationContextUtils;
 import com.metoo.nspm.entity.nspm.User;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;

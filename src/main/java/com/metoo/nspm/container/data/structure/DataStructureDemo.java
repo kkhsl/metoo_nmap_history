@@ -20,6 +20,7 @@ enum Car {
     Car(int p) {
         price = p;
     }
+
     Car(int p, int a) {
         price = p;
         price1 = a;

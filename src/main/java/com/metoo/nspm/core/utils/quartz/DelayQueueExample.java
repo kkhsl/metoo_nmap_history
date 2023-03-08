@@ -1,7 +1,6 @@
 package com.metoo.nspm.core.utils.quartz;
 
-import com.metoo.nspm.core.redis.util.JedisPoolUtil;
-import com.metoo.nspm.core.redis.util.JedisUtils;
+import com.metoo.nspm.core.config.redis.util.JedisPoolUtil;
 import org.junit.Test;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;

@@ -1,4 +1,4 @@
-package com.metoo.nspm.core.redis.util;
+package com.metoo.nspm.core.config.redis.util;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;

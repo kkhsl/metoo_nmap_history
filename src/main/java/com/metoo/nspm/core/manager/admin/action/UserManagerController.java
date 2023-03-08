@@ -2,7 +2,7 @@ package com.metoo.nspm.core.manager.admin.action;
 
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
 import com.metoo.nspm.core.service.nspm.*;
-import com.metoo.nspm.core.shiro.tools.SaltUtils;
+import com.metoo.nspm.core.config.shiro.tools.SaltUtils;
 import com.metoo.nspm.core.utils.CommUtils;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.query.PageInfo;

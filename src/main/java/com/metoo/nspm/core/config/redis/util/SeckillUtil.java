@@ -1,4 +1,4 @@
-package com.metoo.nspm.core.redis.util;
+package com.metoo.nspm.core.config.redis.util;
 
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;

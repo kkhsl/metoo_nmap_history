@@ -3,7 +3,7 @@ package com.metoo.nspm.core.service.nspm.impl;
 import com.metoo.nspm.core.mapper.nspm.RegisterMapper;
 import com.metoo.nspm.core.mapper.nspm.UserMapper;
 import com.metoo.nspm.core.service.nspm.IRegisterService;
-import com.metoo.nspm.core.shiro.tools.SaltUtils;
+import com.metoo.nspm.core.config.shiro.tools.SaltUtils;
 import com.metoo.nspm.entity.nspm.User;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;

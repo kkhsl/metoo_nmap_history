@@ -1,6 +1,6 @@
-package com.metoo.nspm.core.shiro.cache;
+package com.metoo.nspm.core.config.shiro.cache;
 
-import com.metoo.nspm.core.shiro.tools.ApplicationContextUtils;
+import com.metoo.nspm.core.config.shiro.tools.ApplicationContextUtils;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,6 +16,8 @@ import java.util.Set;
  *
  * <p>
  *  Description: 自定义redis缓存实现
+ *      通过RedisTemplate的hash操作实现缓存接口
+ *
  * </p>
  */
 public class RedisCache<k,v> implements Cache<k,v> {

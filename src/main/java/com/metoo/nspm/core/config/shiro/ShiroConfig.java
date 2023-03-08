@@ -1,9 +1,10 @@
 package com.metoo.nspm.core.config.shiro;
 
 //import com.metoo.nspm.core.config.global.LicenseFilter;
+import com.metoo.nspm.core.config.shiro.cache.RedisCacheManager;
 import com.metoo.nspm.core.jwt.util.JwtCredentialsMatcher;
 import com.metoo.nspm.core.jwt.util.MultiRealmAuthenticator;
-import com.metoo.nspm.core.shiro.filter.MyAccessControlFilter;
+import com.metoo.nspm.core.config.shiro.filter.MyAccessControlFilter;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authc.pam.AuthenticationStrategy;
@@ -165,16 +166,18 @@ public class ShiroConfig {
         hashedCredentialsMatcher.setHashIterations(1024);
         myRealm.setCredentialsMatcher(hashedCredentialsMatcher);
 
-        // 开启缓存管理
+        // 开启缓存管理器
 //        myRealm.setCachingEnabled(true);// 开启全局缓存
         // 方式一：EhCache
+            // 只能实现本地缓存，如果应用服务器宕机，则缓存数据丢失；生产环境使用Redis-实现分布式缓存
+                // 缓存数据独立于应用服务器之外，提高数据安全性
 //        myRealm.setCacheManager(new EhCacheManager());// EhCache
 ////        方式二：Redis
-//        myRealm.setCacheManager(new RedisCacheManager());// RedisCacheManager
-//        myRealm.setAuthenticationCachingEnabled(true);// 认证缓存
-//        myRealm.setAuthenticationCacheName("authenticationCache");
-//        myRealm.setAuthorizationCachingEnabled(true);// 授权缓存
-//        myRealm.setAuthorizationCacheName("authorizationCache");
+        myRealm.setCacheManager(new RedisCacheManager());// RedisCacheManager
+        myRealm.setAuthenticationCachingEnabled(true);// 认证缓存
+        myRealm.setAuthenticationCacheName("authenticationCache");
+        myRealm.setAuthorizationCachingEnabled(true);// 授权缓存
+        myRealm.setAuthorizationCacheName("authorizationCache");
         return myRealm;
     }
 

@@ -3,7 +3,7 @@ package com.metoo.nspm.core.config.shiro;
 import com.metoo.nspm.core.jwt.util.JwtToken;
 import com.metoo.nspm.core.service.nspm.IRegisterService;
 import com.metoo.nspm.core.service.nspm.IRoleService;
-import com.metoo.nspm.core.shiro.tools.ApplicationContextUtils;
+import com.metoo.nspm.core.config.shiro.tools.ApplicationContextUtils;
 import com.metoo.nspm.entity.nspm.User;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;

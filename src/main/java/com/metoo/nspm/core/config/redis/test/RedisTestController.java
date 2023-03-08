@@ -1,6 +1,5 @@
-package com.metoo.nspm.core.redis.test;
+package com.metoo.nspm.core.config.redis.test;
 
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;

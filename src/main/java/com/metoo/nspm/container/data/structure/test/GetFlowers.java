@@ -1,4 +1,6 @@
-package com.metoo.nspm.container.data.structure;
+package com.metoo.nspm.container.data.structure.test;
+
+import com.metoo.nspm.container.data.structure.IfElseEnumDemo;
 
 public class GetFlowers {
 

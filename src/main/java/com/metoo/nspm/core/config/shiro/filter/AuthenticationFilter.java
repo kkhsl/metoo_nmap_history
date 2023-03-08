@@ -1,4 +1,4 @@
-package com.metoo.nspm.core.shiro.filter;
+package com.metoo.nspm.core.config.shiro.filter;
 
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 

@@ -1,4 +1,4 @@
-package com.metoo.nspm.core.shiro.tools;
+package com.metoo.nspm.core.config.shiro.tools;
 
 import java.util.Random;
 

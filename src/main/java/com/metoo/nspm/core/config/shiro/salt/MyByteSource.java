@@ -1,4 +1,4 @@
-package com.metoo.nspm.core.shiro.salt;
+package com.metoo.nspm.core.config.shiro.salt;
 
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.codec.CodecSupport;

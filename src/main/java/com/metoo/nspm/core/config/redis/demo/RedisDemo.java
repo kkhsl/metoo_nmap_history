@@ -1,4 +1,4 @@
-package com.metoo.nspm.core.redis;
+package com.metoo.nspm.core.config.redis.demo;
 
 
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.metoo.nspm.core.shiro.main;
+package com.metoo.nspm.core.config.shiro.main;
 
 import com.metoo.nspm.core.config.shiro.MyRealm;
 import org.apache.shiro.SecurityUtils;
