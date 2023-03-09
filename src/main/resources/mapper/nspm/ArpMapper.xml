@@ -702,7 +702,8 @@
                 GROUP BY
                     ip
                 HAVING
-                    COUNT(mac) >= 2)
+                    COUNT(DISTINCT mac) >= 2)
+                    and ip != '2130706433'
     </select>
 
 </mapper>
