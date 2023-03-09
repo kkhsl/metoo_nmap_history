@@ -1,6 +1,9 @@
 package com.metoo.nspm.core.config.shiro;
 
 //import com.metoo.nspm.core.config.global.LicenseFilter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metoo.nspm.core.config.shiro.cache.RedisCacheManager;
 import com.metoo.nspm.core.jwt.util.JwtCredentialsMatcher;
 import com.metoo.nspm.core.jwt.util.MultiRealmAuthenticator;
@@ -26,6 +29,11 @@ import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreato
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import javax.servlet.Filter;
 import java.util.HashMap;
@@ -95,13 +103,10 @@ public class ShiroConfig {
 
         filterChainDefinitionMap.put("/**", "rmb");
 
-        //filterChainDefinitionMap.put("/buyer/**", "authc");
         filterChainDefinitionMap.put("/license/**", "authc");
         filterChainDefinitionMap.put("/index/**", "authc");
         filterChainDefinitionMap.put("/nspm/**", "authc");
         filterChainDefinitionMap.put("/admin/**", "authc");
-//        filterChainDefinitionMap.put("/admin/**", "licenseFilter");
-//        filterChainDefinitionMap.put("/nspm/**", "licenseFilter");
         filterChainDefinitionMap.put("/monitor/**", "authc");
 
 
@@ -128,7 +133,6 @@ public class ShiroConfig {
     }
 
     //2, 创建安全管理器 web环境中配置webSecurity
-    // getDefaultWevSecurityManager(Realm realm)
     @Bean
     public DefaultWebSecurityManager getDefaultWebSecurityManager() {
         DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
@@ -173,11 +177,11 @@ public class ShiroConfig {
                 // 缓存数据独立于应用服务器之外，提高数据安全性
 //        myRealm.setCacheManager(new EhCacheManager());// EhCache
 ////        方式二：Redis
-        myRealm.setCacheManager(new RedisCacheManager());// RedisCacheManager
-        myRealm.setAuthenticationCachingEnabled(true);// 认证缓存
-        myRealm.setAuthenticationCacheName("authenticationCache");
-        myRealm.setAuthorizationCachingEnabled(true);// 授权缓存
-        myRealm.setAuthorizationCacheName("authorizationCache");
+//        myRealm.setCacheManager(new RedisCacheManager());// RedisCacheManager
+//        myRealm.setAuthenticationCachingEnabled(true);// 认证缓存
+//        myRealm.setAuthenticationCacheName("authenticationCache");
+//        myRealm.setAuthorizationCachingEnabled(true);// 授权缓存
+//        myRealm.setAuthorizationCacheName("authorizationCache");
         return myRealm;
     }
 
@@ -199,6 +203,8 @@ public class ShiroConfig {
         DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
        // defaultWebSessionManager.setGlobalSessionTimeout(1000 * 60 * 60 * 24*7);// 会话过期时间，单位：毫秒(在无操作时开始计时)
         defaultWebSessionManager.setGlobalSessionTimeout(-1000L);// -1000L,永不过期 1000 * 60 * 20
+//        defaultWebSessionManager.setGlobalSessionTimeout(1000 * 60);
+
         defaultWebSessionManager.setSessionValidationSchedulerEnabled(true);
         defaultWebSessionManager.setSessionIdCookieEnabled(true);
         defaultWebSessionManager.setSessionIdUrlRewritingEnabled(false);// 移除自带的JSESSIONID，方式第二次打开浏览器是进行注销操作发生

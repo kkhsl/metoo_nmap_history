@@ -4,10 +4,9 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.metoo.nspm.core.mapper.nspm.zabbix.ArpMapper;
 import com.metoo.nspm.core.service.nspm.IArpService;
+import com.metoo.nspm.core.service.nspm.IMacService;
 import com.metoo.nspm.dto.ArpDTO;
-import com.metoo.nspm.dto.NetworkElementDto;
 import com.metoo.nspm.entity.nspm.Arp;
-import com.metoo.nspm.entity.nspm.NetworkElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +21,8 @@ public class ArpServiceImpl implements IArpService {
 
     @Autowired
     private ArpMapper arpMapper;
+    @Autowired
+    private IMacService macService;
 
     @Override
     public List<Arp> selectObjByDistinct() {
@@ -131,5 +132,10 @@ public class ArpServiceImpl implements IArpService {
     @Override
     public List<Arp> selectObjByMutual() {
         return this.arpMapper.selectObjByMutual();
+    }
+
+    @Override
+    public List<Arp> selectMacCountGT2() {
+       return this.arpMapper.selectMacCountGT2();
     }
 }

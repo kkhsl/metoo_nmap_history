@@ -85,14 +85,14 @@
             <if test="interfaceName != null and interfaceName != ''">
                 `interface_name` = #{interfaceName}
             </if>
+            <if test="mac != null and mac != ''">
+                AND mac = #{mac}
+            </if>
+            <if test="tag != null and tag != ''">
+                AND tag = #{tag}
+            </if>
             <if test="other != null">
                 AND tag != #{other}
-            </if>
-            <if test="mac != null">
-                AND mac != #{mac}
-            </if>
-            <if test="unDeviceName != null and unDeviceName != ''">
-                `interface_name` != #{unDeviceName}
             </if>
         </where>
     </select>

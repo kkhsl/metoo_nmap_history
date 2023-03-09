@@ -49,4 +49,6 @@ public interface ArpMapper {
     void copyArpTemp();
 
     List<Arp> selectObjByMutual();
+
+    List<Arp> selectMacCountGT2();
 }

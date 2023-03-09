@@ -13,6 +13,8 @@ public interface IMacService {
 
     List<Mac> selectByMap(Map params);
 
+    List<Mac> selectObjByMap(Map params);
+
     Mac getObjByInterfaceName(String interfaceName);
 
     List<Mac> groupByObjByMap(Map params);

@@ -40,6 +40,11 @@ public class MacServiceImpl implements IMacService{
     }
 
     @Override
+    public List<Mac> selectObjByMap(Map params) {
+        return this.macMapper.selectObjByMap(params);
+    }
+
+    @Override
     public Mac getObjByInterfaceName(String interfaceName) {
         return this.macMapper.getObjByInterfaceName(interfaceName);
     }

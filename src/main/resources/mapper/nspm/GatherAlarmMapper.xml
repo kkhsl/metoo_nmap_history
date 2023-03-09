@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.metoo.nspm.core.mapper.nspm.GatherAlarmMapper">
+
+    <resultMap id="Base_Result_Map" type="com.metoo.nspm.entity.nspm.GatherAlarm">
+        <id column="id" property="id"></id>
+        <result column="device_uuid" property="deviceUuid"></result>
+        <result column="device_interface" property="deviceInterface"></result>
+        <result column="ip" property="ip"></result>
+        <result column="mac" property="mac"></result>
+        <result column="remote_device_uuid" property="remoteDeviceUuid"></result>
+        <result column="remote_device_interface" property="remoteDeviceInterface"></result>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, addTime, deleteStatus, device_uuid, device_interface, INET_NTOA(ip) ip, mac,
+        `type`, remote_device_uuid, remote_device_interface
+    </sql>
+
+    <select id="selectConditionQuery" parameterType="com.metoo.nspm.dto.GatherAlarmDTO" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_gather_alarm
+        <where>
+            <if test="time != null">
+                AND addTime &gt;= #{time}
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND device_uuid = #{deviceUuid}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND ip = #{ip}
+            </if>
+            <if test="mac != null and mac != ''">
+                AND mac = #{mac}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_gather_alarm
+        <where>
+            <if test="addTime != null">
+                AND addTime = #{addTime}
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND device_uuid = #{deviceUuid}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND ip = #{ip}
+            </if>
+            <if test="mac != null and mac != ''">
+                AND mac = #{mac}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.metoo.nspm.entity.nspm.GatherAlarm">
+        INSERT INTO metoo_gather_alarm
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="addTime != null">
+                addTime,
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                device_uuid,
+            </if>
+            <if test="deviceInterface != null and deviceInterface != ''">
+                device_interface,
+            </if>
+            <if test="ip != null and ip != ''">
+                ip,
+            </if>
+            <if test="mac != null and mac != ''">
+                mac,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="remoteDeviceUuid != null and remoteDeviceUuid != ''">
+                `remote_device_uuid`,
+            </if>
+            <if test="remoteDeviceInterface != null and remoteDeviceInterface != ''">
+                `remote_device_interface`,
+            </if>
+      </trim>
+        <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
+            <if test="addTime != null">
+                #{addTime},
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                #{deviceUuid},
+            </if>
+            <if test="deviceInterface != null and deviceInterface != ''">
+                #{deviceInterface},
+            </if>
+            <if test="ip != null and ip != ''">
+                #{ip},
+            </if>
+            <if test="mac != null and mac != ''">
+                #{mac},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="remoteDeviceUuid != null and remoteDeviceUuid != ''">
+                #{remoteDeviceUuid},
+            </if>
+            <if test="remoteDeviceInterface != null and remoteDeviceInterface != ''">
+                #{remoteDeviceInterface},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.metoo.nspm.entity.nspm.GatherAlarm">
+        update metoo_gather_alarm
+        <set>
+            <if test="addTime != null">
+                addTime = #{addTime},
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                device_uuid = #{deviceUuid},
+            </if>
+            <if test="deviceInterface != null and deviceInterface != ''">
+                device_interface = {deviceInterface},
+            </if>
+            <if test="ip != null and ip != ''">
+                ip = {ip},
+            </if>
+            <if test="mac != null and mac != ''">
+                mac = {mac},
+            </if>
+            <if test="type != null">
+                `type` = #{type},
+            </if>
+            <if test="remoteDeviceUuid != null and remoteDeviceUuid != ''">
+                `remote_device_uuid` = #{remoteDeviceUuid},
+            </if>
+            <if test="remoteDeviceInterface != null and remoteDeviceInterface != ''">
+                `remote_device_interface` = #{remoteDeviceInterface},
+            </if>
+        </set>
+        WHERE
+          id = #{id}
+    </update>
+</mapper>

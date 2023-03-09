@@ -3,6 +3,7 @@ package com.metoo.nspm.core.config.shiro.cache;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
+import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * <p>
@@ -15,6 +16,7 @@ import org.apache.shiro.cache.CacheManager;
  * @author hkk
  */
 public class RedisCacheManager implements CacheManager {
+
 
     // 参数：1.认证或者是授权缓存的统一名称
     @Override

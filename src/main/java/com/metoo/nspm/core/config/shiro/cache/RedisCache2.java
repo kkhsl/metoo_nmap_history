@@ -20,11 +20,14 @@ import java.util.Set;
  *
  * </p>
  */
-public class RedisCache<k,v> implements Cache<k,v> {
+public class RedisCache2<k,v> implements Cache<k,v> {
 
     private String cacheName;
 
-    public RedisCache(String cacheName) {
+    public RedisCache2() {
+    }
+
+    public RedisCache2(String cacheName) {
         this.cacheName = cacheName;
     }
 
@@ -78,6 +81,12 @@ public class RedisCache<k,v> implements Cache<k,v> {
 
 
     private RedisTemplate getRedisTemplate(){
-        return (RedisTemplate) ApplicationContextUtils.getBean("redisTemplate");
+        RedisTemplate redisTeplemplate = (RedisTemplate) ApplicationContextUtils.getBean("redisTemplate");
+        //
+        redisTeplemplate.setKeySerializer(new StringRedisSerializer());
+        //
+        redisTeplemplate.setHashKeySerializer(new StringRedisSerializer());
+
+        return redisTeplemplate;
     }
 }

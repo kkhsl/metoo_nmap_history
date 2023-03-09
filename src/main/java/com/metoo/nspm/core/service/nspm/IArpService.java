@@ -48,4 +48,10 @@ public interface IArpService {
     void copyArpTemp();
 
     List<Arp> selectObjByMutual();
+
+    /**
+     * 查询Arp ip对应多个mac地址
+     * @return
+     */
+    List<Arp> selectMacCountGT2();
 }

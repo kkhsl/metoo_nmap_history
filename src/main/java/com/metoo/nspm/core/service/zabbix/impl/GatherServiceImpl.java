@@ -53,7 +53,8 @@ public class GatherServiceImpl implements IGatherService {
     private ISpanningTreeProtocolService spanningTreeProtocolService;
     @Autowired
     private ISpanningTreeProtocolHistoryService spanningTreeProtocolHistoryService;
-
+    @Autowired
+    private IGatherAlarmService gatherAlarmService;
 
     @Override
     public void gatherArpItem(Date time) {
@@ -65,6 +66,9 @@ public class GatherServiceImpl implements IGatherService {
         this.arpService.copyArpTemp();
         // 记录历史Arp
         this.arpHistoryService.copyArpTemp();
+
+        // 记录采集网关欺骗、主机欺骗
+        this.gatherAlarmService.gatherAlarms();
 
     }
 

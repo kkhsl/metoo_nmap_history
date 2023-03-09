@@ -689,4 +689,20 @@
         AND
             arp2.tag = 'E'
     </select>
+
+    <select id="selectMacCountGT2" resultMap="Base_Result_Map">
+        SELECT *
+        FROM rsms_arp
+        WHERE
+            ip IN(
+                SELECT
+                    ip
+                FROM
+                    rsms_arp
+                GROUP BY
+                    ip
+                HAVING
+                    COUNT(mac) >= 2)
+    </select>
+
 </mapper>
