@@ -78,6 +78,6 @@ public class RedisCache<k,v> implements Cache<k,v> {
 
 
     private RedisTemplate getRedisTemplate(){
-        return (RedisTemplate) ApplicationContextUtils.getBean("redisTemplate");
+        return (RedisTemplate) ApplicationContextUtils.getBean("shiroRedisTemplate");
     }
 }

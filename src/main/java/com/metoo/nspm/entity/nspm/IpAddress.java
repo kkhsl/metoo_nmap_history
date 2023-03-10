@@ -41,4 +41,7 @@ public class IpAddress extends IdEntity {
     private List<Route> routs;
     private boolean isError;
     private int status;// 路由状态 0：正常 1：没有下一跳 2：路由环路
+
+
+    private IpDetail ipDetail;
 }

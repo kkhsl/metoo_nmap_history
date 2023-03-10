@@ -292,18 +292,20 @@ public class SubnetManagerController {
             exe.execute(new Runnable() {
                 @Override
                 public void run() {
-                    for (IpDetail ipDetail : ipdetails) {
-                        if (ipDetail.getIp() != null) {
-                            if (ipDetail.getIp().equals("0.0.0.0")) {
-                                continue;
-                            }
-                            String ip = IpUtil.decConvertIp(Long.parseLong(ipDetail.getIp()));
-                            if (!IpUtil.verifyIp(ip)) {
-                                continue;
-                            }
-                            // 判断ip地址是否属于子网
-                            for (Subnet subnet : subnets) {
-                                genericNoSubnet(subnet, ipDetail);
+                    synchronized (this){
+                        for (IpDetail ipDetail : ipdetails) {
+                            if (ipDetail.getIp() != null) {
+                                if (ipDetail.getIp().equals("0.0.0.0")) {
+                                    continue;
+                                }
+                                String ip = IpUtil.decConvertIp(Long.parseLong(ipDetail.getIp()));
+                                if (!IpUtil.verifyIp(ip)) {
+                                    continue;
+                                }
+                                // 判断ip地址是否属于子网
+                                for (Subnet subnet : subnets) {
+                                    genericNoSubnet(subnet, ipDetail);
+                                }
                             }
                         }
                     }
@@ -451,6 +453,7 @@ public class SubnetManagerController {
                         Map addresses = new LinkedHashMap();
                         for(String ip : ips){
                             Address address = this.addressService.selectObjByIp(IpUtil.ipConvertDec(ip));
+//                            IpAddress address = this.ipAddressService.selectObjByIp(IpUtil.ipConvertDec(ip));
                             if(address != null){
                                 IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(ip));
                                 int time = ipDetail.getTime();

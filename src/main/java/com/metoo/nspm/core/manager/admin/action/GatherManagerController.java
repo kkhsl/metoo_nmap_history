@@ -119,6 +119,19 @@ public class GatherManagerController {
         }
     }
 
+    @RequestMapping("gatherIp")
+    public void gatherIp(){
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        Date date = cal.getTime();
+        try {
+            this.gatherService.gatherIpaddressItem(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

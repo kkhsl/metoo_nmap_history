@@ -2080,6 +2080,12 @@ public class ItemServiceImpl implements ItemService {
                                 List<IpAddressTemp> ips = this.ipAddressTempService.selectObjByMap(params);
                                 if(ips.size() == 0){
                                     ipAddressTemp.setAddTime(time);
+                                    params.clear();
+                                    params.put("ip", ipAddressTemp.getIp());
+                                    List<Arp> arps = this.arpService.selectObjByMap(params);
+                                    if(arps.size() > 0){
+                                        ipAddressTemp.setMac(arps.get(0).getMac());
+                                    }
                                     this.ipAddressTempService.save(ipAddressTemp);
                                 }else{
                                     // 比较uuid是否相同，更新uuid
