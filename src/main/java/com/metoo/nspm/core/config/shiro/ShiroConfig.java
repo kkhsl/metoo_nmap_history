@@ -4,8 +4,6 @@ package com.metoo.nspm.core.config.shiro;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.metoo.nspm.core.config.redis.RedisManager;
-import com.metoo.nspm.core.config.shiro.cache.RedisCacheManager;
 import com.metoo.nspm.core.jwt.util.JwtCredentialsMatcher;
 import com.metoo.nspm.core.jwt.util.MultiRealmAuthenticator;
 import com.metoo.nspm.core.config.shiro.filter.MyAccessControlFilter;
@@ -172,17 +170,17 @@ public class ShiroConfig {
         myRealm.setCredentialsMatcher(hashedCredentialsMatcher);
 
         // 开启缓存管理器
-        myRealm.setCachingEnabled(true);// 开启全局缓存
+//        myRealm.setCachingEnabled(true);// 开启全局缓存
         // 方式一：EhCache
             // 只能实现本地缓存，如果应用服务器宕机，则缓存数据丢失；生产环境使用Redis-实现分布式缓存
                 // 缓存数据独立于应用服务器之外，提高数据安全性
 //        myRealm.setCacheManager(new EhCacheManager());// EhCache
-////        方式二：Redis
-        myRealm.setCacheManager(new RedisCacheManager());// RedisCacheManager
-        myRealm.setAuthenticationCachingEnabled(true);// 认证缓存
-        myRealm.setAuthenticationCacheName("authenticationCache");
-        myRealm.setAuthorizationCachingEnabled(true);// 授权缓存
-        myRealm.setAuthorizationCacheName("authorizationCache");
+//////        方式二：Redis
+//        myRealm.setCacheManager(new RedisCacheManager());// RedisCacheManager
+//        myRealm.setAuthenticationCachingEnabled(true);// 认证缓存
+//        myRealm.setAuthenticationCacheName("authenticationCache");
+//        myRealm.setAuthorizationCachingEnabled(true);// 授权缓存
+//        myRealm.setAuthorizationCacheName("authorizationCache");
         return myRealm;
     }
 
@@ -210,35 +208,8 @@ public class ShiroConfig {
         defaultWebSessionManager.setSessionIdCookieEnabled(true);
         defaultWebSessionManager.setSessionIdUrlRewritingEnabled(false);// 移除自带的JSESSIONID，方式第二次打开浏览器是进行注销操作发生
 
-        defaultWebSessionManager.setSessionDAO(redisSessionDAO());
 
         return defaultWebSessionManager;
-    }
-    /**
-     * RedisSessionDAO shiro sessionDao层的实现 通过redis
-     * 使用的是shiro-redis开源插件
-     */
-    @Bean
-    public RedisSessionDao redisSessionDAO() {
-        RedisSessionDao redisSessionDAO = new RedisSessionDao();
-//        redisSessionDAO.setExpire(expire);//session会话过期时间，默认就是1800秒
-        redisSessionDAO.setRedisManager(redisManager());
-        return redisSessionDAO;
-    }
-
-    /**
-     * 配置shiro redisManager
-     * 使用的是shiro-redis开源插件
-     */
-    @Bean
-    public RedisManager redisManager() {
-        RedisManager redisManager = new RedisManager();
-//        redisManager.setHost(redisHost);
-//        redisManager.setPort(redisPort);
-//        redisManager.setTimeout(30000);//连接redis超时
-//        if(!StringUtils._isEmpty_(redisPassword))
-//            redisManager.setPassword(redisPassword);
-        return redisManager;
     }
 
 //    @Bean("sessionManager")

@@ -19,6 +19,8 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -58,11 +60,13 @@ public class GatherServiceImpl implements IGatherService {
 
     @Override
     public void gatherArpItem(Date time) {
+
         this.itemService.gatherArpItem(time);
         // 打标签
         this.zabbixItemService.arpTag();
         // 同步到arp
         this.arpService.truncateTable();
+
         this.arpService.copyArpTemp();
         // 记录历史Arp
         this.arpHistoryService.copyArpTemp();
@@ -193,6 +197,59 @@ public class GatherServiceImpl implements IGatherService {
         this.macService.copyMacTemp();
         // 记录历史
         this.macHistoryService.copyMacTemp();
+        watch.stop();
+        System.out.println("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+    }
+
+    @Override
+    public void gatherMacThreadPool2(Date time) throws InterruptedException {
+        ExecutorService exe = Executors.newSingleThreadExecutor();
+        StopWatch watch = new StopWatch();
+        watch.start();
+        exe.execute(new Runnable() {
+            @Override
+            public void run() {
+                itemService.gatherMacThreadPool(time);
+            }
+        });
+        watch.stop();
+        System.out.println("Mac采集-写入 耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        watch.reset();
+        watch.start();
+        exe.execute(new Runnable() {
+            @Override
+            public void run() {
+                zabbixItemService.labelTheMac();
+            }
+        });
+
+        watch.stop();
+        System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        watch.reset();
+        watch.start();
+        exe.execute(new Runnable() {
+            @Override
+            public void run() {
+                itemService.topologySyncToMacBatch(time);
+            }
+        });
+        watch.stop();
+        System.out.println("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        watch.reset();
+        watch.start();
+        // 同步网元数据到Mac
+        exe.execute(new Runnable() {
+            @Override
+            public void run() {
+                macService.truncateTable();
+                macService.copyMacTemp();
+                // 记录历史
+                macHistoryService.copyMacTemp();
+            }
+        });
         watch.stop();
         System.out.println("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
     }

@@ -93,12 +93,11 @@ public class ItemServiceImpl implements ItemService {
 //                Thread.sleep(5000);
 //            } catch (InterruptedException e) {
 //            }
-
-
             System.out.println(Thread.currentThread().getName() + " - " + number);
         });
         System.out.println("---");
     }
+
     @Override
     public void gatherArpItem(Date time) {
         Map params = new HashMap();
@@ -196,7 +195,7 @@ public class ItemServiceImpl implements ItemService {
                                     arpTempService.save(arpTemp);
                                 }
                                 // 记录ip使用率
-                                IpDetail existingIp = ipDetailService.selectObjByIp(ipDetail.getIp());
+                                IpDetail existingIp = ipDetailService.selectObjByIp(arpTemp.getIp());
                                 if (existingIp == null) {
                                     ipDetail.setDeviceName(deviveName);
                                     ipDetailService.save(ipDetail);
@@ -204,7 +203,6 @@ public class ItemServiceImpl implements ItemService {
                             }
                         }
                     }
-
                 }
                 if(itemTagArpList.size() <= 0){
                     params.put("ip", ip);
@@ -282,7 +280,7 @@ public class ItemServiceImpl implements ItemService {
                                         arpTempService.save(arpTemp);
                                     }
                                     // 记录ip使用率
-                                    IpDetail existingIp = ipDetailService.selectObjByIp(ipDetail.getIp());
+                                    IpDetail existingIp = ipDetailService.selectObjByIp(arpTemp.getIp());
                                     if (existingIp == null) {
                                         ipDetail.setDeviceName(deviveName);
                                         ipDetailService.save(ipDetail);
@@ -292,7 +290,6 @@ public class ItemServiceImpl implements ItemService {
                         }
                     }
                 }
-
             }
         }
         // 补全(默认标记为L)

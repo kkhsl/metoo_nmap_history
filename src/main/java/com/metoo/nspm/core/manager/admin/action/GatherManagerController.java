@@ -102,6 +102,22 @@ public class GatherManagerController {
         }
     }
 
+    @RequestMapping("gatherMacThreadPool2")
+    public void gatherMacThreadPool2(){
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        Date date = cal.getTime();
+        try {
+            StopWatch watch = StopWatch.createStarted();
+            this.gatherService.gatherMacThreadPool2(date);
+            watch.stop();
+            System.out.println("采集总耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @RequestMapping("gatherSpanningTreeProtocol")
     public void gatherStp(){
         Calendar cal = Calendar.getInstance();

@@ -33,6 +33,7 @@ public interface IGatherService {
      * @throws InterruptedException
      */
     void gatherMacThreadPool(Date time);
+    void gatherMacThreadPool2(Date time) throws InterruptedException;
 
     /**
      * 采集路由

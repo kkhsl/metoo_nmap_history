@@ -24,6 +24,8 @@ public class ThreadPool {
     //ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);//定长线程池
     // ExecutorService fixedThreadPool = Executors.newCachedThreadPool();//
 
+
+
     public void test(){
         // 推荐手动创建线程池
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
@@ -59,10 +61,12 @@ public class ThreadPool {
         return pool;
     }
 
-    public ExecutorService getFixedThreadPool(int size){
-        return Executors.newFixedThreadPool(size);
-    }
-
+    /**
+     * 向线程池添加一个任务
+     * submit(): 向线程池提交单个异步任务
+     * invokeAll(): 向线程池提交批量异步任务
+     * @param run
+     */
     public void addThread(Runnable run) {
         fixedThreadPool.execute(run);
     }
@@ -73,6 +77,11 @@ public class ThreadPool {
      */
     public ExecutorService getService() {
         return fixedThreadPool;
+    }
+
+
+    public ExecutorService getFixedThreadPool(int size){
+        return Executors.newFixedThreadPool(size);
     }
 
 }
