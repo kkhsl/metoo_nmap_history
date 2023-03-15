@@ -12,7 +12,6 @@ public class RedisDemo {
     public static void main(String[] args) {
         Jedis jedis = new Jedis();
         jedis.auth("123456");
-
     }
 
     @Test

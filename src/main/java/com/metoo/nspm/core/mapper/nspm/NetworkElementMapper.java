@@ -18,7 +18,7 @@ public interface NetworkElementMapper {
 
     List<NetworkElement> selectObjByMap(Map params);
 
-    List<NetworkElement> selectObjAll();
+    List<NetworkElement> selectObjAll(Map params);
 
     int save(NetworkElement instance);
 

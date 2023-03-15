@@ -1,5 +1,6 @@
 package com.metoo.nspm.core.service.nspm.impl;
 
+import com.metoo.nspm.core.manager.admin.tools.GroupTools;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
 import com.metoo.nspm.core.mapper.nspm.NetworkElementMapper;
 import com.metoo.nspm.core.service.nspm.IGroupService;
@@ -15,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -28,6 +26,8 @@ public class NetworkElementServiceImpl implements INetworkElementService {
     private NetworkElementMapper networkElementMapper;
     @Autowired
     private IGroupService groupService;
+    @Autowired
+    private GroupTools groupTools;
 
     @Override
     public NetworkElement selectObjById(Long id) {
@@ -58,7 +58,18 @@ public class NetworkElementServiceImpl implements INetworkElementService {
 
     @Override
     public List<NetworkElement> selectObjAll() {
-        return this.networkElementMapper.selectObjAll();
+        User user = ShiroUserHolder.currentUser();
+        if(user.getGroupId() != null){
+            Group group = this.groupService.selectObjById(user.getGroupId());
+            Map params = new HashMap();
+            List<Long> groupList = new ArrayList<>();
+            if(group != null){
+                Set<Long> ids = this.groupTools.genericGroupId(group.getId());
+                params.put("groupIds", ids);
+                return this.networkElementMapper.selectObjAll(params);
+            }
+        }
+        return new ArrayList<>();
     }
 
     @Override

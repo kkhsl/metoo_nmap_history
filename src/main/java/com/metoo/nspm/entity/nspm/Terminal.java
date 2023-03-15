@@ -3,18 +3,16 @@ package com.metoo.nspm.entity.nspm;
 import com.metoo.nspm.core.domain.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-
-@ApiModel("介质访问控制:Media Access Control")
+@ApiModel("拓扑终端")
 @Data
-@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Mac extends IdEntity {
+public class Terminal extends IdEntity {
 
     @ApiModelProperty("设备名称")
     private String deviceIp;
@@ -51,7 +49,9 @@ public class Mac extends IdEntity {
     private String remoteUuid;
     private String vendor;
     private String vlan;
-
+    @ApiModelProperty("是否在线")
     private Integer online;
+    private Long terminalTypeId;
     private String terminalTypeName;
+
 }

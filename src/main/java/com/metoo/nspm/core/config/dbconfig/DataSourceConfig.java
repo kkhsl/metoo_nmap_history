@@ -32,17 +32,17 @@ public class DataSourceConfig {
     }
 
 //     topology数据库配置
-    @Bean(name = "topologyDataSpringProperties")
-    @ConfigurationProperties(prefix = "spring.datasource.topology")
-    public DataSourceProperties topologyDataSourceProperties(){
-        return new DataSourceProperties();
-    }
-
-    // topology数据库数据源
-    @Bean("topologyDataSource")
-    public DataSource topologyDataSource(@Qualifier("topologyDataSpringProperties") DataSourceProperties dataSourceProperties){
-        return dataSourceProperties.initializeDataSourceBuilder().build();
-    }
+//    @Bean(name = "topologyDataSpringProperties")
+//    @ConfigurationProperties(prefix = "spring.datasource.topology")
+//    public DataSourceProperties topologyDataSourceProperties(){
+//        return new DataSourceProperties();
+//    }
+//
+//    // topology数据库数据源
+//    @Bean("topologyDataSource")
+//    public DataSource topologyDataSource(@Qualifier("topologyDataSpringProperties") DataSourceProperties dataSourceProperties){
+//        return dataSourceProperties.initializeDataSourceBuilder().build();
+//    }
 
     // zabbix数据库配置
     @Bean(name = "zabbixDataSpringProperties")

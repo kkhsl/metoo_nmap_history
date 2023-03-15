@@ -78,6 +78,10 @@ public class NetworkElementManagerController {
     private ITopologyService topologyService;
     @Autowired
     private ICredentialService credentialService;
+    @Autowired
+    private ITerminalService terminalService;
+    @Autowired
+    private ITerminalTypeService terminalTypeService;
 
     @Value("${batchImportNeFileName}")
     private String batchImportNeFileName;
@@ -162,6 +166,44 @@ public class NetworkElementManagerController {
     public Object all(){
         List<NetworkElement> networkElements = this.networkElementService.selectObjAll();
         return ResponseUtil.ok(networkElements);
+    }
+
+    @ApiOperation("网元|终端列表")
+    @GetMapping("/terminal/all")
+    public Object terminalAll(){
+        List<NetworkElement> networkElements = this.networkElementService.selectObjAll();
+        Map params = new HashMap();
+        for (NetworkElement networkElement : networkElements) {
+            if(networkElement.getIp() != null){
+                params.put("uuid", networkElement.getUuid());
+                List<Terminal> terminals = this.terminalService.selectObjByMap(params);
+                networkElement.setTerminalList(terminals);
+            }
+        }
+        return ResponseUtil.ok(networkElements);
+    }
+
+    @ApiOperation("网元|终端列表")
+    @PostMapping("/terminal")
+    public Object terminal(@RequestBody String[] uuids){
+        if(uuids != null && uuids.length > 0){
+            Map params = new HashMap();
+            Map map = new HashMap();
+            for (String uuid : uuids) {
+                params.put("uuid", uuid);
+                List<Terminal> terminals = this.terminalService.selectObjByMap(params);
+                terminals.stream().forEach(e -> {
+                    if(e.getTerminalTypeId() != null
+                            && !e.getTerminalTypeId().equals("")){
+                        TerminalType terminalType = this.terminalTypeService.selectObjById(e.getTerminalTypeId());
+                        e.setTerminalTypeName(terminalType.getName());
+                    }
+                });
+                map.put(uuid, terminals);
+            }
+            return ResponseUtil.ok(map);
+        }
+        return ResponseUtil.ok();
     }
 
     @ApiOperation("网元|端口列表")

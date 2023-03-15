@@ -117,6 +117,14 @@
 
     <select id="selectObjAll" resultMap="Base_Result_Map">
         SELECT id, device_name, ip, device_type_name, uuid, interface_name FROM metoo_ne
+        <where>
+            <if test="groupIds != null and groupIds != ''">
+                AND group_id in
+                <foreach collection="groupIds" index = "index" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
     </select>
 
     <insert id="save" parameterType="com.metoo.nspm.entity.nspm.NetworkElement" useGeneratedKeys="true" keyProperty="id">

@@ -114,9 +114,6 @@ public class UserServiceImpl implements IUserService {
         }else{// 未设置组时，默认为所属组与当前用户相同
             User currentUser = ShiroUserHolder.currentUser();
             currentUser = this.userMapper.findByUserName(currentUser.getUsername());
-            System.out.println(currentUser.getGroupLevel());
-            user.setGroupLevel(currentUser.getGroupLevel());
-            user.setGroupName(currentUser.getGroupName());
             user.setGroupId(currentUser.getGroupId());
         }
         if(dto.getId() == null){

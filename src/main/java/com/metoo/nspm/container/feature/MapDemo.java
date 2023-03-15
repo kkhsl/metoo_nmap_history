@@ -1,15 +1,15 @@
-package com.metoo.nspm.core.utils.collections;
+package com.metoo.nspm.container.feature;
 
 import org.junit.Test;
 
 import java.util.*;
 
-public class MapTest {
+public class MapDemo {
 
     /**
      * map集合遍历的四种方式
      */
-    private static Map map = new HashMap();
+    private static Map<String, String> map = new HashMap();
 //    private static Map map = new LinkedHashMap();
 
     static {
@@ -73,4 +73,13 @@ public class MapTest {
         }
         System.out.println(map);
     }
+
+    @Test
+    public void stream(){
+        map.entrySet().stream().forEach((Map.Entry<String, String> entry) -> {
+            System.out.println(entry.getKey());
+            System.out.println(entry.getValue());
+        });
+    }
+
 }

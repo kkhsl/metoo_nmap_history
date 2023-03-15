@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,5 +65,11 @@ public class NetworkElement extends IdEntity {
 
     // 端口列表
     private List<Map> interfaces;
+
+    // 分组列表
+    private List<Group> groupList = new ArrayList<>();
+    // 终端列表
+    private List<Terminal> terminalList = new ArrayList<>();
+
 
 }

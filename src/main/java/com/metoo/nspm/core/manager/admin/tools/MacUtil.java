@@ -1,9 +1,15 @@
 package com.metoo.nspm.core.manager.admin.tools;
 
+import com.metoo.nspm.core.mapper.nspm.TerminalMapper;
 import com.metoo.nspm.core.service.nspm.IMacVendorService;
+import com.metoo.nspm.core.service.nspm.ITerminalService;
+import com.metoo.nspm.core.service.nspm.ITerminalTypeService;
+import com.metoo.nspm.core.service.nspm.impl.TerminalServiceImpl;
 import com.metoo.nspm.core.utils.MyStringUtils;
 import com.metoo.nspm.entity.nspm.Mac;
 import com.metoo.nspm.entity.nspm.MacVendor;
+import com.metoo.nspm.entity.nspm.Terminal;
+import com.metoo.nspm.entity.nspm.TerminalType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +20,13 @@ import java.util.Map;
 @Component
 public class MacUtil {
 
+
     @Autowired
     private IMacVendorService macVendorService;
+    @Autowired
+    private ITerminalService terminalService;
+    @Autowired
+    private ITerminalTypeService terminalTypeService;
 
     public List<Mac> macJoint(List<Mac> macs){
         if(macs != null && macs.size() > 0) {
@@ -38,6 +49,50 @@ public class MacUtil {
             }
         }
         return macs;
+    }
+
+    public List<Terminal> terminalJoint(List<Terminal> terminals){
+        if(terminals != null && terminals.size() > 0) {
+            for (Terminal terminal : terminals) {
+                if (terminal.getMac() != null && !terminal.getMac().equals("")) {
+                    String macAddr = terminal.getMac();
+                    int index = MyStringUtils.acquireCharacterPosition(macAddr, ":", 3);
+                    if(index != -1){
+                        macAddr = macAddr.substring(0, index);
+                        Map params = new HashMap();
+                        params.clear();
+                        params.put("mac", macAddr);
+                        List<MacVendor> macVendors = this.macVendorService.selectObjByMap(params);
+                        if (macVendors.size() > 0) {
+                            MacVendor macVendor = macVendors.get(0);
+                            terminal.setVendor(macVendor.getVendor());
+                        }
+                    }
+                }
+            }
+        }
+        return terminals;
+    }
+
+    public void writerType(List<Mac> macs){
+        if(macs.size() > 0){
+            Map params = new HashMap();
+            macs.stream().forEach(e -> {
+                params.clear();
+                params.put("mac", e.getMac());
+                List<Terminal> terminals = this.terminalService.selectObjByMap(params);
+                if(terminals.size() > 0){
+                    Terminal terminal = terminals.get(0);
+                    if(terminal.getOnline() != null){
+                        e.setOnline(terminal.getOnline());
+                    }
+                    if(terminal.getTerminalTypeId() != null){
+                        TerminalType terminalType = this.terminalTypeService.selectObjById(terminal.getTerminalTypeId());
+                        e.setTerminalTypeName(terminalType.getName());
+                    }
+                }
+            });
+        }
     }
 
     public static void main(String[] args) {

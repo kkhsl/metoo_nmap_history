@@ -1,5 +1,6 @@
 package com.metoo.nspm.core.service.zabbix.impl;
 
+import com.metoo.nspm.core.config.shiro.cache.RedisCache;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixItemService;
 import com.metoo.nspm.core.service.nspm.*;
@@ -57,6 +58,8 @@ public class GatherServiceImpl implements IGatherService {
     private ISpanningTreeProtocolHistoryService spanningTreeProtocolHistoryService;
     @Autowired
     private IGatherAlarmService gatherAlarmService;
+    @Autowired
+    private ITerminalService terminalService;
 
     @Override
     public void gatherArpItem(Date time) {
@@ -195,10 +198,21 @@ public class GatherServiceImpl implements IGatherService {
         // 同步网元数据到Mac
         this.macService.truncateTable();
         this.macService.copyMacTemp();
+
+        this.terminalService.syncHistoryMac(time);
+
         // 记录历史
         this.macHistoryService.copyMacTemp();
         watch.stop();
+
+
+        this.terminalService.syncMac();
+
+
+
         System.out.println("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+
     }
 
     @Override

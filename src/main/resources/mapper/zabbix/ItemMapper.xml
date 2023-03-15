@@ -64,7 +64,7 @@
             NOT IN(
                     SELECT DISTINCT(itemid) FROM item_tag
                     WHERE
-                     item_tag.`value` = '%{#'
+                     item_tag.`value` like '%{%'
                 )
     </select>
 
@@ -129,7 +129,7 @@
                 NOT IN(
                 SELECT DISTINCT(itemid) FROM item_tag
                 WHERE
-                item_tag.`value` = '%{#'
+                item_tag.`value` like '%{%'
             )
         )tag
           on tag.itemid = item_tag.itemid
@@ -194,7 +194,7 @@
             SELECT DISTINCT(itemid)
             FROM item_tag
             WHERE
-             item_tag.`value` = '%{#'
+             item_tag.`value` like '%{%'
             )
     </select>
 
@@ -242,7 +242,7 @@
             SELECT DISTINCT(itemid)
             FROM item_tag
             WHERE
-             item_tag.`value` = '%{#'
+             item_tag.`value` like '%{%'
             )
     </select>
 
@@ -351,7 +351,7 @@
             NOT IN(
                     SELECT DISTINCT(itemid) FROM item_tag
                     WHERE
-                     item_tag.`value` = '%{#'
+                     item_tag.`value` like '%{%'
                 )
     </select>
 
@@ -434,7 +434,7 @@
             NOT IN(
                     SELECT DISTINCT(itemid) FROM item_tag
                     WHERE
-                     item_tag.`value` = '%{#'
+                     item_tag.`value` like '%{%'
                 )
     </select>
 
@@ -507,7 +507,7 @@
                         NOT IN(
                                 SELECT DISTINCT(itemid) FROM item_tag
                                 WHERE
-                                 item_tag.`value` = '%{#'
+                                 item_tag.`value` like '%{%'
                             )
     </select>
 
@@ -592,7 +592,7 @@
             NOT IN(
                     SELECT DISTINCT(itemid) FROM item_tag
                     WHERE
-                     item_tag.`value` = '%{#'
+                     item_tag.`value` like '%{%'
                 )
 
     </select>
@@ -689,7 +689,7 @@
                     NOT IN(
                             SELECT DISTINCT(itemid) FROM item_tag
                             WHERE
-                             item_tag.`value` = '%{#'
+                             item_tag.`value` like '%{%'
                         )
     </select>
 

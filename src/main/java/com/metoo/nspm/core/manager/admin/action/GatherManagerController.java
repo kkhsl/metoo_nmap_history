@@ -1,10 +1,12 @@
 package com.metoo.nspm.core.manager.admin.action;
 
+import com.metoo.nspm.core.service.nspm.ITerminalService;
 import com.metoo.nspm.core.service.zabbix.IGatherService;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -148,6 +150,12 @@ public class GatherManagerController {
         }
     }
 
+    @Autowired
+    private ITerminalService terminalService;
 
+    @GetMapping("/terminal")
+    public void terminal(){
+        this.terminalService.syncMac();
+    }
 
 }

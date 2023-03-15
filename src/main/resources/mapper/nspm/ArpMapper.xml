@@ -319,6 +319,12 @@
             <if test="ip != null and ip != ''">
                 AND ip = #{ip}
             </if>
+            <if test="ips != null and ips != ''">
+                AND ip in
+                <foreach collection="ips" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="interfaceName != null and interfaceName != ''">
                AND interface_name = #{interfaceName}
             </if>

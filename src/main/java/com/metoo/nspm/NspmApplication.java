@@ -60,10 +60,10 @@ public class NspmApplication extends SpringBootServletInitializer {
     @Order(0)
     static class Runner implements CommandLineRunner{
 
-        @Autowired
-        private ITopologyTokenService topologyTokenService;
-        @Autowired
-        private TestInitService testInitService;
+//        @Autowired
+//        private ITopologyTokenService topologyTokenService;
+//        @Autowired
+//        private TestInitService testInitService;
 
         @Override
         public void run(String... args) {

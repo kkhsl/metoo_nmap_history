@@ -21,6 +21,7 @@
         <result column="interface_index" property="interfaceIndex"></result>
         <result column="ip_address" property="ipAddress"></result>
         <result column="vlan" property="vlan"></result>
+        <result column="terminal_type_name" property="terminalTypeName"></result>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -30,7 +31,8 @@
 
     <sql id="Ntoa_Column_List">
         id, addTime, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
-        remote_device_ip, remote_device_type,  remote_uuid, interface_index, ip, device_ip, device_type, vlan
+        remote_device_ip, remote_device_type,  remote_uuid, interface_index, ip, device_ip, device_type, vlan,
+        terminal_type_name
     </sql>
 
     <sql id="Copy_Column_List">
@@ -198,6 +200,16 @@
             ${orderType}
         </if>
     </select>
+
+    <update id="update" parameterType="com.metoo.nspm.entity.nspm.Mac">
+        UPDATE rsms_mac_history
+        <set>
+            <if test="terminalTypeName != null and terminalTypeName != ''">
+                  terminal_type_name = #{terminalTypeName}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
 
     <delete id="batchDelete" parameterType="com.metoo.nspm.entity.nspm.Mac">
         DELETE FROM rsms_mac_history where

@@ -2,6 +2,8 @@ package com.metoo.nspm.core.service.zabbix.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.core.config.redis.util.MyRedisManager;
+import com.metoo.nspm.core.config.shiro.cache.RedisCache;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.MacUtil;
 import com.metoo.nspm.core.manager.myzabbix.utils.ItemUtil;
@@ -20,10 +22,12 @@ import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.ItemTag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.shiro.cache.CacheException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -72,6 +76,15 @@ public class ItemServiceImpl implements ItemService {
     private ISpanningTreeProtocolTempService spanningTreeProtocolTempService;
     @Autowired
     private IMacService macService;
+
+    @Autowired
+    private static MyRedisManager redisManager = new MyRedisManager("arp");
+
+    @Autowired
+    private static MyRedisManager redisMacChange = new MyRedisManager("change");
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public static void main(String[] args) throws Exception {
         List<String> strList = Arrays.asList("a", "b", "c", "d", "e");
@@ -167,7 +180,6 @@ public class ItemServiceImpl implements ItemService {
                                 if (tag.getTag().equals("ifindex")) {
                                     // 1, 获取ifbasic最小minIndex, minIndex + (ifindex - 1)
                                     //2, 根据新获取的index获取ifbasic的端口名
-                                    // 1,
                                     ItemTag itemTag = this.itemTagMapper.selectItemTagMinIfIndex(ip);
                                     String ifindex = itemTag.getValue();
                                     int index = 0;
@@ -185,6 +197,28 @@ public class ItemServiceImpl implements ItemService {
                             }
                             // 保存Arp条目
                             if (arpTemp.getIp() != null && !arpTemp.getIp().equals("")) {
+
+//                                try {
+//                                    if(arpTemp.getMac() != null && !arpTemp.getMac().equals("")){
+//                                        Object mac = redisManager.get(arpTemp.getIp());
+//                                        if(mac == null || mac.equals("")){
+//                                            redisManager.put(arpTemp.getIp(), arpTemp.getMac());
+//                                            redisMacChange.put(arpTemp.getIp(), 0);
+//                                        }else if(!mac.toString().equals(arpTemp.getMac())){
+//                                            // 更新mac 地址；变化次数加一
+//                                            Object v = redisManager.get(arpTemp.getIp());
+//                                            if(v == null){
+//                                                redisMacChange.put(arpTemp.getIp(), 0);
+//                                            }else{
+//                                                redisManager.put(arpTemp.getIp(), arpTemp.getMac());
+//                                                redisTemplate.opsForHash().increment(redisMacChange.getCacheName(), arpTemp.getIp(), 1);
+//                                            }
+//                                        }
+//                                    }
+//                                } catch (CacheException e) {
+//                                    e.printStackTrace();
+//                                }
+
                                 params.clear();
                                 params.put("ip", arpTemp.getIp());
                                 params.put("deviceName", arpTemp.getDeviceName());
@@ -270,6 +304,26 @@ public class ItemServiceImpl implements ItemService {
                                 }
                                 // 保存Arp条目
                                 if (arpTemp.getIp() != null && !arpTemp.getIp().equals("")) {
+//                                    try {
+//                                        if(arpTemp.getMac() != null && !arpTemp.getMac().equals("")){
+//                                            Object mac = redisManager.get(arpTemp.getIp());
+//                                            if(mac == null || mac.equals("")){
+//                                                redisManager.put(arpTemp.getIp(), arpTemp.getMac());
+//                                                redisMacChange.put(arpTemp.getIp(), 0);
+//                                            }else if(!mac.toString().equals(arpTemp.getMac())){
+//                                                // 更新mac 地址；变化次数加一
+//                                                Object v = redisManager.get(arpTemp.getIp());
+//                                                if(v == null){
+//                                                    redisMacChange.put(arpTemp.getIp(), 0);
+//                                                }else{
+//                                                    redisManager.put(arpTemp.getIp(), arpTemp.getMac());
+//                                                    redisTemplate.opsForHash().increment(redisMacChange.getCacheName(), arpTemp.getIp(), 1);
+//                                                }
+//                                            }
+//                                        }
+//                                    } catch (CacheException e) {
+//                                        e.printStackTrace();
+//                                    }
                                     params.clear();
                                     params.put("ip", arpTemp.getIp());
                                     params.put("deviceName", arpTemp.getDeviceName());

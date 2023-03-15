@@ -353,8 +353,10 @@ public class StreamDemo {
     public void max() {
         Optional<Inner> maxListOptional = INNERLIST.stream().max(Comparator.comparingInt(Inner::getAge));
         maxListOptional.ifPresent(e -> System.out.println("Max: " + e.getAge()));
+
         Optional<Inner> minListOptional = INNERLIST.stream().min(Comparator.comparingInt(Inner::getAge));
         minListOptional.ifPresent(e -> System.out.println("Min：" + e.getAge()));
+
         OptionalDouble average = INNERLIST.stream().mapToInt(e -> e.getAge()).average();
         average.ifPresent(e -> System.out.println("Avg：" + e));
 

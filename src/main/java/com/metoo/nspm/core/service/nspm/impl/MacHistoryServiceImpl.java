@@ -41,6 +41,16 @@ public class MacHistoryServiceImpl implements IMacHistoryService {
     }
 
     @Override
+    public int update(Mac instance) {
+        try {
+            return this.macHistoryMapper.update(instance);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    @Override
     public int batchDelete(List<Mac> macs) {
         return this.macHistoryMapper.batchDelete(macs);
     }

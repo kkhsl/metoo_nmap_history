@@ -126,7 +126,6 @@ public class StaticScheduleTask {
             cal.clear(Calendar.MILLISECOND);
             Date date = cal.getTime();
             try {
-
                 StopWatch watch = StopWatch.createStarted();
                 this.gatherService.gatherMacThreadPool(date);
                 watch.stop();
