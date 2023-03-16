@@ -53,7 +53,7 @@ public class ArpManagerController {
             }
             dto.setMacFilter("1");
             Page<Arp> page = null;
-            if(dto != null){
+            if(dto.getTime() != null){
                 page = this.arpHistoryService.selectObjConditionQuery(dto);
             }else{
                 page = this.arpService.selectObjConditionQuery(dto);

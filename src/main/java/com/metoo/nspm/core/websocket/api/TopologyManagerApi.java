@@ -255,6 +255,7 @@ public class TopologyManagerApi {
                 args.clear();
                 args.put("uuid", uuid);
                 args.put("online", 1);
+                args.put("interfaceStatus", 1);
                 args.put("tag", "DT");
 //                List<Mac> macs = this.macService.selectByMap(args);
                 List<Terminal> terminals = this.terminalService.selectObjByMap(args);

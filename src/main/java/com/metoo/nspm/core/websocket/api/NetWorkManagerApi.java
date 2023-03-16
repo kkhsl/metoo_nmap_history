@@ -819,6 +819,7 @@ public class NetWorkManagerApi {
                             mm.put("online", terminal.getOnline());
                             TerminalType terminalType = this.terminalTypeService.selectObjById(terminal.getTerminalTypeId());
                             mm.put("terminalTypeName", terminalType.getName());
+                            mm.put("interfaceStatus", terminal.getInterfaceStatus());
                             map.put(m, mm);
                         }
                     });

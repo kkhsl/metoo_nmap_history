@@ -59,6 +59,9 @@
             <if test="online != null and online != ''">
                 AND online = #{online}
             </if>
+            <if test="interfaceStatus != null and interfaceStatus != ''">
+                AND interface_status = #{interfaceStatus}
+            </if>
             <if test="ids != null and ids != ''">
                 AND id NOT IN
                 <foreach collection="ids" index = "index" item="item" separator="," open="(" close=")">
