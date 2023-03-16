@@ -3,7 +3,6 @@ package com.metoo.nspm.core.service.zabbix.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.config.redis.util.MyRedisManager;
-import com.metoo.nspm.core.config.shiro.cache.RedisCache;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.MacUtil;
 import com.metoo.nspm.core.manager.myzabbix.utils.ItemUtil;
@@ -22,7 +21,6 @@ import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.ItemTag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.shiro.cache.CacheException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.lang.Thread.sleep;
@@ -2621,6 +2618,40 @@ public class ItemServiceImpl implements ItemService {
                 }
             }
         }
+    }
+
+    @Override
+    public Integer selectInterfaceStatus(Map params) {
+        String interfaceName = String.valueOf(params.get("interfaceName"));
+        if(interfaceName == null || interfaceName.equals("")){
+            return -1;
+        }
+        List<Item> itemTagArpList = itemMapper.selectInterfaceStatus(params);
+        if(itemTagArpList.size() > 0) {
+//            AtomicInteger status = new AtomicInteger();
+            int status = -1;
+            String name = "";
+            for (Item item : itemTagArpList) {
+                List<ItemTag> tags = item.getItemTags();
+                if(tags.size() > 0){
+                    for (ItemTag tag : tags) {
+                        String value = tag.getValue();
+                        if (tag.getTag().equals("ifname")) {
+                            name = value;
+                        }
+                        if (tag.getTag().equals("ifup")) {
+//                            status.set(Integer.parseInt(value));
+                            status = Integer.parseInt(value);
+                        }
+                    }
+                }
+                if(name.equals(interfaceName)){
+                    break;
+                }
+            }
+            return status;
+        }
+        return 0;
     }
 
 //    @Override

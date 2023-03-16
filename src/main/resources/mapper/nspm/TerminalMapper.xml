@@ -26,20 +26,21 @@
         <result column="online" property="online"></result>
         <result column="terminal_type_id" property="terminalTypeId"></result>
         <result column="terminal_type_name" property="terminalTypeName"></result>
+        <result column="interface_status" property="interfaceStatus"></result>
 
     </resultMap>
 
     <sql id="Base_Column_List">
         id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
         remote_device_ip, remote_device_type, remote_uuid, interface_index, ip, device_ip, device_type, vlan, `type`, online,
-        terminal_type_id, terminal_type_name
+        terminal_type_id, terminal_type_name, interface_status
     </sql>
 
     <sql id="Ntoa_Column_List">
         id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
         remote_device_ip, remote_device_type, remote_uuid, interface_index, ip,
         device_ip, device_type, vlan, online,
-        terminal_type_id, terminal_type_name
+        terminal_type_id, terminal_type_name, interface_status
     </sql>
 
     <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
@@ -130,6 +131,9 @@
             <if test="terminalTypeId != null">
                 terminal_type_id,
             </if>
+            <if test="interfaceStatus != null">
+                interface_status,
+            </if>
         </trim>
         <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
             <if test="addTime != null">
@@ -185,6 +189,9 @@
             </if>
             <if test="terminalTypeId != null">
                 #{terminalTypeId},
+            </if>
+            <if test="interfaceStatus != null">
+                #{interfaceStatus},
             </if>
         </trim>
     </insert>
@@ -248,6 +255,9 @@
             </if>
             <if test="terminalTypeId != null and terminalTypeId != ''">
                 terminal_type_id = #{terminalTypeId},
+            </if>
+            <if test="interfaceStatus != null">
+                interface_status = #{interfaceStatus},
             </if>
         </set>
         WHERE id = #{id}

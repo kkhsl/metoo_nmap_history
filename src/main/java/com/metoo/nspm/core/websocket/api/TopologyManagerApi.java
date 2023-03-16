@@ -242,7 +242,8 @@ public class TopologyManagerApi {
 
     @ApiOperation("设备 Mac (DT))")
     @GetMapping(value = {"/mac/dt"})
-    public NoticeWebsocketResp getObjMac(@RequestParam(value = "requestParams", required = false) String requestParams){
+    public NoticeWebsocketResp getObjMac(@RequestParam(value = "requestParams", required = false) String requestParams) throws Exception {
+
         Map params = JSONObject.parseObject(String.valueOf(requestParams), Map.class);
         Date time = DateTools.parseDate(String.valueOf(params.get("time")), "yyyy-MM-dd HH:mm");
         List<String> list = JSONObject.parseObject(String.valueOf(params.get("params")), List.class);

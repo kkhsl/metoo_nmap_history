@@ -57,5 +57,8 @@ public interface ItemService {
 
     void topologySyncToMacBatch(Date time);
 
+    // 查询端口状态
+    Integer selectInterfaceStatus(Map params);
+
 
 }

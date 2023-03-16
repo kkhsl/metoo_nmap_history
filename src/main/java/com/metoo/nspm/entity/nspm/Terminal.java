@@ -34,6 +34,9 @@ public class Terminal extends IdEntity {
     private String type;
     @ApiModelProperty("接口索引")
     private String interfaceIndex;
+
+    @ApiModelProperty("端口状态")
+    private Integer interfaceStatus;
     @ApiModelProperty("接口ip")
     private String ip;
     @ApiModelProperty("接口ip")

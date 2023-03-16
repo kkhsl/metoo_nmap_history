@@ -833,7 +833,7 @@ public class NetWorkManagerApi {
             return rep;
         }
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
-        rep.setNoticeType("9");
+        rep.setNoticeType("11");
         rep.setNoticeStatus(0);
         return rep;
     }

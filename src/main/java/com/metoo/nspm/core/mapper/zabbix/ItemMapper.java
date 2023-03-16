@@ -32,4 +32,7 @@ public interface ItemMapper {
 
     List<Item> gatherItemBySTP(Map params);
 
+    // 查询端口状态
+    List<Item> selectInterfaceStatus(Map params);
+
 }

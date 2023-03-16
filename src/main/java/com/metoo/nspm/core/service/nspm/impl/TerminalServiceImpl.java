@@ -5,6 +5,7 @@ import com.metoo.nspm.core.service.nspm.IMacHistoryService;
 import com.metoo.nspm.core.service.nspm.IMacService;
 import com.metoo.nspm.core.service.nspm.ITerminalService;
 import com.metoo.nspm.core.service.nspm.ITerminalTypeService;
+import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.entity.nspm.Mac;
 import com.metoo.nspm.entity.nspm.Terminal;
 import com.metoo.nspm.entity.nspm.TerminalType;
@@ -28,6 +29,8 @@ public class TerminalServiceImpl implements ITerminalService {
     private IMacService macService;
     @Autowired
     private IMacHistoryService macHistoryService;
+    @Autowired
+    private ItemService itemService;
 
     @Override
     public List<Terminal> selectObjByMap(Map params) {
@@ -109,6 +112,11 @@ public class TerminalServiceImpl implements ITerminalService {
             TerminalType terminalType = this.terminalTypeService.selectObjByType(1);
             List<Long> ids = new ArrayList<>();
             macs.stream().forEach(e -> {
+                // 更新端口状态
+                params.clear();
+                params.put("interfaceName", e.getInterfaceName());
+                params.put("ip", e.getDeviceIp());
+                Integer ifup = this.itemService.selectInterfaceStatus(params);
                 params.clear();
                 params.put("mac", e.getMac());
                 List<Terminal> terminals = this.selectObjByMap(params);
@@ -116,6 +124,9 @@ public class TerminalServiceImpl implements ITerminalService {
                     terminals.stream().forEach(t -> {
                         if(t.getOnline() == 0){
                             t.setOnline(1);
+                        }
+                        if(t.getInterfaceStatus() != ifup){
+                            t.setInterfaceStatus(ifup);
                         }
                         if(!t.getUuid().equals(e.getUuid())
                                 ||
@@ -133,6 +144,7 @@ public class TerminalServiceImpl implements ITerminalService {
                     BeanUtils.copyProperties(e, terminal);
                     terminal.setOnline(1);
                     terminal.setTerminalTypeId(terminalType.getId());
+                    terminal.setInterfaceStatus(ifup);
                     this.terminalMapper.insert(terminal);
                     ids.add(terminal.getId());
                 }

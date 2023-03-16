@@ -722,4 +722,35 @@
         AND tag_inner.tag = 'ifname'
     </select>
 
+
+    <select id="selectInterfaceStatus" parameterType="java.util.Map" resultMap="ItemArp_Result_Map">
+                 SELECT item_external.*
+                 FROM (
+                   SELECT *
+                   FROM item_tag
+                   WHERE itemid
+                   IN (
+                    SELECT itemid
+                    FROM interface
+                    JOIN items
+                    ON
+                     interface.hostid = items.hostid
+                    WHERE interface.ip = #{ip}
+                  )
+                  AND `value` = 'ifbasic'
+                  GROUP BY itemid
+                  ORDER BY itemid
+                  DESC
+                 ) items
+                 JOIN item_tag item_external
+                 ON item_external.itemid = items.itemid
+                  WHERE
+                  item_external.itemid NOT IN(
+                            SELECT DISTINCT(itemid) FROM item_tag
+                            WHERE
+                             item_tag.`value` like '%{%'
+                        )
+
+    </select>
+
 </mapper>
