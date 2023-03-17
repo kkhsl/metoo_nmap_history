@@ -66,7 +66,8 @@ public class StaticScheduleTask {
      * 采集Arp
      */
     @Scheduled(cron = "0 */1 * * * ?")
-    public void configureTask(){
+//    @Scheduled(cron = "*/5 * * * * ?")
+    public void configureTask() throws InterruptedException {
 //        ThreadContext.bind(manager);
         //下面正常使用业务代码即可
         if(flag){
@@ -87,39 +88,21 @@ public class StaticScheduleTask {
                 e.printStackTrace();
             }
             System.out.println("===Arp采集耗时：" + (System.currentTimeMillis()-time) + "===");
+//            for (int i = 1; i <= 10; i++){
+//                Thread.sleep(1000);
+//                System.out.println("arp" + i);
+//            }
         }
     }
-
-    /**
-     * 采集Mac
-     */
-//    @Scheduled(cron = "0 */5 * * * ?")
-//    public void gatherMac(){
-//        if(flag){
-//            Long time=System.currentTimeMillis();
-//            log.info("Task-Mac采集开始：" + time);
-//            // 采集时间
-//            Calendar cal = Calendar.getInstance();
-//            cal.clear(Calendar.SECOND);
-//            cal.clear(Calendar.MILLISECOND);
-//            Date date = cal.getTime();
-//            try {
-//                this.gatherService.gatherMacItem(date);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            log.info("Task-Mac采集结束，采集时间为：" + (System.currentTimeMillis()-time));
-//        }
-//    }
 
     /**
      * 使用批量插入、Stream并行流优化采集
      */
     @Scheduled(cron = "0 */1 * * * ?")
-    public void gatherMacBatch(){
+//    @Scheduled(cron = "*/5 * * * * ?")
+    public void gatherMac() throws InterruptedException {
         if(flag){
             Long time = System.currentTimeMillis();
-
             // 采集时间
             Calendar cal = Calendar.getInstance();
             cal.clear(Calendar.SECOND);
@@ -134,6 +117,11 @@ public class StaticScheduleTask {
                 e.printStackTrace();
             }
             log.info("Task-Mac采集结束，采集时间为：" + (System.currentTimeMillis()-time));
+
+//            for (int i = 1; i <= 10; i++){
+//                Thread.sleep(1000);
+//                System.out.println("mac" + i);
+//            }
         }
     }
 
@@ -166,7 +154,7 @@ public class StaticScheduleTask {
      * 采集Problem
      */
 //    @Scheduled(cron = "0 */1 * * * ?")
-    @Scheduled(cron = "*/10 * * * * ?")
+//    @Scheduled(cron = "*/10 * * * * ?")
 //    public void gatherProblem(){
 ////        ThreadContext.bind(manager);
 //        //下面正常使用业务代码即可
@@ -286,8 +274,5 @@ public class StaticScheduleTask {
             System.out.println("==删除数据耗时：" + (System.currentTimeMillis()-time) + "===");
         }
     }
-
-
-
 
 }

@@ -808,22 +808,55 @@ public class NetWorkManagerApi {
             Set<Map.Entry<String, JSONArray>> keys = requestParam.entrySet();
             for (Map.Entry<String, JSONArray> entry : keys) {
                 if(entry.getValue() != null && entry.getValue().size() > 0){
-                    Map map = new HashMap();
+                    List list = new ArrayList<>();
                     entry.getValue().stream().forEach(m ->{
+                        Map flux_terminal = new HashMap();
                         params.clear();
                         params.put("mac", m);
                         List<Terminal> terminals = this.terminalService.selectObjByMap(params);
                         if(terminals.size() > 0){
                             Terminal terminal = terminals.get(0);
-                            Map mm = new HashMap();
-                            mm.put("online", terminal.getOnline());
                             TerminalType terminalType = this.terminalTypeService.selectObjById(terminal.getTerminalTypeId());
-                            mm.put("terminalTypeName", terminalType.getName());
-                            mm.put("interfaceStatus", terminal.getInterfaceStatus());
-                            map.put(m, mm);
+                            terminal.setTerminalTypeName(terminalType.getName());
+                            // 流量
+                            Map flux = new HashMap();
+                            Map args = new HashMap();
+                            args.clear();
+                            args.put("ip", terminal.getDeviceIp());
+                            // 采集ifbasic,然后查询端口对应的历史流量
+                            args.put("tag", "ifreceived");
+                            args.put("available", 1);
+                            List<Item> items = this.itemService.selectTagByMap(args);
+                            if(items.size() > 0){
+                                for (Item item : items) {
+                                    String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                                    flux.put("received", lastvalue);
+                                    break;
+                                }
+                            } else{
+                                flux.put("received", "0");
+                            }
+                            args.clear();
+                            args.put("ip", terminal.getDeviceIp());
+                            // 采集ifbasic,然后查询端口对应的历史流量
+                            args.put("tag", "ifsent");
+                            args.put("available", 1);
+                            List<Item> ifsents = this.itemService.selectTagByMap(args);
+                            if(ifsents.size() > 0){
+                                for (Item item : ifsents) {
+                                    String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                                    flux.put("sent", lastvalue);
+                                    break;
+                                }
+                            }else{
+                                flux.put("sent", "0");
+                            }
+                            flux_terminal.put("terminal", terminal);
+                            flux_terminal.put("flux", flux);
+                            list.add(flux_terminal);
                         }
                     });
-                    result.put(entry.getKey(), map);
+                    result.put(entry.getKey(), list);
                 }
             }
 
@@ -838,5 +871,46 @@ public class NetWorkManagerApi {
         rep.setNoticeStatus(0);
         return rep;
     }
+
+//    @ApiOperation("11：网元|设备状态")
+//    @GetMapping("/ne/partition/terminal")
+//    public NoticeWebsocketResp partitionTerminal(@RequestParam(value = "requestParams", required = false) String requestParams){
+//        Map<String, JSONArray> requestParam = JSONObject.parseObject(requestParams, Map.class);
+//        Map result = new HashMap();
+//        if(!requestParam.isEmpty()){
+//            Map params = new HashMap();
+//            Set<Map.Entry<String, JSONArray>> keys = requestParam.entrySet();
+//            for (Map.Entry<String, JSONArray> entry : keys) {
+//                if(entry.getValue() != null && entry.getValue().size() > 0){
+//                    Map map = new HashMap();
+//                    entry.getValue().stream().forEach(m ->{
+//                        params.clear();
+//                        params.put("mac", m);
+//                        List<Terminal> terminals = this.terminalService.selectObjByMap(params);
+//                        if(terminals.size() > 0){
+//                            Terminal terminal = terminals.get(0);
+//                            Map mm = new HashMap();
+//                            mm.put("online", terminal.getOnline());
+//                            TerminalType terminalType = this.terminalTypeService.selectObjById(terminal.getTerminalTypeId());
+//                            mm.put("terminalTypeName", terminalType.getName());
+//                            mm.put("interfaceStatus", terminal.getInterfaceStatus());
+//                            map.put(m, mm);
+//                        }
+//                    });
+//                    result.put(entry.getKey(), map);
+//                }
+//            }
+//
+//            NoticeWebsocketResp rep = new NoticeWebsocketResp();
+//            rep.setNoticeType("11");
+//            rep.setNoticeStatus(1);
+//            rep.setNoticeInfo(result);
+//            return rep;
+//        }
+//        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+//        rep.setNoticeType("11");
+//        rep.setNoticeStatus(0);
+//        return rep;
+//    }
 
 }

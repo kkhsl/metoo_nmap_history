@@ -19,36 +19,24 @@ import java.util.concurrent.*;
 
 @Component
 public class ThreadPool {
-    ExecutorService fixedThreadPool = Executors.newSingleThreadExecutor();// 创建单线程池
-    // 不推荐使用，这种方式对现成的控制粒度比较低
-    //ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);//定长线程池
-    // ExecutorService fixedThreadPool = Executors.newCachedThreadPool();//
 
-
-
-    public void test(){
-        // 推荐手动创建线程池
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                2,
-                4,
-                10,
-                TimeUnit.MILLISECONDS,
-                new ArrayBlockingQueue<>(2),
-                new ThreadFactory() {
-                    @Override
-                    public Thread newThread(@NotNull Runnable r) {
-                        Thread t = new Thread(r);
-                        t.setName("t1");
-                        return t;
-                    }
-                }, new ThreadPoolExecutor.AbortPolicy());
-        // 线程池执行任务
-        executor.execute(() ->{
-            for (int i = 0; i <= 10; i++){
-                System.out.println(i);
-            }
-        });
+    public static void main(String[] args) {
+       int s =  Runtime.getRuntime().availableProcessors();
+        System.out.println(s);
+        int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 10);
+        System.out.println(POOL_SIZE);
     }
+
+    public static final int POOL_SIZE;
+
+    static {
+        POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 5);
+    }
+
+//    ExecutorService fixedThreadPool = Executors.newSingleThreadExecutor();// 创建单线程池
+    // 不推荐使用，这种方式对现成的控制粒度比较低
+    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(POOL_SIZE);//定长线程池
+    // ExecutorService fixedThreadPool = Executors.newCachedThreadPool();//
 
 
     private static ThreadPool pool = new ThreadPool();// 创建单例
@@ -84,4 +72,29 @@ public class ThreadPool {
         return Executors.newFixedThreadPool(size);
     }
 
+
+
+    public void test(){
+        // 推荐手动创建线程池
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
+                2,
+                4,
+                10,
+                TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(2),
+                new ThreadFactory() {
+                    @Override
+                    public Thread newThread(@NotNull Runnable r) {
+                        Thread t = new Thread(r);
+                        t.setName("t1");
+                        return t;
+                    }
+                }, new ThreadPoolExecutor.AbortPolicy());
+        // 线程池执行任务
+        executor.execute(() ->{
+            for (int i = 0; i <= 10; i++){
+                System.out.println(i);
+            }
+        });
+    }
 }
