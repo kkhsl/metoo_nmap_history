@@ -28,19 +28,17 @@ public class ProblemManagerApi {
     public NoticeWebsocketResp problempAll(
             @RequestParam(value = "requestParams", required = false) String requestParams){
         Map<String, Object> requestParam = JSONObject.parseObject(requestParams, Map.class);
+        String sessionId = (String) requestParam.get("sessionId");
         NspmProblemDTO dto = new NspmProblemDTO();
-        dto.setCurrentPage(Integer.parseInt(requestParam.get("currentPage").toString()));
-        dto.setPageSize(Integer.parseInt(requestParam.get("pageSize").toString()));
+        Map<String, Object> param = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
+        dto.setCurrentPage(Integer.parseInt(param.get("currentPage").toString()));
+        dto.setPageSize(Integer.parseInt(param.get("pageSize").toString()));
         Page<Problem> page = this.problemService.selectConditionQuery(dto);
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
-        if(page.getResult().size() > 0){
-            rep.setNoticeType("8");
-            rep.setNoticeStatus(1);
-            rep.setNoticeInfo(new PageInfo<Problem>(page));
-        }else{
-            rep.setNoticeType("8");
-            rep.setNoticeStatus(0);
-        }
+        rep.setNoticeType("8");
+        rep.setNoticeStatus(1);
+        rep.setNoticeInfo(new PageInfo<Problem>(page));
+        RedisResponseUtils.syncRedis(sessionId, new PageInfo<Problem>(page), 8);
         return rep;
     }
 
@@ -49,16 +47,17 @@ public class ProblemManagerApi {
     public NoticeWebsocketResp problemp(
             @RequestParam(value = "requestParams", required = false) String requestParams){
         Map<String, Object> requestParam = JSONObject.parseObject(requestParams, Map.class);
+        String sessionId = (String) requestParam.get("sessionId");
         Map params = new HashMap();
         params.put("limit", requestParam.get("limit"));
         List<Problem> problemList = this.problemService.selectObjByMap(params);
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
+        rep.setNoticeType("6");
+        rep.setNoticeInfo(problemList);
+        RedisResponseUtils.syncRedis(sessionId, problemList, 6);
         if(problemList.size() > 0){
-            rep.setNoticeType("6");
             rep.setNoticeStatus(1);
-            rep.setNoticeInfo(problemList);
         }else{
-            rep.setNoticeType("6");
             rep.setNoticeStatus(0);
         }
         return rep;
@@ -66,15 +65,18 @@ public class ProblemManagerApi {
 
     @ApiOperation("拓扑端口事件:可改为只是用：uuid，使用uuid查询数据库获取ip")
     @GetMapping("/interface/event")
-    public Object interfaceEvent(@RequestParam(value = "requestParams") String param){
-        List problems = new ArrayList();
-        if(param != null && !param.equals("")){
-            List<Object> requestParams = JSONObject.parseObject(param, List.class);
+    public Object interfaceEvent(@RequestParam(value = "requestParams") String requestParams){
+        List result = new ArrayList();
+        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+        if(requestParams != null && !requestParams.equals("")){
+            Map param = JSONObject.parseObject(String.valueOf(requestParams), Map.class);
+            String sessionId = (String) param.get("sessionId");
+            List<Object> list = JSONObject.parseObject(String.valueOf(param.get("params")), List.class);
             List<String> events = new ArrayList<>();
             events.add("tempexceed");
             events.add("cpuexceed");
             events.add("memexceed");
-            for (Object requestParam : requestParams){
+            for (Object requestParam : list){
                 String[] str = requestParam.toString().split("&");
                 // 获取端口事件状态
                 Map params = new HashMap();
@@ -89,20 +91,18 @@ public class ProblemManagerApi {
                     for(Problem problem : problemList){
                         event.put(problem.getEvent(), problem.getStatus());
                         event.put("uuid", str[1]);
-                        problems.add(event);
+                        result.add(event);
                     }
                 }
             }
-        }
-        NoticeWebsocketResp rep = new NoticeWebsocketResp();
-        if (problems.size() > 0) {
             rep.setNoticeStatus(1);
             rep.setNoticeType("7");
-            rep.setNoticeInfo(problems);
-        }else{
-            rep.setNoticeType("7");
-            rep.setNoticeStatus(0);
+            rep.setNoticeInfo(result);
+            RedisResponseUtils.syncRedis(sessionId, result, 7);
+            return rep;
         }
+        rep.setNoticeType("7");
+        rep.setNoticeStatus(0);
         return rep;
     }
 
