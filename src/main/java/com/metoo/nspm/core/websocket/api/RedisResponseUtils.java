@@ -21,7 +21,6 @@ public class RedisResponseUtils {
             boolean k0flag = false;
             boolean k1flag = false;
 
-
             if(value == null || "".equals(value)){
                 key1 = key + ":1";
                 value = redisWss.get(key1);
@@ -36,13 +35,13 @@ public class RedisResponseUtils {
             }else{
                 boolean flag = Md5Crypt.getDiffrent(value, result);
                 if(flag){
-                    if(k0flag){
-                        redisWss.remove(key0);
-                    }
                     if(k1flag){
                         redisWss.remove(key1);
+                        redisWss.put(key + ":0", result);
                     }
-                    redisWss.put(key + ":0", result);
+//                    if(k0flag){
+//                        redisWss.remove(key0);
+//                    }
                 }else{
                     if(k0flag){
                         redisWss.remove(key0);

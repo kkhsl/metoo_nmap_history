@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/admin/gather")
 public class GatherManagerController {
 
     Logger log = LoggerFactory.getLogger(GatherManagerController.class);
