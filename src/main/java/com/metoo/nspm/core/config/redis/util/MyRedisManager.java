@@ -45,6 +45,11 @@ public class MyRedisManager<k,v> {
         return (v) getRedisTemplate().opsForHash().delete(this.cacheName, k.toString());
     }
 
+//    public v rename(k k) throws CacheException {
+//
+//        return (v) getRedisTemplate().opsForHash().
+//    }
+
 
     public void clear() throws CacheException {
         getRedisTemplate().delete(this.cacheName);

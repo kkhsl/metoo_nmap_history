@@ -20,7 +20,6 @@ import com.metoo.nspm.entity.zabbix.Interface;
 import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.Problem;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,8 +48,6 @@ public class NetWorkManagerApi {
     @Autowired
     private IProblemService problemService;
     @Autowired
-    private IMacService macService;
-    @Autowired
     private IMacHistoryService macHistoryService;
     @Autowired
     private ItemService itemService;
@@ -69,17 +66,20 @@ public class NetWorkManagerApi {
         System.out.println(ii);
     }
 
-
+    @ApiOperation("")
     @RequestMapping("/list")
-    public NoticeWebsocketResp testApi(@RequestParam(value = "requestParams") String param){
-        if(param != null && !param.isEmpty()){
-            Map map = JSONObject.parseObject(param, Map.class);
+    public NoticeWebsocketResp testApi(@RequestParam(value = "requestParams") String requestParams){
+        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+        if(requestParams != null && !requestParams.isEmpty()){
+            Map param = JSONObject.parseObject(requestParams, Map.class);
+            String sessionId = (String) param.get("sessionId");
+            Map result = new HashMap();
             // 获取类型
-            NetworkElementDto dto = JSONObject.parseObject(map.get("params").toString(), NetworkElementDto.class);
+            NetworkElementDto dto = JSONObject.parseObject(param.get("params").toString(), NetworkElementDto.class);
             if (dto == null) {
                 dto = new NetworkElementDto();
             }
-            dto.setUserId(Long.parseLong(map.get("userId").toString()));
+            dto.setUserId(Long.parseLong(param.get("userId").toString()));
             if (dto.getGroupId() != null) {
                 Group group = this.groupService.selectObjById(dto.getGroupId());
                 if (group != null) {
@@ -88,7 +88,6 @@ public class NetWorkManagerApi {
                 }
             }
             Page<NetworkElement> page = this.networkElementService.selectConditionQuery(dto);
-            Map nes = new HashMap();
             if (page.getResult().size() > 0) {
                 for (NetworkElement ne : page.getResult()) {
                     if (ne.getIp() != null) {
@@ -96,31 +95,31 @@ public class NetWorkManagerApi {
                         if (obj != null) {
                             ne.setAvailable(obj.getAvailable());
                             ne.setError(obj.getError());
-                            nes.put(ne.getIp(), obj.getAvailable());
+                            result.put(ne.getIp(), obj.getAvailable());
                         }
                     }
                 }
-                NoticeWebsocketResp rep = new NoticeWebsocketResp();
                 rep.setNoticeType("1");
                 rep.setNoticeStatus(1);
-                rep.setNoticeInfo(nes);
-                return rep;
+                rep.setNoticeInfo(result);
+                RedisResponseUtils.syncRedis(sessionId, result, 1);
             }
         }
-        NoticeWebsocketResp rep = new NoticeWebsocketResp();
         rep.setNoticeStatus(0);
         return rep;
     }
 
-    @ApiOperation("拓扑端口事件")
+    @ApiOperation("5:拓扑端口事件")
     @GetMapping("/interface/event")
-    public Object interfaceEvent(@RequestParam(value = "requestParams") String param){
-        Map map = new HashMap();
-        List list = new ArrayList();
-        if(param != null && !param.equals("")){
-            List<Object> requestParams = JSONObject.parseObject(param, List.class);
-            for (Object requestParam : requestParams){
-                Map ele = JSONObject.parseObject(requestParam.toString(), Map.class);
+    public Object interfaceEvent(@RequestParam(value = "requestParams") String requestParams){
+        List result = new ArrayList();
+        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+        if(requestParams != null && !requestParams.equals("")){
+            Map param = JSONObject.parseObject(String.valueOf(requestParams), Map.class);
+            String sessionId = (String) param.get("sessionId");
+            List<Object> list = JSONObject.parseObject(String.valueOf(param.get("params")), List.class);
+            for (Object obj : list){
+                Map ele = JSONObject.parseObject(obj.toString(), Map.class);
                 Set<Map.Entry<String, String>> entrySet = ele.entrySet();
                 for(Map.Entry<String, String> entry : entrySet){
                     if(entry.getKey().equals("from") || entry.getKey().equals("to")){
@@ -194,18 +193,16 @@ public class NetWorkManagerApi {
                         }
                     }
                 }
-                list.add(ele);
+                result.add(ele);
             }
-        }
-        NoticeWebsocketResp rep = new NoticeWebsocketResp();
-        if (list.size() > 0) {
             rep.setNoticeStatus(1);
             rep.setNoticeType("5");
-            rep.setNoticeInfo(list);
-        }else{
-            rep.setNoticeType("5");
-            rep.setNoticeStatus(0);
+            rep.setNoticeInfo(result);
+            RedisResponseUtils.syncRedis(sessionId, result, 5);
+            return rep;
         }
+        rep.setNoticeType("5");
+        rep.setNoticeStatus(0);
         return rep;
     }
 
@@ -322,11 +319,15 @@ public class NetWorkManagerApi {
 
     @ApiOperation("拓扑设备状态")
     @GetMapping("/snmp/status")
-    public Object status(@RequestParam(value = "requestParams") String param){
-        List list = new ArrayList();
-        if(param != null && !param.equals("")){
-            List<Object> requestParams = JSONObject.parseObject(param, List.class);
-            for (Object ip : requestParams){
+    public Object status(@RequestParam(value = "requestParams") String requestParams){
+        List result = new ArrayList();
+        String sessionId = "";
+        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+        if(requestParams != null && !requestParams.equals("")){
+            Map param = JSONObject.parseObject(String.valueOf(requestParams), Map.class);
+            sessionId = (String) param.get("sessionId");
+            List<Object> ips = JSONObject.parseObject(param.get("params").toString(), List.class);
+            for (Object ip : ips){
                 try {
                     Map map = new HashMap();
                     String[] str = ip.toString().split("&");
@@ -334,22 +335,18 @@ public class NetWorkManagerApi {
                     String avaliable = this.interfaceUtil.getInterfaceAvaliable(str[0]);
                     map.put("snmp", avaliable);
                     map.put("uuid", str[1]);
-                    list.add(map);
+                    result.add(map);
                 } catch (Exception e) {
                     e.printStackTrace();
                     continue;
                 }
             }
-        }
-        NoticeWebsocketResp rep = new NoticeWebsocketResp();
-        if (list.size() > 0) {
-            rep.setNoticeStatus(1);
             rep.setNoticeType("2");
-            rep.setNoticeInfo(list);
-        }else{
-            rep.setNoticeType("2");
-            rep.setNoticeStatus(0);
+            rep.setNoticeInfo(result);
+            RedisResponseUtils.syncRedis(sessionId, result, 2);
+            return rep;
         }
+        rep.setNoticeType("2");
         return rep;
     }
 
@@ -683,16 +680,17 @@ public class NetWorkManagerApi {
     public NoticeWebsocketResp neInterfaces(@RequestParam(value = "requestParams", required = false) String requestParams){
         Map requestParam = JSONObject.parseObject(requestParams, Map.class);
         if(!requestParam.isEmpty()){
+            String sessionId = (String) requestParam.get("sessionId");
             Map subarea = new HashMap();
-            Date time = DateTools.parseDate(String.valueOf(requestParam.get("time")), "yyyy-MM-dd HH:mm");
-            Map params = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
-            for(Object key : params.keySet()){
-                String value = params.get(key).toString();
+            Map param = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
+            Date time = DateTools.parseDate(String.valueOf(param.get("time")), "yyyy-MM-dd HH:mm");
+            for(Object key : param.keySet()){
+                String value = param.get(key).toString();
                 JSONArray ary = JSONArray.parseArray(value);
                 if(ary.size() > 0){
                     Map map = new HashMap();
-                    for (Object param : ary) {
-                        JSONObject ele = JSONObject.parseObject(param.toString());
+                    for (Object obj : ary) {
+                        JSONObject ele = JSONObject.parseObject(obj.toString());
                         String uuid = ele.getString("uuid");
                         NetworkElement ne = this.networkElementService.selectObjByUuid(uuid);
                         if(ne != null){
@@ -790,6 +788,7 @@ public class NetWorkManagerApi {
             rep.setNoticeType("9");
             rep.setNoticeStatus(1);
             rep.setNoticeInfo(subarea);
+            RedisResponseUtils.syncRedis(sessionId, subarea, 9);
             return rep;
         }
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
@@ -801,29 +800,66 @@ public class NetWorkManagerApi {
     @ApiOperation("11：网元|设备状态")
     @GetMapping("/ne/partition/terminal")
     public NoticeWebsocketResp partitionTerminal(@RequestParam(value = "requestParams", required = false) String requestParams){
-        Map<String, JSONArray> requestParam = JSONObject.parseObject(requestParams, Map.class);
+
+        Map<String, Object> requestParam = JSONObject.parseObject(requestParams, Map.class);
+        String sessionId = (String) requestParam.get("sessionId");
+
+        Map<String, JSONArray> param = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
         Map result = new HashMap();
-        if(!requestParam.isEmpty()){
+        if(!param.isEmpty()){
             Map params = new HashMap();
-            Set<Map.Entry<String, JSONArray>> keys = requestParam.entrySet();
+            Set<Map.Entry<String, JSONArray>> keys = param.entrySet();
             for (Map.Entry<String, JSONArray> entry : keys) {
                 if(entry.getValue() != null && entry.getValue().size() > 0){
-                    Map map = new HashMap();
+                    List list = new ArrayList<>();
                     entry.getValue().stream().forEach(m ->{
+                        Map flux_terminal = new HashMap();
                         params.clear();
                         params.put("mac", m);
                         List<Terminal> terminals = this.terminalService.selectObjByMap(params);
                         if(terminals.size() > 0){
                             Terminal terminal = terminals.get(0);
-                            Map mm = new HashMap();
-                            mm.put("online", terminal.getOnline());
                             TerminalType terminalType = this.terminalTypeService.selectObjById(terminal.getTerminalTypeId());
-                            mm.put("terminalTypeName", terminalType.getName());
-                            mm.put("interfaceStatus", terminal.getInterfaceStatus());
-                            map.put(m, mm);
+                            terminal.setTerminalTypeName(terminalType.getName());
+                            // 流量
+                            Map flux = new HashMap();
+                            Map args = new HashMap();
+                            args.clear();
+                            args.put("ip", terminal.getDeviceIp());
+                            // 采集ifbasic,然后查询端口对应的历史流量
+                            args.put("tag", "ifreceived");
+                            args.put("available", 1);
+                            List<Item> items = this.itemService.selectTagByMap(args);
+                            if(items.size() > 0){
+                                for (Item item : items) {
+                                    String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                                    flux.put("received", lastvalue);
+                                    break;
+                                }
+                            } else{
+                                flux.put("received", "0");
+                            }
+                            args.clear();
+                            args.put("ip", terminal.getDeviceIp());
+                            // 采集ifbasic,然后查询端口对应的历史流量
+                            args.put("tag", "ifsent");
+                            args.put("available", 1);
+                            List<Item> ifsents = this.itemService.selectTagByMap(args);
+                            if(ifsents.size() > 0){
+                                for (Item item : ifsents) {
+                                    String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                                    flux.put("sent", lastvalue);
+                                    break;
+                                }
+                            }else{
+                                flux.put("sent", "0");
+                            }
+                            flux_terminal.put("terminal", terminal);
+                            flux_terminal.put("flux", flux);
+                            list.add(flux_terminal);
                         }
                     });
-                    result.put(entry.getKey(), map);
+                    result.put(entry.getKey(), list);
                 }
             }
 
@@ -831,6 +867,7 @@ public class NetWorkManagerApi {
             rep.setNoticeType("11");
             rep.setNoticeStatus(1);
             rep.setNoticeInfo(result);
+            RedisResponseUtils.syncRedis(sessionId, result, 11);
             return rep;
         }
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
@@ -838,5 +875,46 @@ public class NetWorkManagerApi {
         rep.setNoticeStatus(0);
         return rep;
     }
+
+//    @ApiOperation("11：网元|设备状态")
+//    @GetMapping("/ne/partition/terminal")
+//    public NoticeWebsocketResp partitionTerminal(@RequestParam(value = "requestParams", required = false) String requestParams){
+//        Map<String, JSONArray> requestParam = JSONObject.parseObject(requestParams, Map.class);
+//        Map result = new HashMap();
+//        if(!requestParam.isEmpty()){
+//            Map params = new HashMap();
+//            Set<Map.Entry<String, JSONArray>> keys = requestParam.entrySet();
+//            for (Map.Entry<String, JSONArray> entry : keys) {
+//                if(entry.getValue() != null && entry.getValue().size() > 0){
+//                    Map map = new HashMap();
+//                    entry.getValue().stream().forEach(m ->{
+//                        params.clear();
+//                        params.put("mac", m);
+//                        List<Terminal> terminals = this.terminalService.selectObjByMap(params);
+//                        if(terminals.size() > 0){
+//                            Terminal terminal = terminals.get(0);
+//                            Map mm = new HashMap();
+//                            mm.put("online", terminal.getOnline());
+//                            TerminalType terminalType = this.terminalTypeService.selectObjById(terminal.getTerminalTypeId());
+//                            mm.put("terminalTypeName", terminalType.getName());
+//                            mm.put("interfaceStatus", terminal.getInterfaceStatus());
+//                            map.put(m, mm);
+//                        }
+//                    });
+//                    result.put(entry.getKey(), map);
+//                }
+//            }
+//
+//            NoticeWebsocketResp rep = new NoticeWebsocketResp();
+//            rep.setNoticeType("11");
+//            rep.setNoticeStatus(1);
+//            rep.setNoticeInfo(result);
+//            return rep;
+//        }
+//        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+//        rep.setNoticeType("11");
+//        rep.setNoticeStatus(0);
+//        return rep;
+//    }
 
 }

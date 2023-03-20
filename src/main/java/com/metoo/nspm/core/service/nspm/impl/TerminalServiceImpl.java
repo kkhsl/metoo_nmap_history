@@ -96,7 +96,7 @@ public class TerminalServiceImpl implements ITerminalService {
         params.put("tag", "DT");
         List<Mac> macs = this.macService.selectByMap(params);
         if(macs.size() < 0){
-            List<Terminal> terminals = this.selectObjByMap(null);
+            List<Terminal> terminals = this.terminalMapper.selectObjByMap(null);
             terminals = terminals.stream().map(e -> {
                         if(e.getOnline() == 1){
                             e.setOnline(0);
@@ -119,7 +119,7 @@ public class TerminalServiceImpl implements ITerminalService {
                 Integer ifup = this.itemService.selectInterfaceStatus(params);
                 params.clear();
                 params.put("mac", e.getMac());
-                List<Terminal> terminals = this.selectObjByMap(params);
+                List<Terminal> terminals = this.terminalMapper.selectObjByMap(params);
                 if(terminals.size() > 0){
                     terminals.stream().forEach(t -> {
                         if(t.getOnline() == 0){
@@ -151,7 +151,7 @@ public class TerminalServiceImpl implements ITerminalService {
             });
             params.clear();
             params.put("notIds", ids);
-            List<Terminal> terminals = this.selectObjByMap(params);
+            List<Terminal> terminals = this.terminalMapper.selectObjByMap(params);
             terminals = terminals.stream().map(e -> {
                         if(e.getOnline() == 1){
                             e.setOnline(0);
@@ -177,7 +177,7 @@ public class TerminalServiceImpl implements ITerminalService {
             macs.stream().forEach(e -> {
                 params.clear();
                 params.put("mac", e.getMac());
-                List<Terminal> terminals = this.selectObjByMap(params);
+                List<Terminal> terminals = this.terminalMapper.selectObjByMap(params);
                 if(terminals.size() > 0){
                     Terminal terminal = terminals.get(0);
                     if(terminal.getTerminalTypeId() != null && !terminal.getTerminalTypeId().equals("")){

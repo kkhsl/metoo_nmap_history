@@ -62,13 +62,13 @@
             <if test="interfaceStatus != null and interfaceStatus != ''">
                 AND interface_status = #{interfaceStatus}
             </if>
-            <if test="ids != null and ids != ''">
-                AND id NOT IN
+            <if test="ids != null and ids.size > 0 ">
+                AND id IN
                 <foreach collection="ids" index = "index" item="item" separator="," open="(" close=")">
                     #{item}
                 </foreach>
             </if>
-            <if test="notIds != null and notIds != ''">
+            <if test="notIds != null and notIds.size > 0">
                 AND id NOT IN
                 <foreach collection="notIds" index = "index" item="item" separator="," open="(" close=")">
                     #{item}

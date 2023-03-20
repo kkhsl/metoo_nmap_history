@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/websocket/api/gather/alarm")
@@ -26,18 +28,14 @@ public class GatherAlarmmanagerApi {
 
     @RequestMapping("/list")
     public Object alarms(@RequestParam(value = "requestParams") String requestParams){
-
-        GatherAlarmDTO dto = JSONObject.parseObject(requestParams, GatherAlarmDTO.class);
-        Page<GatherAlarm> page = this.gatherAlarmService.selectConditionQuery(dto);
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
-        if(page.getResult().size() > 0){
-            rep.setNoticeStatus(1);
-            rep.setNoticeType("10");
-            rep.setNoticeInfo(new PageInfo<GatherAlarm>(page));
-        }else{
-            rep.setNoticeType("10");
-            rep.setNoticeStatus(0);
-        }
+        Map param = JSONObject.parseObject(String.valueOf(requestParams), Map.class);
+        String sessionId = (String) param.get("sessionId");
+        GatherAlarmDTO dto = JSONObject.parseObject(param.get("params").toString(), GatherAlarmDTO.class);
+        Page<GatherAlarm> page = this.gatherAlarmService.selectConditionQuery(dto);
+        rep.setNoticeType("10");
+        rep.setNoticeInfo(new PageInfo<GatherAlarm>(page));
+        RedisResponseUtils.syncRedis(sessionId, new PageInfo<GatherAlarm>(page), 10);
         return rep;
     }
 

@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 @RequestMapping("/websocket/api/zabbix")
 @RestController
@@ -33,13 +30,17 @@ public class ZabbixManagerApi {
     }
     // 根据ip 名称 查询端口流量
     @RequestMapping("/lastvalue")
-    public Object history(@RequestParam(value = "requestParams") String paramsss) {
-        if(paramsss != null && !paramsss.isEmpty()){
-            List<String> requestParams = JSONObject.parseObject(paramsss, List.class);
-//            String[] requestParams = paramsss.split(",");
-            if(requestParams.size() > 0){
+    public Object history(@RequestParam(value = "requestParams") String requestParams) {
+        List result = new ArrayList();
+        String sessionId = "";
+        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+        if(requestParams != null && !requestParams.equals("")){
+            Map param = JSONObject.parseObject(String.valueOf(requestParams), Map.class);
+            sessionId = (String) param.get("sessionId");
+            List<String> list = JSONObject.parseObject(String.valueOf(param.get("params")), List.class);
+            if(list.size() > 0){
                 Map map = new HashMap();
-                for (String str : requestParams){
+                for (String str : list){
                     String[] data = str.split("&");
                     if(data.length >= 2) {
                         Map params = new HashMap();
@@ -78,16 +79,13 @@ public class ZabbixManagerApi {
                         map.put(str, ele);
                     }
                 }
-                NoticeWebsocketResp rep = new NoticeWebsocketResp();
                 rep.setNoticeType("3");
-                rep.setNoticeStatus(1);
                 rep.setNoticeInfo(map);
+                RedisResponseUtils.syncRedis(sessionId, result, 3);
                 return rep;
             }
         }
-        NoticeWebsocketResp rep = new NoticeWebsocketResp();
         rep.setNoticeType("3");
-        rep.setNoticeStatus(0);
         return rep;
     }
 

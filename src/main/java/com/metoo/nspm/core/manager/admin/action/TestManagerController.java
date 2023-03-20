@@ -1,26 +1,37 @@
 package com.metoo.nspm.core.manager.admin.action;
 
+import com.github.pagehelper.Page;
+import com.metoo.nspm.core.config.redis.util.MyRedisManager;
+import com.metoo.nspm.core.manager.admin.tools.Md5Crypt;
 import com.metoo.nspm.core.service.nspm.IRackService;
 import com.metoo.nspm.core.service.nspm.TestInitService;
+import com.metoo.nspm.core.service.zabbix.IProblemService;
+import com.metoo.nspm.core.utils.query.PageInfo;
+import com.metoo.nspm.dto.NspmProblemDTO;
 import com.metoo.nspm.entity.nspm.Rack;
+import com.metoo.nspm.entity.nspm.User;
+import com.metoo.nspm.entity.zabbix.Problem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@RequestMapping("/test")
 @RestController
-public class TestInitAction {
+public class TestManagerController {
 
     @Autowired
     private TestInitService testInitService;
     @Autowired
     private IRackService rackService;
+    @Autowired
+    private IProblemService problemService;
 
     private static Long domainId = 0L;
 
@@ -107,6 +118,43 @@ public class TestInitAction {
 
             }
         }
+    }
+
+
+    @Autowired
+    private static MyRedisManager redisWss = new MyRedisManager("ws");
+
+    /**
+     * 测试MD5
+     *  toString() | JSONObject.toJSONString()
+     * @param dto
+     */
+    @PostMapping("/comparison")
+    public void comparison(@RequestBody NspmProblemDTO dto){
+
+        Map map1 = new HashMap();
+        Map map2 = new HashMap();
+
+        List list1 = new ArrayList();
+        List list2 = new ArrayList();
+
+        User user1 = new User();
+        User user2 = new User();
+
+        Page<Problem> page1 = this.problemService.selectConditionQuery(dto);
+        Object o1 = new PageInfo<Problem>(page1);
+
+
+//        Page<Problem> page2 = this.problemService.selectConditionQuery(dto);
+//        Object o2 = new PageInfo<Problem>(page2);
+
+        Object o2 = redisWss.get("cb9d11b5-7fa4-4626-a221-9ff8bc010678:8:0");
+
+        boolean flag = Md5Crypt.getDiffrent(o1, o2);
+        System.out.println(flag);
+
+        boolean flag1 = Md5Crypt.getDiffrentStr(o1, o2);
+        System.out.println(flag1);
     }
 
 

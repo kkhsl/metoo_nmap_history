@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.List;
 
 @ApiModel("封装分页数据")
@@ -16,7 +17,7 @@ import java.util.List;
 @Accessors
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageInfo<E> {
+public class PageInfo<E> implements Serializable {
 
     @JsonIgnore
     @ApiModelProperty("Mybatis分页对象")
