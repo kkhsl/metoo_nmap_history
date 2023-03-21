@@ -19,7 +19,7 @@ public class KafkaConsumerDemo {
 
     public static void main(String[] args) {
 
-//        Properties props = new Properties();
+//        PropertiesDemo props = new PropertiesDemo();
 //        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "0.0.0.0:00,0.0.0.0:00,0.0.0.0:00");
 //        // 消费分组名
 //        props.put(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP_NAME);

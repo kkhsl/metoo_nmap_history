@@ -47,7 +47,7 @@ public class WebSSh {
 //        }
 //        session.setPassword(pwd);
 //
-//        Properties config = new Properties();
+//        PropertiesDemo config = new PropertiesDemo();
 //        session.setConfig(config);
 //        session.setDaemonThread(true);
 //        session.connect(30000);

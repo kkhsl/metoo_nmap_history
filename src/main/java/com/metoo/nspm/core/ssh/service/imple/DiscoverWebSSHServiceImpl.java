@@ -106,7 +106,7 @@ public class DiscoverWebSSHServiceImpl extends WebSSHServiceImpl {
 
 //    private void connectToSSH(SSHConnectInfo sshConnectInfo, WebSSHData webSSHData, WebSocketSession webSocketSession) throws JSchException, IOException {
 //        Session session = null;
-//        Properties config = new Properties();
+//        PropertiesDemo config = new PropertiesDemo();
 //        config.put("StrictHostKeyChecking", "no");
 //        String deviceUuid = webSSHData.getDeviceUuid();
 //        if (!StringUtils.isEmpty(deviceUuid)) {

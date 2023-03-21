@@ -19,4 +19,5 @@ public class Properties {
     private String batchImportDeviceFileName;
 
 
+
 }

@@ -10,7 +10,7 @@ public class KafkaProductDemo {
     private final static String TOPIC_NAME = "my-replicated-topic";
 
     public static void main(String[] args)throws ExecutionException, InterruptedException {
-//        Properties props = new Properties();
+//        PropertiesDemo props = new PropertiesDemo();
 //        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"0.0.0.0:00,0.0.0.0:00,0.0.0.0:00");
 //        // 把发送的key从字符串序列中转化为字节数组
 //        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
