@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 public class MyAccessControlFilter extends AccessControlFilter {
 
@@ -65,8 +66,13 @@ public class MyAccessControlFilter extends AccessControlFilter {
             }
 //            return true;
         }
-        response.setContentType("application/json;charset=utf-8");
-        response.getWriter().print(JSONObject.toJSONString(new Result(401,"Log in")));
+//        response.setContentType("application/json;charset=utf-8");
+//        response.getWriter().print(JSONObject.toJSONString(new Result(401,"Log in")));
+        HttpServletResponse response1 = (HttpServletResponse) response;
+        response1.setContentType("application/json;charset=utf-8");
+//        response.getWriter().print(JSONObject.toJSONString(new Result(401,"Log in")));
+        response1.setStatus(302);
+        response1.sendRedirect("https://www.baidu.com/");//重定向
         return false;
     }
 
