@@ -21,10 +21,7 @@ public class PageInfo<E> implements Serializable {
 
     @JsonIgnore
     @ApiModelProperty("Mybatis分页对象")
-    private Page<E> t;
-
-    @ApiModelProperty("起始条数")
-    private Integer startRow;
+    private transient Page<E> t;
 
     @ApiModelProperty("每页条数")
     private Integer pageSize;
@@ -35,20 +32,23 @@ public class PageInfo<E> implements Serializable {
     @ApiModelProperty("当前页码")
     private Integer pageNum;
 
-    @ApiModelProperty("总条数")
-    private long total;
+    @ApiModelProperty("起始条数")
+    private Long startRow;
 
     @ApiModelProperty("由第几条结束")
-    private Integer endRow;
+    private Long endRow;
+
+    @ApiModelProperty("总条数")
+    private long total;
 
     @ApiModelProperty("排序")
     private String orderBy;
 
     @ApiModelProperty("结果集")
-    private List<E> obj;
+    private transient List<E> obj;
 
     @ApiModelProperty("其他结果集")
-    private Object other;
+    private transient Object other;
 
     public PageInfo(Page page) {
         this.obj = page.getResult();

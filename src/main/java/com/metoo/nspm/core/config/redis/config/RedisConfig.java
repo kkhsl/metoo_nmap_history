@@ -19,6 +19,17 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
+/**
+ * RedisTemlate的两种序列化时间方案
+ * 方案一：
+ *      自定义RedisTemplate
+ *      修改RedisTemplate的序列化器为GenericJackson2JsonRedisSerializer
+ *
+ * 方案二：
+ *      使用StringRedisTemplate
+ *      写入Redis时，手动把对象序列化为JSON
+ *      读取Redis时，手动把读取到的JSON反序列化为对象
+ */
 
 @EnableCaching
 @Configuration

@@ -4,8 +4,6 @@ import com.metoo.nspm.core.config.redis.util.MyRedisManager;
 import com.metoo.nspm.core.manager.admin.tools.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Map;
-
 public class RedisResponseUtils {
 
     @Autowired
@@ -51,6 +49,25 @@ public class RedisResponseUtils {
                     }
                     redisWss.put(key + ":1", result);
                 }
+            }
+        }
+    }
+
+    public static void rem(String sessionid, Integer type){
+
+        String key0 = sessionid + ":" + type + ":0";
+
+        Object value = redisWss.get(key0);
+
+        if(value != null){
+            redisWss.remove(key0);
+        }else {
+            String key1 = sessionid + ":" + type + ":1";
+
+            value = redisWss.get(key1);
+
+            if (value != null) {
+                redisWss.remove(key1);
             }
         }
     }

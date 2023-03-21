@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.apache.shiro.session.ExpiredSessionException;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -150,6 +151,15 @@ public class GlobalExceptionHandler {
         System.out.println(e.getMessage());
         return ResponseUtil.missingparameter();
     }
+
+    @ExceptionHandler(value = ClientAbortException.class)
+    @ResponseBody
+    public Object ClientAbortException(ClientAbortException e){
+        System.out.println(e.getMessage());
+        return ResponseUtil.missingparameter();
+    }
+
+
 
 //    @ExceptionHandler(value = DataIntegrityViolationException.class)
 //    @ResponseBody

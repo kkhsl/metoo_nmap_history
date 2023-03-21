@@ -26,22 +26,22 @@ public class RedisDemo {
     public void string(){
         Jedis jedis = new Jedis("127.0.0.1",6379);
         jedis.auth("123456");
-        jedis.select(2);
+        jedis.select(1);
 
         // 设置单个数据
-//        jedis.set("javaKey","javaValue");
-        // 获取
-        String javaValue = jedis.get("javaKey");
-        System.out.println(javaValue);
+        jedis.set("javaKey","javaValue");
+//        // 获取
+//        String javaValue = jedis.get("name");
+//        System.out.println(javaValue);
 
         // 设置多个数据
-        jedis.mset("javaKay1","javaValue1","javaKey2","javaKey3");
-        List<String> mget = jedis.mget("javaKey1","javaKey2");
-
-        Set<String> keys = jedis.keys("*");
-        for (String key : keys) {
-            System.out.println(key);
-        }
+//        jedis.mset("javaKay1","javaValue1","javaKey2","javaKey3");
+//        List<String> mget = jedis.mget("javaKey1","javaKey2");
+//
+//        Set<String> keys = jedis.keys("*");
+//        for (String key : keys) {
+//            System.out.println(key);
+//        }
     }
 
     @Test

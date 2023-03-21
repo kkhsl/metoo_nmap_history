@@ -8,12 +8,14 @@ import com.metoo.nspm.core.utils.query.PageInfo;
 import com.metoo.nspm.dto.NspmProblemDTO;
 import com.metoo.nspm.entity.zabbix.Problem;
 import io.swagger.annotations.ApiOperation;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.*;
 
 @RequestMapping("/websocket/api/problem")
@@ -23,24 +25,6 @@ public class ProblemManagerApi {
     @Autowired
     private IProblemService problemService;
 
-    @ApiOperation("告警信息(分页查询)")
-    @GetMapping("/all")
-    public NoticeWebsocketResp problempAll(
-            @RequestParam(value = "requestParams", required = false) String requestParams){
-        Map<String, Object> requestParam = JSONObject.parseObject(requestParams, Map.class);
-        String sessionId = (String) requestParam.get("sessionId");
-        NspmProblemDTO dto = new NspmProblemDTO();
-        Map<String, Object> param = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
-        dto.setCurrentPage(Integer.parseInt(param.get("currentPage").toString()));
-        dto.setPageSize(Integer.parseInt(param.get("pageSize").toString()));
-        Page<Problem> page = this.problemService.selectConditionQuery(dto);
-        NoticeWebsocketResp rep = new NoticeWebsocketResp();
-        rep.setNoticeType("8");
-        rep.setNoticeStatus(1);
-        rep.setNoticeInfo(new PageInfo<Problem>(page));
-        RedisResponseUtils.syncRedis(sessionId, new PageInfo<Problem>(page), 8);
-        return rep;
-    }
 
     @ApiOperation("告警信息")
     @GetMapping
@@ -103,6 +87,26 @@ public class ProblemManagerApi {
         }
         rep.setNoticeType("7");
         rep.setNoticeStatus(0);
+        return rep;
+    }
+
+
+    @ApiOperation("告警信息(分页查询)")
+    @GetMapping("/all")
+    public NoticeWebsocketResp problempAll(
+            @RequestParam(value = "requestParams", required = false) String requestParams){
+        Map<String, Object> requestParam = JSONObject.parseObject(requestParams, Map.class);
+        String sessionId = (String) requestParam.get("sessionId");
+        NspmProblemDTO dto = new NspmProblemDTO();
+        Map<String, Object> param = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
+        dto.setCurrentPage(Integer.parseInt(param.get("currentPage").toString()));
+        dto.setPageSize(Integer.parseInt(param.get("pageSize").toString()));
+        Page<Problem> page = this.problemService.selectConditionQuery(dto);
+        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+        rep.setNoticeType("8");
+        rep.setNoticeStatus(1);
+        rep.setNoticeInfo(new PageInfo<Problem>(page));
+        RedisResponseUtils.syncRedis(sessionId, new PageInfo<Problem>(page), 8);
         return rep;
     }
 
