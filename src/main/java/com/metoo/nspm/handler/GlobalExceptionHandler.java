@@ -153,10 +153,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = ClientAbortException.class)
-    @ResponseBody
-    public Object ClientAbortException(ClientAbortException e){
-        System.out.println(e.getMessage());
-        return ResponseUtil.missingparameter();
+    public void ClientAbortException(ClientAbortException e){
+//        System.out.println(e.getMessage());
+//        return ResponseUtil.missingparameter();
     }
 
 

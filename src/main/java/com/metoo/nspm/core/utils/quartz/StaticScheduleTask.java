@@ -150,6 +150,28 @@ public class StaticScheduleTask {
         }
     }
 
+    @Scheduled(cron = "0 */1 * * * ?")
+    public void gatherStp(){
+//        ThreadContext.bind(manager);
+        //下面正常使用业务代码即可
+        if(flag){
+            Long time=System.currentTimeMillis();
+            System.out.println("Stp开始采集");
+            // 采集时间
+            Calendar cal = Calendar.getInstance();
+            cal.clear(Calendar.SECOND);
+            cal.clear(Calendar.MILLISECOND);
+            Date date = cal.getTime();
+            try {
+                this.gatherService.gatherSpanningTreeProtocol(date);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println("===Stp采集耗时：" + (System.currentTimeMillis()-time) + "===");
+        }
+    }
+
+
     /**
      * 采集Problem
      */
