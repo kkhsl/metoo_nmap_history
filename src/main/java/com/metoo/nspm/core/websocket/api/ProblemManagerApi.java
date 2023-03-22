@@ -94,7 +94,7 @@ public class ProblemManagerApi {
     @ApiOperation("告警信息(分页查询)")
     @GetMapping("/all")
     public NoticeWebsocketResp problempAll(
-            @RequestParam(value = "requestParams", required = false) String requestParams){
+            @RequestParam(value = "requestParams", required = false) String requestParams) throws ClientAbortException {
         Map<String, Object> requestParam = JSONObject.parseObject(requestParams, Map.class);
         String sessionId = (String) requestParam.get("sessionId");
         NspmProblemDTO dto = new NspmProblemDTO();
@@ -107,29 +107,10 @@ public class ProblemManagerApi {
         rep.setNoticeStatus(1);
         rep.setNoticeInfo(new PageInfo<Problem>(page));
         RedisResponseUtils.syncRedis(sessionId, new PageInfo<Problem>(page), 8);
+//        if(true){// 清除数据，并抛出异常；
+//            throw new ClientAbortException("a");
+//        }
         return rep;
     }
-
-//    @ApiOperation("告警信息")
-//    @GetMapping("/cpu")
-//    public NoticeWebsocketResp problemp1(){
-//        Map params = new HashMap();
-//        List<String> events = new ArrayList<>();
-//        events.add("tempexceed");
-//        events.add("cpuexceed");
-//        events.add("memexceed");
-//        params.put("events", events);
-//        List<Problem> problemList = this.problemService.selectObjByMap(params);
-//        NoticeWebsocketResp rep = new NoticeWebsocketResp();
-//        if(problemList.size() > 0){
-//            rep.setNoticeType("7");
-//            rep.setNoticeStatus(1);
-//            rep.setNoticeInfo(problemList);
-//        }else{
-//            rep.setNoticeType("7");
-//            rep.setNoticeStatus(0);
-//        }
-//        return rep;
-//    }
 
 }
