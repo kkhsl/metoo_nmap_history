@@ -16,6 +16,9 @@ import java.util.Date;
 @NoArgsConstructor
 public class IdEntity implements Serializable{
 
+//    Id规律性太明显
+//    受单表数据量的限制
+//    Uuid 空间占用
     private Long id;
 
     /*@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")//页面写入数据库时格式化

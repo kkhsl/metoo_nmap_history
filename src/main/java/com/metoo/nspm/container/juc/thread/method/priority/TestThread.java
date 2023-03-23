@@ -86,4 +86,7 @@ public class TestThread {
 
         System.out.println("主线程结束");
     }
+
+    // 测试自定义线程池结束是否会影响其他线程池
+
 }

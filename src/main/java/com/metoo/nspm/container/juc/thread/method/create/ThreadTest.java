@@ -12,6 +12,7 @@ public class ThreadTest {
     Logger log = LoggerFactory.getLogger(ThreadTest.class);
 
     public static void main(String[] args) {
+
         System.out.println("JVM启动main线程，main线程执行main方法：打印当前县城名称" + Thread.currentThread().getName());
         // 创建子线程
         MyThread myThread = new MyThread();
