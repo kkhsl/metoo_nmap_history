@@ -66,7 +66,7 @@ public class ThreadPoolDemo {
                 public void run() {
                     try {
                         Thread.sleep(1000);
-                        synchronized (list){
+                        synchronized (this){
                             list.add(num1.getAndIncrement());
                         }
                     } catch (InterruptedException e) {
