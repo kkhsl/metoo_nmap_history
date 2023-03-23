@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.metoo.nspm.core.mapper.nspm.IpAlterationMapper">
+
+    <select id="selectObjByMap" parameterType="java.util.Map" resultType="com.metoo.nspm.entity.nspm.IpAlteration">
+        SELECT INET_NTOA(ip) ip, mac
+        FROM rsms_ip_alteration
+        <where>
+            <if test="ip != null and ip != ''">
+                AND ip = #{ip}
+            </if>
+            <if test="mac != null and mac != ''">
+                AND mac = #{mac}
+            </if>
+            <if test="addTime != null">
+                AND addTime &lt;= #{addTime}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderType != null and orderType != ''">
+            ${orderType}
+        </if>
+    </select>
+
+    <select id="selectObjByAddTime" parameterType="java.util.Map" resultType="com.metoo.nspm.entity.nspm.IpAlteration">
+        SELECT INET_NTOA(ip) ip, mac
+        FROM rsms_ip_alteration
+        where addTime &gt;= #{addTime} group by ip having count(*) >= 2;
+    </select>
+
+    <insert id="save" parameterType="com.metoo.nspm.entity.nspm.IpAlteration">
+        INSERT INTO rsms_ip_alteration
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="ip != null and ip != ''">
+                ip,
+            </if>
+            <if test="mac != null and mac != ''">
+                mac,
+            </if>
+            <if test="addTime != null">
+                addTime,
+            </if>
+        </trim>
+        <trim prefix="VALUES(" suffixOverrides="," suffix=")">
+            <if test="ip != null and ip != ''">
+                #{ip},
+            </if>
+            <if test="mac != null and mac != ''">
+                #{mac},
+            </if>
+            <if test="addTime != null ">
+                #{addTime},
+            </if>
+        </trim>
+    </insert>
+</mapper>

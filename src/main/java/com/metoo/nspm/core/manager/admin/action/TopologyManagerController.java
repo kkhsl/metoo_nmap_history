@@ -17,9 +17,11 @@ import com.metoo.nspm.dto.zabbix.RoutDTO;
 import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.test.annotation.Repeat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/admin/topology")
 @RestController
@@ -66,6 +69,8 @@ public class TopologyManagerController {
     private SubnetTool subnetTool;
     @Autowired
     private RoutTool routTool;
+    @Autowired
+    private ITerminalService terminalService;
 
     @RequestMapping("/list")
     public Object list(@RequestBody(required = false) TopologyDTO dto){
@@ -1191,6 +1196,33 @@ public class TopologyManagerController {
             }
         }
         return list;
+    }
+
+    @GetMapping("/query/device/{ip}")
+    public Object queryDevice(@PathVariable(value = "ip") String ip){
+        if(StringUtils.isNotBlank(ip)){
+            Map result = new HashMap();
+            Map params = new HashMap();
+            params.put("ip", IpUtil.ipConvertDec(ip));
+            List<IpAddress> ipAddresses = this.ipAddressServie.selectObjByMap(params);
+            if(ipAddresses.size() > 0){
+                Set<String> set = ipAddresses.stream().map(e -> {
+                    return e.getDeviceUuid();
+                }).collect(Collectors.toSet());
+                result.put("device", set);
+            }
+            params.clear();
+            params.put("ip", ip);
+            List<Terminal> terminals = this.terminalService.selectObjByMap(params);
+            if(terminals.size() > 0){
+                Set<String> set = terminals.stream().map(e -> {
+                    return e.getMac();
+                }).collect(Collectors.toSet());
+                result.put("terminal", set);
+            }
+            return ResponseUtil.ok(result);
+        }
+       return ResponseUtil.badArgument();
     }
 
 

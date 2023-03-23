@@ -74,6 +74,8 @@ public class ItemServiceImpl implements ItemService {
     private ISpanningTreeProtocolTempService spanningTreeProtocolTempService;
     @Autowired
     private IMacService macService;
+    @Autowired
+    private IpAlterationService ipAlterationService;
 
     @Autowired
     private static MyRedisManager redisManager = new MyRedisManager("arp");
@@ -196,6 +198,9 @@ public class ItemServiceImpl implements ItemService {
                             // 保存Arp条目
                             if (arpTemp.getIp() != null && !arpTemp.getIp().equals("")) {
 
+                                if(arpTemp.getMac() != null && !arpTemp.getMac().equals("")){
+                                    ipAlterationService.RecordChange(arpTemp.getIp(), arpTemp.getMac());
+                                }
 //                                try {
 //                                    if(arpTemp.getMac() != null && !arpTemp.getMac().equals("")){
 //                                        Object mac = redisManager.get(arpTemp.getIp());
@@ -302,6 +307,9 @@ public class ItemServiceImpl implements ItemService {
                                 }
                                 // 保存Arp条目
                                 if (arpTemp.getIp() != null && !arpTemp.getIp().equals("")) {
+                                    if(arpTemp.getMac() != null && !arpTemp.getMac().equals("")){
+                                        ipAlterationService.RecordChange(arpTemp.getIp(), arpTemp.getMac());
+                                    }
 //                                    try {
 //                                        if(arpTemp.getMac() != null && !arpTemp.getMac().equals("")){
 //                                            Object mac = redisManager.get(arpTemp.getIp());
@@ -1881,7 +1889,7 @@ public class ItemServiceImpl implements ItemService {
             this.macTempService.truncateTable();
             devices.parallelStream().forEach(map ->{
                 exe.execute(new Thread(() -> {
-                    synchronized (this){
+                    synchronized (this){// 锁对象需要优化
                         System.out.println(Thread.currentThread().getName());
                         String deviceName = String.valueOf(map.get("deviceName"));
                         String deviceType = String.valueOf(map.get("deviceType"));
