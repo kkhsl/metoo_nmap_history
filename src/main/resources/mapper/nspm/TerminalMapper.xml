@@ -47,6 +47,9 @@
         SELECT <include refid="Ntoa_Column_List"/>
         FROM rsms_terminal
         <where>
+            <if test="ip != null and ip !=''">
+                AND ip = #{ip}
+            </if>
             <if test="mac != null and mac !=''">
                 AND mac = #{mac}
             </if>

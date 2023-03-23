@@ -68,11 +68,14 @@ public class MyAccessControlFilter extends AccessControlFilter {
         }
 //        response.setContentType("application/json;charset=utf-8");
 //        response.getWriter().print(JSONObject.toJSONString(new Result(401,"Log in")));
-        HttpServletResponse response1 = (HttpServletResponse) response;
-        response1.setContentType("application/json;charset=utf-8");
+//        HttpServletResponse response1 = (HttpServletResponse) response;
+//        response1.setContentType("application/json;charset=utf-8");
 //        response.getWriter().print(JSONObject.toJSONString(new Result(401,"Log in")));
-        response1.setStatus(302);
-        response1.sendRedirect("https://www.baidu.com/");//重定向
+//        response1.setStatus(302);
+//        response1.sendRedirect("https://www.baidu.com/");//重定向
+
+        response.setContentType("application/json;charset=utf-8");
+        response.getWriter().print(JSONObject.toJSONString(new Result(401,"Log in")));
         return false;
     }
 

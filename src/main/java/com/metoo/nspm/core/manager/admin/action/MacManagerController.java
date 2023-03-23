@@ -48,6 +48,7 @@ public class MacManagerController {
             dto.setMacFilter("1");
             dto.setOrderBy("vlan");
             dto.setOrderType("ASC");
+            dto.setUnMac("00:00:00:00:00:00");
             Page<Mac> page = null;
             if(dto.getTime() != null){
                 page = this.macHistoryService.selectObjConditionQuery(dto);

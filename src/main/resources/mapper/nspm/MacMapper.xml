@@ -51,6 +51,9 @@
             <if test="mac != null and mac != ''">
                 AND mac = #{mac}
             </if>
+            <if test="unMac != null and unMac != ''">
+                AND mac != #{unMac}
+            </if>
             <if test="macFilter != null and macFilter != ''">
                 AND mac != ''
             </if>
