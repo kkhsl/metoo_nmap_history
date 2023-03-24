@@ -119,7 +119,8 @@ public class RsmsDeviceManagerController {
     public Object type(){
         List<DeviceType> deviceTypeList = this.deviceTypeService.selectCountByJoin();
         if(deviceTypeList.size() > 0){
-            ExecutorService exe = Executors.newFixedThreadPool(deviceTypeList.size());
+            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
+            ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
             for(DeviceType deviceType : deviceTypeList){
                 if(deviceType.getNetworkElementList().size() > 0){
                     for(NetworkElement ne : deviceType.getNetworkElementList()){

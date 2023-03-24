@@ -269,6 +269,11 @@ public class GatherServiceImpl implements IGatherService {
     }
 
     @Override
+    public void gatherMacThreadPool3(Date time) {
+        this.itemService.testGatherMacThreadPool(time);
+    }
+
+    @Override
     public void gatherRouteItem(Date time) {
         this.itemService.gatherRouteItem(time);
         this.routService.truncateTable();

@@ -36,6 +36,8 @@ public interface IGatherService {
 
     void gatherMacThreadPool2(Date time) throws InterruptedException;
 
+    void gatherMacThreadPool3(Date time);
+
     /**
      * 采集路由
      * @param time

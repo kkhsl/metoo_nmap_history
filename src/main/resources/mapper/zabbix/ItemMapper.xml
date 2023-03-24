@@ -468,6 +468,7 @@
                                     AND item_tag.tag = #{index_relevance}
                             )
                             AND tag_inner.tag = #{name_relevance}
+                            limit 1
                         ), NULL) AS name
                     FROM (
                             SELECT *

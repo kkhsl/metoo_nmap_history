@@ -921,6 +921,12 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         macSL.stream().forEach(item -> {
             // 查询arp
             if(org.apache.commons.lang3.StringUtils.isNotEmpty(item.getMac())){
+                if(item.getMac().equals("50:00:00:29:00:06")
+                    || item.getMac().equals("50:00:00:24:00:03")
+                    || item.getMac().equals("50:00:00:24:00:08")
+                    || item.getMac().equals("50:00:00:24:00:07")){
+                    System.out.println(1);
+                }
                 params.clear();
                 params.put("tag", "L");
                 params.put("mac", item.getMac());
