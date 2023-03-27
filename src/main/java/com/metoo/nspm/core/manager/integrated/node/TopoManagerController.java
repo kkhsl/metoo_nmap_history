@@ -33,6 +33,7 @@ import com.metoo.nspm.vo.ItemTagBoardVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.junit.Test;
 import org.nutz.json.Json;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -822,7 +823,7 @@ public class TopoManagerController {
 
 
     @ApiOperation("端口信息")
-    @PostMapping("/topology-layer/port")
+    @PostMapping("/topology-layer/port0")
     public Object port(@RequestBody(required = false) TopoNodeDto dto){
         if(StringUtils.isEmpty(dto.getIp())){
             return ResponseUtil.badArgument();
@@ -843,6 +844,9 @@ public class TopoManagerController {
                 NetworkElement networkElement = networkElements.get(0);
                 DeviceType deviceType = this.deviceTypeService.selectObjById(networkElement.getDeviceTypeId());
                 if(deviceType.getType() == 10){
+                    name = networkElement.getInterfaceName();
+                }
+                if(deviceType.getType() == 11){
                     name = networkElement.getInterfaceName();
                 }
             }
@@ -930,6 +934,106 @@ public class TopoManagerController {
         return ResponseUtil.ok(list);
     }
 
+
+    @ApiOperation("端口信息")
+    @GetMapping("/topology-layer/port/{uuid}")
+    public Object port(@PathVariable(value = "uuid") String uuid){
+        if(Strings.isBlank(uuid)){
+            return ResponseUtil.badArgument();
+        }
+        Map params = new HashMap();
+        params.put("uuid", uuid);
+        List<NetworkElement> networkElements = this.networkElementService.selectObjByMap(params);
+        String name = "";
+        String ip = "";
+        Integer type = -1;
+        if(networkElements.size() > 0){
+            NetworkElement networkElement = networkElements.get(0);
+            DeviceType deviceType = this.deviceTypeService.selectObjById(networkElement.getDeviceTypeId());
+            if(deviceType != null){
+                type = deviceType.getType();
+            }
+            ip = networkElement.getIp();
+            name = networkElement.getInterfaceName();
+        }
+        List<Map<String, Object>> list = new ArrayList();
+        if(type != 10 && type != 11 && type != -1){
+            params.put("ip", ip);
+            params.put("index", "ifindex");
+            List<Item> itemTagList = this.itemMapper.interfaceTable(params);
+            for (Item item : itemTagList) {
+                List<ItemTag> tags = item.getItemTags();
+                Map map = new HashMap();
+                map.put("description", "");
+                map.put("name", "");
+                map.put("ip", "");
+                map.put("mask", "");
+                map.put("status", "");
+                for (ItemTag tag : tags) {
+                    if (tag.getTag().equals("description")) {
+                        map.put("description", StringUtil.isEmpty(tag.getValue()) ? "" : tag.getValue());
+                    }
+                    if (tag.getTag().equals("ifname")) {
+                        map.put("name", StringUtil.isEmpty(tag.getValue()) ? "" : tag.getValue());
+                    }
+                    if (tag.getTag().equals("ifup")) {
+                        String status = "";
+                        switch (tag.getValue()) {
+                            case "1":
+                                status = "up";
+                                break;
+                            case "2":
+                                status = "down";
+                                break;
+                            default:
+                                status = "unknown";
+                        }
+                        map.put("status", status);
+                    }
+                    if (tag.getTag().equals("ifindex")) {
+                        map.put("index", tag.getValue());
+                        StringBuffer ip_mask = new StringBuffer();
+                        if(tag.getIp() != null && !tag.getIp().equals("")){
+                            String[] ips = tag.getIp().split("/");
+                            String[] masks = tag.getMask().split("/");
+                            if(ips.length == 0){
+                                map.put("ip", "");
+                            }
+                            if(ips.length == 1){
+                                ip_mask.append(tag.getIp());
+                                if(tag.getMask() != null && !tag.getMask().equals("")){
+                                    ip_mask.append("/").append(tag.getMask());
+                                }
+                                map.put("ip", ip_mask);
+                            }
+                            if(ips.length > 1 && masks.length > 1){
+                                for(int i = 0; i < ips.length; i ++){
+                                    ip_mask.append(ips[i]).append("/").append(masks[i]);
+                                    if(i + 1 < ips.length){
+                                        ip_mask .append("\n");
+                                    }
+                                }
+                                map.put("ip", ip_mask);
+                            }
+                        }
+                    }
+                }
+                list.add(map);
+            }
+        }else{
+            Map map = new HashMap();
+            map.put("name", name);
+            map.put("status", "up");
+            map.put("ip", ip);
+            list.add(map);
+        }
+
+        if(list != null && list.size() > 0){
+            ListSortUtil.sortStr(list);
+        }
+        return ResponseUtil.ok(list);
+    }
+
     @ApiOperation("端口信息(名称、index、triggerid)")
     @PostMapping("/ne/port")
     public Object portNe(@RequestBody(required = false) TopoNodeDto dto){
@@ -954,8 +1058,6 @@ public class TopoManagerController {
             }
         }
         params.clear();
-        params.put("ip", dto.getIp());
-        params.put("index", "ifindex");
         String name = "";
         if(dto.getIp() != null){
             params.clear();
@@ -972,6 +1074,9 @@ public class TopoManagerController {
         List list = new ArrayList();
         if(name.equals("")){
             double cpuValue = this.getValue();
+            params.clear();
+            params.put("ip", dto.getIp());
+            params.put("index", "ifindex");
             List<Item> itemTagList = this.itemMapper.interfaceTable(params);
             for (Item item : itemTagList) {
                 List<ItemTag> tags = item.getItemTags();

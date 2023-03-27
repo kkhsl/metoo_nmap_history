@@ -30,7 +30,7 @@ public class NetworkElement extends IdEntity {
     private String deviceTypeName;
     @ExcelImport("用途描述")
     private String description;
-    @ApiModelProperty("连接类型 默认0：ssh 1：telnet")
+    @ApiModelProperty("连接类型 0：ssh 1：telnet")
     private Integer connectType;
     @ApiModelProperty("端口 22")
     private Integer port;

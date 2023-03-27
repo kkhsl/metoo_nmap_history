@@ -132,6 +132,9 @@
             <if test="unUuid != null and unUuid != ''">
                 AND `uuid` != #{unUuid}
             </if>
+            <if test="remoteDeviceType != null and remoteDeviceType != ''">
+                AND remote_device_type = #{remoteDeviceType}
+            </if>
         </where>
     </select>
 
@@ -435,7 +438,8 @@
                     mac,
                     remote_uuid,
                     remote_interface,
-                    remote_device
+                    remote_device,
+                    remote_device_type
         )
         VALUES
         <foreach collection ="list" item="item" separator ="," >
@@ -452,7 +456,8 @@
                 #{item.mac},
                 #{item.remoteUuid},
                 #{item.remoteInterface},
-                #{item.remoteDevice}
+                #{item.remoteDevice},
+                #{item.remoteDeviceType}
             )
         </foreach>
     </insert>

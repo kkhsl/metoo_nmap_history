@@ -973,6 +973,32 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             this.macTempService.batchUpdate(macDT);
         }
         watch.stop();
+
+        // 查所有RT，根据RT关联的端口查DE条目，对端设备为HUB的，手工增加mac条目
+        params.clear();
+        params.put("tag", "RT");
+        List<MacTemp> rts = this.macTempService.selectByMap(params);
+        if(rts.size() > 0){
+            rts.stream().forEach(e ->{
+                params.clear();
+                params.put("deviceName", e.getDeviceName());
+                params.put("interfaceName", e.getInterfaceName());
+                params.put("tag", "DE");
+                params.put("remoteDeviceType", "HUB");
+                List<MacTemp> macTemps = this.macTempService.selectByMap(params);
+                for(MacTemp macTemp : macTemps){
+                    MacTemp instance = new MacTemp();
+                    instance.setDeviceName(macTemp.getRemoteDevice());
+                    instance.setUuid(macTemp.getRemoteUuid());
+                    instance.setInterfaceName("PortN");
+                    instance.setMac(e.getMac());
+                    instance.setIp(e.getIp());
+                    instance.setTag("DT");
+                    this.macTempService.save(instance);
+                }
+            });
+        }
+
         System.out.println("Mac-DT采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
     }
 

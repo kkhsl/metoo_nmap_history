@@ -76,6 +76,10 @@ public class ItemServiceImpl implements ItemService {
     private IMacService macService;
     @Autowired
     private IpAlterationService ipAlterationService;
+    @Autowired
+    private INetworkElementService networkElementService;
+    @Autowired
+    private IDeviceTypeService deviceTypeService;
 
     @Autowired
     private static MyRedisManager redisManager = new MyRedisManager("arp");
@@ -3025,6 +3029,13 @@ public class ItemServiceImpl implements ItemService {
                                         String name = String.valueOf(toNode.get("name"));
                                         fromMac.setRemoteDevice(name);
                                     }
+                                    NetworkElement toDevice = this.networkElementService.selectObjByUuid(to);
+                                    if(toDevice != null){
+                                        DeviceType deviceType = this.deviceTypeService.selectObjById(toDevice.getDeviceTypeId());
+                                        if(deviceType != null){
+                                            fromMac.setRemoteDeviceType(deviceType.getName());
+                                        }
+                                    }
                                     MacTemp toMac = new MacTemp();
                                     toMac.setAddTime(time);
                                     toMac.setTag("DE");
@@ -3042,6 +3053,13 @@ public class ItemServiceImpl implements ItemService {
                                         toMac.setRemoteDevice(name);
                                     }
 
+                                    NetworkElement fromDevice = this.networkElementService.selectObjByUuid(from);
+                                    if(fromDevice != null){
+                                        DeviceType deviceType = this.deviceTypeService.selectObjById(fromDevice.getDeviceTypeId());
+                                        if(deviceType != null){
+                                            toMac.setRemoteDeviceType(deviceType.getName());
+                                        }
+                                    }
                                     list.add(fromMac);
                                     list.add(toMac);
                                 }

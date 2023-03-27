@@ -181,17 +181,19 @@ public class GatherServiceImpl implements IGatherService {
         watch.stop();
         System.out.println("Mac采集-写入 耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
-        watch.reset();
-        watch.start();
-        this.zabbixItemService.labelTheMac();
-        watch.stop();
-        System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
         watch.reset();
         watch.start();
         this.itemService.topologySyncToMacBatch(time);
         watch.stop();
         System.out.println("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+
+        watch.reset();
+        watch.start();
+        this.zabbixItemService.labelTheMac();
+        watch.stop();
+        System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
         watch.reset();
         watch.start();

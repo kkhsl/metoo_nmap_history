@@ -107,7 +107,7 @@ public class ResponseUtil {
 
     public static Object notFound(){return new Result(400, "请求异常");}
 
-    public static Object missingparameter(){return new Result(400, "缺少必填参数");}
+    public static Object missingParameter(){return new Result(400, "缺少必填参数");}
 
     public static Object InvalidFormatException(){return new Result(400, "数据格式异常");}
 

@@ -27,7 +27,9 @@ import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.ItemTag;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,14 +37,17 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.crypto.hash.Hash;
 import org.aspectj.util.FileUtil;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.text.html.Option;
 import javax.xml.ws.Response;
 import java.io.*;
 import java.net.URLDecoder;
@@ -82,12 +87,13 @@ public class NetworkElementManagerController {
     private ITerminalService terminalService;
     @Autowired
     private ITerminalTypeService terminalTypeService;
+    @Autowired
+    private ItemMapper itemMapper;
 
     @Value("${batchImportNeFileName}")
     private String batchImportNeFileName;
     @Value("${batchImportFilePath}")
     private String batchImportFilePath;
-
 
     public static void main(String[] args) {
         String path = "C:\\software\\VP";
@@ -225,10 +231,6 @@ public class NetworkElementManagerController {
         return ResponseUtil.ok(networkElements);
     }
 
-
-    @Autowired
-    private ItemMapper itemMapper;
-
     public List<Map> interfaceAll(NetworkElement ne){
         if(ne != null){
             String ip = ne.getIp();
@@ -335,6 +337,60 @@ public class NetworkElementManagerController {
         return new ArrayList<>();
     }
 
+    @Test
+    public void condition(){
+        //调用工厂方法创建Optional实例
+        Optional<String> name = Optional.of("Dolores");
+        //创建一个空实例
+        Optional empty = Optional.ofNullable(null);
+        //创建一个不允许值为空的空实例
+//        Optional noEmpty = Optional.of(null);
+
+        //如果值不为null，orElse方法返回Optional实例的值。
+        //如果为null，返回传入的消息。
+        //输出：Dolores
+        System.out.println(name.orElse("There is some value!"));
+        //输出：There is no value present!
+        System.out.println(empty.orElse(null));
+        //抛NullPointerException
+//        System.out.println(noEmpty.orElse("There is no value present!"));
+    }
+
+    @Test
+    public void condition2(){
+        Map params = new HashMap();
+        Optional<Map> optional = Optional.ofNullable(params);
+        if(optional.isPresent() && !params.isEmpty()) {
+            System.out.println(0);
+        }else
+        System.out.println(1);
+        System.out.println(2);
+    }
+
+//    @ApiOperation("/允许连接设备")
+//    @PostMapping("/permit/connect")
+//    public Object condition(@RequestBody Map params) throws MissingServletRequestParameterException {
+//        Optional<Map> optional = Optional.ofNullable(params);
+//        if(optional.isPresent() && !params.isEmpty()){
+//            params.put("permitConnect", 1);
+//            List list = this.networkElementService.selectObjByMap(params);
+//            return ResponseUtil.ok(list);
+//        }
+//        throw new MissingServletRequestParameterException("","");
+//    }
+
+    @SneakyThrows
+    @ApiOperation("/允许连接设备")
+    @PostMapping("/permit/connect")
+    public Object condition(@RequestBody Map params) {
+        Optional<Map> optional = Optional.ofNullable(params);
+        if(optional.isPresent() && !params.isEmpty()){
+            List list = this.networkElementService.selectObjByMap(params);
+            return ResponseUtil.ok(list);
+        }
+        throw new MissingServletRequestParameterException("","");
+    }
+
     @GetMapping("/add")
     public Object add(){
         Map map = new HashMap();
@@ -395,7 +451,8 @@ public class NetworkElementManagerController {
 
     @ApiOperation("校验Ip格式")
     @GetMapping("/verify")
-    public Object verify(@RequestParam(value = "ip") String ip){
+    public Object verify(@RequestParam(value = "ip") String ip,
+                         @RequestParam(value = "id") String id){
         if (!StringUtils.isEmpty(ip)) {
             // 验证ip合法性
             boolean flag =  IpUtil.verifyIp(ip);
@@ -403,7 +460,7 @@ public class NetworkElementManagerController {
                 return ResponseUtil.badArgument("ip不合法");
             }
             Map params = new HashMap();
-            params.put("neId", ip);
+            params.put("neId", id);
             params.put("ip", ip);
             List<NetworkElement> nes = this.networkElementService.selectObjByMap(params);
             if(nes.size() > 0){
@@ -488,7 +545,9 @@ public class NetworkElementManagerController {
             if(deviceType.getType() == 10){
                 instance.setInterfaceName("Port0");
             }
-
+            if(deviceType.getType() == 11){
+                instance.setInterfaceName("Port0");
+            }
             if(ne != null && !ne.getDeviceTypeName().equals(deviceType.getName())){
                 deviceTypeName = deviceType.getName();
             }
@@ -514,6 +573,8 @@ public class NetworkElementManagerController {
             }
         }else{
             instance.setCredentialId(null);
+            instance.setConnectType(null);
+            instance.setPort(null);
         }
 
         if(this.networkElementService.save(instance) >= 1 ? true : false){
