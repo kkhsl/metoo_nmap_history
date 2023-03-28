@@ -129,7 +129,8 @@ public class TerminalServiceImpl implements ITerminalService {
                         if(t.getOnline() == 0){
                             t.setOnline(1);
                         }
-                        if(t.getInterfaceStatus() != ifup && !t.getInterfaceName().equals("PortN")){
+                        if(t.getInterfaceStatus() != ifup
+                                && !t.getInterfaceName().equals("PortN")){
                             t.setInterfaceStatus(ifup);
                         }
                         if(!t.getUuid().equals(e.getUuid())

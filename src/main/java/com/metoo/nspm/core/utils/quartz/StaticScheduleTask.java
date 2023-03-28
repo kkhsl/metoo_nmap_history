@@ -110,7 +110,7 @@ public class StaticScheduleTask {
             Date date = cal.getTime();
             try {
                 StopWatch watch = StopWatch.createStarted();
-                this.gatherService.gatherMacThreadPool(date);
+                this.gatherService.gatherMacThreadPool4(date);
                 watch.stop();
                 System.out.println("采集总耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
             } catch (Exception e) {

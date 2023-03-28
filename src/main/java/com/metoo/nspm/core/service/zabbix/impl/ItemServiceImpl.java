@@ -2,6 +2,7 @@ package com.metoo.nspm.core.service.zabbix.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.container.juc.callable.MyCallable;
 import com.metoo.nspm.core.config.redis.util.MyRedisManager;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.MacUtil;
@@ -1892,15 +1893,17 @@ public class ItemServiceImpl implements ItemService {
         if (devices != null && devices.size() > 0) {
 //            final CountDownLatch latch = new CountDownLatch(devices.size());
 //            IListUtils listUtils = new IListUtils();
-            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
+            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 24);
             ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
 //            ThreadPool threadPool = ThreadPool.getInstance();
             List<MacTemp> batchInsert = new ArrayList<>();
             Map params = new HashMap();
             this.macTempService.truncateTable();
             devices.parallelStream().forEach(map ->{
-                exe.execute(new Thread(() -> {
-                    synchronized (batchInsert){// 锁对象需要优化
+                exe.execute(
+                        new Thread(
+                                () -> {
+                    synchronized (batchInsert){
                         System.out.println(Thread.currentThread().getName());
                         String deviceName = String.valueOf(map.get("deviceName"));
                         String deviceType = String.valueOf(map.get("deviceType"));
@@ -2165,6 +2168,74 @@ public class ItemServiceImpl implements ItemService {
                     break;
                 }
             }
+        }
+    }
+
+
+    private static int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
+    private static ExecutorService staticExe = Executors.newFixedThreadPool(POOL_SIZE);
+
+    @Override
+    public void gatherMacCallable(Date time){
+        StopWatch watch = StopWatch.createStarted();
+        List<Map> devices = this.topoNodeService.queryNetworkElement();
+        if (devices != null && devices.size() > 0) {
+            final CountDownLatch latch = new CountDownLatch(devices.size());
+//            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
+//            ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
+            Vector<MacTemp> batchInsert = new Vector<>();
+            this.macTempService.truncateTable();
+            devices.parallelStream().forEach(map ->{
+                Future<List<MacTemp>> future = staticExe.submit(new MyCallable(time, map, itemMapper));
+                try {
+                    List<MacTemp> macTemps = future.get();
+                    batchInsert.addAll(macTemps);
+                    latch.countDown();
+
+//                    if(future.isDone()){
+//                        List<MacTemp> macTemps = future.get();
+//                        batchInsert.addAll(macTemps);
+//                        latch.countDown();
+//                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            });
+            try {
+                latch.await();
+                watch.stop();
+                log.info("Mac-采集 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+
+                if(batchInsert.size() > 0){
+                    watch.reset();
+                    watch.start();
+                    try {
+                        Vector<MacTemp> list2 = batchInsert.parallelStream().collect(
+                                Collectors.collectingAndThen(
+                                        Collectors.toCollection(() -> new TreeSet<>(
+                                                Comparator
+                                                        .comparing(MacTemp::getDeviceName)
+                                                        .thenComparing(MacTemp::getInterfaceName)
+                                                        .thenComparing(MacTemp::getMac))),
+                                        Vector::new));
+                        System.out.println("批量插入");
+                        this.macTempService.batchInsert(list2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        log.info("Mac采集异常：" + e.getMessage());
+                    }
+                    watch.stop();
+                    log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+                    // 等待并发Stream处理完成
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }finally {
+//                exe.shutdown();
+            }
+
         }
     }
 

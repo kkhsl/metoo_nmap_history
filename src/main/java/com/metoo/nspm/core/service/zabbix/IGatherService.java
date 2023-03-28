@@ -38,6 +38,8 @@ public interface IGatherService {
 
     void gatherMacThreadPool3(Date time);
 
+    void gatherMacThreadPool4(Date time);
+
     /**
      * 采集路由
      * @param time

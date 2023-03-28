@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -25,7 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Service
-//@Transactional
+@Transactional
 public class GatherServiceImpl implements IGatherService {
 
     Logger log = LoggerFactory.getLogger(GatherServiceImpl.class);
@@ -273,6 +274,49 @@ public class GatherServiceImpl implements IGatherService {
     @Override
     public void gatherMacThreadPool3(Date time) {
         this.itemService.testGatherMacThreadPool(time);
+    }
+
+    @Override
+    public void gatherMacThreadPool4(Date time) {
+        StopWatch watch = new StopWatch();
+        watch.start();
+        this.itemService.gatherMacCallable(time);
+        watch.stop();
+        System.out.println("Mac采集-写入 耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        watch.reset();
+        watch.start();
+        this.itemService.topologySyncToMacBatch(time);
+        watch.stop();
+        System.out.println("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+
+        watch.reset();
+        watch.start();
+        this.zabbixItemService.labelTheMac();
+        watch.stop();
+        System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        watch.reset();
+        watch.start();
+        // 同步网元数据到Mac
+        this.macService.truncateTable();
+        this.macService.copyMacTemp();
+
+        this.terminalService.syncHistoryMac(time);
+
+        // 记录历史
+        this.macHistoryService.copyMacTemp();
+        watch.stop();
+
+
+        this.terminalService.syncMac();
+
+
+
+        System.out.println("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+
     }
 
     @Override

@@ -172,7 +172,7 @@
 
     <insert id="copyRoutTemp">
         INSERT INTO rsms_route_history (<include refid="Copy_Column_List"/>)
-        SELECT <include refid="Copy_Column_List"/> FROM rsms_rout_temp
+        SELECT <include refid="Copy_Column_List"/> FROM rsms_route_temp
     </insert>
 
 </mapper>

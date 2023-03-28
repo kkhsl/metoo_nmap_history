@@ -1,5 +1,8 @@
 package com.metoo.nspm.container.juc.ThreadPool;
 
+import com.metoo.nspm.container.juc.callable.MyCallable;
+import com.metoo.nspm.container.juc.callable.TestCallable;
+import com.metoo.nspm.container.juc.callable.TestCallable2;
 import org.apache.poi.ss.formula.functions.T;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -10,8 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RequestMapping("/threadpool")
@@ -163,4 +165,107 @@ public class ThreadPoolDemo {
         }
     }
 
+
+    /**
+     * 遍历创建线程池，查看线程的名称
+     */
+    @Test
+    public void test5(){
+        ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
+        List list = new ArrayList();
+        for (int i = 1; i <= 2; i++){
+            System.out.println("循环 " + i);
+            final CountDownLatch countDownLatch = new CountDownLatch(2);
+
+            for (int j = 0; j < 10; j++) {
+                Future<Integer> future = exe.submit(new TestCallable(j));
+                try {
+                    list.add(future.get());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("二层循环" + j);
+                countDownLatch.countDown();
+            }
+            try {
+                countDownLatch.await();
+                System.out.println("等待结束" + i);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }finally {
+                System.out.println(list);
+            }
+        }
+    }
+
+
+    @Test
+    public void test6() throws ExecutionException, InterruptedException {
+        ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
+
+        for (int i = 1; i <= 2; i++){
+            System.out.println("循环 " + i);
+            final CountDownLatch countDownLatch = new CountDownLatch(2);
+
+            for (int j = 0; j < 10; j++) {
+                Future<Object> future = exe.submit(new TestCallable2());
+
+                future.get();
+
+                System.out.println("二层循环" + j);
+                countDownLatch.countDown();
+            }
+            try {
+                countDownLatch.await();
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }finally {
+                System.out.println("等待结束" + i);
+            }
+        }
+    }
+
+    @Test
+    public void test7(){
+        ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
+        List list = new ArrayList();
+        //Future 相当于是用来存放Executor执行的结果的一种容器
+        ArrayList<Future<Integer>> results = new ArrayList<Future<Integer>>();
+
+        for (int i = 1; i <= 2; i++){
+            System.out.println("循环 " + i);
+            final CountDownLatch countDownLatch = new CountDownLatch(2);
+
+            for (int j = 0; j < 10; j++) {
+//                Future<Integer> future = exe.submit(new TestCallable(j));
+                results.add(exe.submit(new TestCallable(j)));
+                System.out.println("二层循环" + j);
+                countDownLatch.countDown();
+            }
+            try {
+
+
+                countDownLatch.await();
+
+                for (Future<Integer> fs : results) {
+                    if (fs.isDone()) {
+                        list.add(fs.get());
+                    } else {
+                        System.out.println("Future result is not yet complete");
+                    }
+                }
+
+                System.out.println("等待结束" + i);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } finally {
+                System.out.println(list);
+            }
+        }
+    }
 }

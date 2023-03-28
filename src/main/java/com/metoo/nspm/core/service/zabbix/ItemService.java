@@ -18,6 +18,8 @@ public interface ItemService {
 
     void gatherMacThreadPool(Date time);
 
+    void gatherMacCallable(Date time);
+
     void testGatherMacThreadPool(Date time);
 
 
