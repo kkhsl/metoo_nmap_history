@@ -20,7 +20,8 @@ public class TestCallable implements Callable<Integer> {
 
 }
 
-class CallableTest {
+class CallableClose {
+
     public static void main(String[] args) throws InterruptedException,
             ExecutionException {
         ExecutorService exec = Executors.newCachedThreadPool();
