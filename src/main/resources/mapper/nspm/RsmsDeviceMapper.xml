@@ -194,6 +194,12 @@
             <if test="id != null and id != ''">
                 AND id = #{id}
             </if>
+            <if test="ids != null and ids != ''">
+              AND id in
+                <foreach collection="ids" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="name != null and name != ''">
                 AND `name` = #{name}
             </if>

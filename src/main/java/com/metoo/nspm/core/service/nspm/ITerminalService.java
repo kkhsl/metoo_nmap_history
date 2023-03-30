@@ -20,7 +20,7 @@ public interface ITerminalService {
     int batchUpdate(List<Terminal> instances);
 
     // 同步DT信息
-    void syncMac();
+    void syncMacToTerminal();
 
     void syncHistoryMac(Date time);
 }

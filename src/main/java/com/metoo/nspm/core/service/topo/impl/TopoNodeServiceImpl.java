@@ -84,7 +84,7 @@ public class TopoNodeServiceImpl implements ITopoNodeService {
     @Override
     public List<Map> queryNetworkElement() {
         List<NetworkElement> nes = this.networkElementService.selectObjByMap(null);
-        List<Map> ipList = new ArrayList<>();
+        List<Map> devices = new ArrayList<>();
         if(nes.size() > 0) {
             for (NetworkElement ne : nes) {
                 boolean available = this.interfaceUtil.verifyHostIsAvailable(ne.getIp());
@@ -95,11 +95,11 @@ public class TopoNodeServiceImpl implements ITopoNodeService {
                     map.put("deviceName", ne.getDeviceName());
                     map.put("uuid", ne.getUuid());
                     map.put("deviceType", ne.getDeviceTypeName());
-                    ipList.add(map);
+                    devices.add(map);
                 }
             }
         }
-        return ipList;
+        return devices;
     }
 
     public static void main(String[] args) {

@@ -42,7 +42,7 @@ public class MyCallable implements Callable<List<MacTemp>> {
 
     @Override
     public List call() {
-        List<MacTemp> list = new ArrayList<MacTemp>();
+        List<MacTemp> list = new Vector<>();
         System.out.println(Thread.currentThread().getName());
         String deviceName = String.valueOf(map.get("deviceName"));
         String deviceType = String.valueOf(map.get("deviceType"));

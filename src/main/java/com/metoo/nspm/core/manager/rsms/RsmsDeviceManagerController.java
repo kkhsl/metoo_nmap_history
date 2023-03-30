@@ -22,7 +22,6 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.aspectj.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -642,6 +642,54 @@ public class RsmsDeviceManagerController {
             }
         }
         return ResponseUtil.badArgument("文件不存在");
+    }
+
+    @ApiOperation("设备导出")
+    @RequestMapping(value = "/export")
+    public Object export(HttpServletResponse response, RsmsDevice device){
+        if(device.getIds() == null || device.getIds().size() <= 0){
+            return ResponseUtil.badArgument("请选择要导出的设备");
+        }
+        if(StringUtils.isBlank(device.getExcelName())){
+            return ResponseUtil.badArgument("请选择要导出的文件名");
+        }
+//        if(StringUtils.isBlank(device.getExcelName())){
+//            return ResponseUtil.badArgument("请选择要文件导出位置");
+//        }
+        Map params = new HashMap();
+        params.put("ids", device.getIds());
+        List<RsmsDevice> devices = this.rsmsDeviceService.selectObjByMap(params);
+        if(devices.size() > 0){
+            for (RsmsDevice rsmsDevice : devices) {
+                if(rsmsDevice.getDeviceTypeId() != null && !rsmsDevice.getDeviceTypeId().equals("")){
+                    DeviceType instance = this.deviceTypeService.selectObjById(rsmsDevice.getDeviceTypeId());
+                    rsmsDevice.setDeviceTypeName(instance.getName());
+                }
+                if(rsmsDevice.getVendorId() != null && !rsmsDevice.getVendorId().equals("")){
+                    Vendor instance = this.vendorService.selectObjById(rsmsDevice.getVendorId());
+                    rsmsDevice.setVendorName(instance.getName());
+                }
+                if(rsmsDevice.getGroupId() != null && !rsmsDevice.getGroupId().equals("")){
+                    Group instance = this.groupService.selectObjById(rsmsDevice.getGroupId());
+                    rsmsDevice.setGroupName(instance.getBranchName());
+                }
+                if(rsmsDevice.getPlantRoomId() != null && !rsmsDevice.getPlantRoomId().equals("")){
+                    PlantRoom instance = this.plantRoomService.getObjById(rsmsDevice.getPlantRoomId());
+                    rsmsDevice.setPlantRoomName(instance.getName());
+                }
+                if(rsmsDevice.getRackId() != null && !rsmsDevice.getRackId().equals("")){
+                    Rack instance = this.rackService.getObjById(rsmsDevice.getRackId());
+                    rsmsDevice.setRackName(instance.getName());
+                }
+                if(rsmsDevice.getProjectId() != null && !rsmsDevice.getProjectId().equals("")){
+                    Project instance = this.projectService.selectObjById(rsmsDevice.getProjectId());
+                    rsmsDevice.setProjectName(instance.getName());
+                }
+            }
+            List<List<Object>> sheetDataList = ExcelUtils.getSheetData(devices);
+            ExcelUtils.export(response, "设备管理", sheetDataList);
+        }
+        return ResponseUtil.ok();
     }
 
     @Autowired

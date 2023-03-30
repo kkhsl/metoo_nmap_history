@@ -44,8 +44,7 @@ public class TestThread {
             }
         });
         t1.start();
-        t1.join();
-        Thread.currentThread().join(5000);
+        Thread.currentThread().join(6000);
         log.info("主线程：" + Thread.currentThread().getName() + " 等待");
         log.info("主线程执行结束");
     }

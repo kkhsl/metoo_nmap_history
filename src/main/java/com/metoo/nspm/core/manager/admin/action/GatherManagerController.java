@@ -187,7 +187,7 @@ public class GatherManagerController {
 
     @GetMapping("/terminal")
     public void terminal(){
-        this.terminalService.syncMac();
+        this.terminalService.syncMacToTerminal();
     }
 
 }

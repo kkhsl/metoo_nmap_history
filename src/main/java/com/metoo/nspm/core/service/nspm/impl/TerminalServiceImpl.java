@@ -90,7 +90,7 @@ public class TerminalServiceImpl implements ITerminalService {
     }
 
     @Override
-    public void syncMac() {
+    public void syncMacToTerminal() {
         Map params = new HashMap();
         params.clear();
         params.put("tag", "DT");

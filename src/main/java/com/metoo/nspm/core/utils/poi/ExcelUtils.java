@@ -595,6 +595,7 @@ public class ExcelUtils {
         return file;
     }
 
+
     /**
      * 获取文件
      *
@@ -634,7 +635,7 @@ public class ExcelUtils {
         return file;
     }
 
-    private static <T> List<List<Object>> getSheetData(List<T> list) {
+    public static <T> List<List<Object>> getSheetData(List<T> list) {
         // 获取表头字段
         List<ExcelClassField> excelClassFieldList = getExcelClassFieldList(list.get(0).getClass());
         List<String> headFieldList = new ArrayList<>();
@@ -907,7 +908,7 @@ public class ExcelUtils {
         // 设置样式
         cell.setCellStyle(style);
         // 数据为空时
-        if (o == null) {
+        if (o == null || o.equals("")) {
             cell.setCellType(CellType.STRING);
             cell.setCellValue("");
             return CELL_OTHER;

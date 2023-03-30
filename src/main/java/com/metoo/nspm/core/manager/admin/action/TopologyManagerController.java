@@ -823,7 +823,7 @@ public class TopologyManagerController {
 //            return ResponseUtil.ok(map);
 //    }
 
-    @ApiOperation("二层设备查询")
+    @ApiOperation("路由查询")
     @RequestMapping("/layer_2_device")
     public Object routTable(String srcIp, Integer srcMask, String destIp, Integer destMask,
                             @RequestParam(value = "time", required = false)
@@ -906,6 +906,22 @@ public class TopologyManagerController {
         params.put("userId", user.getId());
         List<RouteTable> routTableList = this.routTableService.selectObjByMap(params);
         map.put("routTable", routTableList);
+
+        Map param = new HashMap();
+        boolean flag = false;
+        for (RouteTable routeTable : routTableList) {
+            if(routeTable.getIp().equals(destIp)){
+                flag = true;
+                break;
+            }
+        }
+        if(flag){
+            map.put("type", 0);
+            map.put("msg", "从起点Ip " + srcIp +" 到终点Ip " + destIp +" 路由正常");
+        }else{
+            map.put("type", 1);
+            map.put("msg", "从起点Ip " + srcIp +" 到终点Ip " + destIp +" 路由异常");
+        }
 
         // 二层路径
 //        if(type == 1){

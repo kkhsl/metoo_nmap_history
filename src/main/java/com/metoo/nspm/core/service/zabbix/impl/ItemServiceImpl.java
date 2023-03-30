@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
 import static java.lang.Thread.sleep;
 
 @Service
-//@Transactional
+//@Transactional(rollbackFor = Exception.class)
 public class ItemServiceImpl implements ItemService {
 
     Logger log = LoggerFactory.getLogger(ItemServiceImpl.class);
@@ -1891,19 +1892,17 @@ public class ItemServiceImpl implements ItemService {
         StopWatch watch = StopWatch.createStarted();
         List<Map> devices = this.topoNodeService.queryNetworkElement();
         if (devices != null && devices.size() > 0) {
-//            final CountDownLatch latch = new CountDownLatch(devices.size());
-//            IListUtils listUtils = new IListUtils();
-            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 24);
+            final CountDownLatch latch = new CountDownLatch(devices.size());
+            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
             ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
-//            ThreadPool threadPool = ThreadPool.getInstance();
-            List<MacTemp> batchInsert = new ArrayList<>();
+            List<MacTemp> batchInsert = new Vector();
             Map params = new HashMap();
             this.macTempService.truncateTable();
             devices.parallelStream().forEach(map ->{
                 exe.execute(
                         new Thread(
                                 () -> {
-                    synchronized (batchInsert){
+//                    synchronized (batchInsert){
                         System.out.println(Thread.currentThread().getName());
                         String deviceName = String.valueOf(map.get("deviceName"));
                         String deviceType = String.valueOf(map.get("deviceType"));
@@ -2132,42 +2131,71 @@ public class ItemServiceImpl implements ItemService {
                                 });
                             }
                         }
-                        System.out.println("采集中");
-                    }
+                        latch.countDown();
+                        log.info("采集中");
+//                    }
                 }));
             });
-            if(exe != null){
-                exe.shutdown();
-            }
-            watch.stop();
-            log.info("Mac-采集 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
-            while (true) {
-                if (exe.isTerminated()) {
-                    if(batchInsert.size() > 0){
-                        watch.reset();
-                        watch.start();
-                        try {
-                            List<MacTemp> list2 = batchInsert.parallelStream().collect(
-                                    Collectors.collectingAndThen(
-                                            Collectors.toCollection(() -> new TreeSet<>(
-                                                    Comparator
-                                                            .comparing(MacTemp::getDeviceName)
-                                                            .thenComparing(MacTemp::getInterfaceName)
-                                                            .thenComparing(MacTemp::getMac))),
-                                            ArrayList::new));
-                            System.out.println("批量插入");
-                            this.macTempService.batchInsert(list2);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            log.info("Mac采集异常：" + e.getMessage());
-                        }
-                        watch.stop();
-                        log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
-                        // 等待并发Stream处理完成
-                    }
-                    break;
+//            if(exe != null){
+//                exe.shutdown();
+//            }
+            try {
+                latch.await();
+                watch.stop();
+                log.info("Mac-采集 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+
+                watch.reset();
+                watch.start();
+                try {
+                    List<MacTemp> list2 = batchInsert.parallelStream().collect(
+                            Collectors.collectingAndThen(
+                                    Collectors.toCollection(() -> new TreeSet<>(
+                                            Comparator
+                                                    .comparing(MacTemp::getDeviceName)
+                                                    .thenComparing(MacTemp::getInterfaceName)
+                                                    .thenComparing(MacTemp::getMac))),
+                                    ArrayList::new));
+                    System.out.println("批量插入");
+                    this.macTempService.batchInsert(list2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.info("Mac采集异常：" + e.getMessage());
                 }
+                watch.stop();
+                log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+
+                // 等待并发Stream处理完成
+
+//            while (true) {
+//                if (exe.isTerminated()) {
+//                    if(batchInsert.size() > 0){
+//                        watch.reset();
+//                        watch.start();
+//                        try {
+//                            List<MacTemp> list2 = batchInsert.parallelStream().collect(
+//                                    Collectors.collectingAndThen(
+//                                            Collectors.toCollection(() -> new TreeSet<>(
+//                                                    Comparator
+//                                                            .comparing(MacTemp::getDeviceName)
+//                                                            .thenComparing(MacTemp::getInterfaceName)
+//                                                            .thenComparing(MacTemp::getMac))),
+//                                            ArrayList::new));
+//                            System.out.println("批量插入");
+//                            this.macTempService.batchInsert(list2);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            log.info("Mac采集异常：" + e.getMessage());
+//                        }
+//                        watch.stop();
+//                        log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+//                        // 等待并发Stream处理完成
+//                    }
+//                    break;
+//                }
+//            }
         }
     }
 
@@ -2183,7 +2211,7 @@ public class ItemServiceImpl implements ItemService {
             final CountDownLatch latch = new CountDownLatch(devices.size());
 //            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
 //            ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
-            Vector<MacTemp> batchInsert = new Vector<>();
+            List<MacTemp> batchInsert = new Vector<>();
             this.macTempService.truncateTable();
             devices.parallelStream().forEach(map ->{
                 Future<List<MacTemp>> future = staticExe.submit(new MyCallable(time, map, itemMapper));
@@ -2191,7 +2219,6 @@ public class ItemServiceImpl implements ItemService {
                     List<MacTemp> macTemps = future.get();
                     batchInsert.addAll(macTemps);
                     latch.countDown();
-
 //                    if(future.isDone()){
 //                        List<MacTemp> macTemps = future.get();
 //                        batchInsert.addAll(macTemps);
@@ -2206,7 +2233,7 @@ public class ItemServiceImpl implements ItemService {
             try {
                 latch.await();
                 watch.stop();
-                log.info("Mac-采集 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+                log.info("Mac-采集耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
 
                 if(batchInsert.size() > 0){
                     watch.reset();
@@ -2220,7 +2247,6 @@ public class ItemServiceImpl implements ItemService {
                                                         .thenComparing(MacTemp::getInterfaceName)
                                                         .thenComparing(MacTemp::getMac))),
                                         Vector::new));
-                        System.out.println("批量插入");
                         this.macTempService.batchInsert(list2);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -2228,7 +2254,6 @@ public class ItemServiceImpl implements ItemService {
                     }
                     watch.stop();
                     log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
-                    // 等待并发Stream处理完成
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -2238,7 +2263,6 @@ public class ItemServiceImpl implements ItemService {
 
         }
     }
-
 
     @Override
     public void testGatherMacThreadPool(Date time) {

@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Transactional
+//@Transactional
 public class GatherServiceImpl implements IGatherService {
 
     Logger log = LoggerFactory.getLogger(GatherServiceImpl.class);
@@ -182,7 +182,6 @@ public class GatherServiceImpl implements IGatherService {
         watch.stop();
         System.out.println("Mac采集-写入 耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
-
         watch.reset();
         watch.start();
         this.itemService.topologySyncToMacBatch(time);
@@ -209,7 +208,7 @@ public class GatherServiceImpl implements IGatherService {
         watch.stop();
 
 
-        this.terminalService.syncMac();
+        this.terminalService.syncMacToTerminal();
 
 
 
@@ -278,24 +277,27 @@ public class GatherServiceImpl implements IGatherService {
 
     @Override
     public void gatherMacThreadPool4(Date time) {
+
         StopWatch watch = new StopWatch();
         watch.start();
         this.itemService.gatherMacCallable(time);
         watch.stop();
-        System.out.println("Mac采集-写入 耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        log.info("Mac采集-写入 耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
 
         watch.reset();
         watch.start();
         this.itemService.topologySyncToMacBatch(time);
         watch.stop();
-        System.out.println("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
+        log.info("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
 
         watch.reset();
         watch.start();
         this.zabbixItemService.labelTheMac();
         watch.stop();
-        System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+        log.info("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
 
         watch.reset();
         watch.start();
@@ -305,16 +307,12 @@ public class GatherServiceImpl implements IGatherService {
 
         this.terminalService.syncHistoryMac(time);
 
-        // 记录历史
         this.macHistoryService.copyMacTemp();
         watch.stop();
 
+        this.terminalService.syncMacToTerminal();
 
-        this.terminalService.syncMac();
-
-
-
-        System.out.println("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+        log.info("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
 
 
     }

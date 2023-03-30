@@ -3,6 +3,7 @@ package com.metoo.nspm.container.juc.ThreadPool;
 import com.metoo.nspm.container.juc.callable.MyCallable;
 import com.metoo.nspm.container.juc.callable.TestCallable;
 import com.metoo.nspm.container.juc.callable.TestCallable2;
+import com.metoo.nspm.entity.nspm.Vendor;
 import org.apache.poi.ss.formula.functions.T;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 @RequestMapping("/threadpool")
 @RestController
@@ -266,6 +269,90 @@ public class ThreadPoolDemo {
             } finally {
                 System.out.println(list);
             }
+        }
+    }
+
+    // 测试使用线程池，每个线程对list集合操作两次添加动作
+    @Test
+    public void test8(){
+        ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
+        List<Integer> list = new ArrayList();
+        for (int i = 0; i < 5000000; i++) {
+            exe.execute(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (list){
+                        list.add(1);
+                        list.add(1);
+
+                    }
+                }
+            });
+        }
+        try {
+            Thread.currentThread().join(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        int sum =list.stream()
+                .mapToInt(e -> e).sum();
+        System.out.println(sum);
+    }
+
+    @Test
+    public void test9(){
+        ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
+        List<Integer> list = new Vector<>();
+        List<Integer> num = new ArrayList();
+        for (int i = 0; i < 5000000; i++) {
+            num.add(i);
+        }
+        final CountDownLatch countDownLatch = new CountDownLatch(5000000);
+
+        num.stream().forEach(e ->{
+            exe.execute(new Runnable() {
+                @Override
+                public void run() {
+                    list.add(1);   list.add(1);
+                    countDownLatch.countDown();
+                }
+            });
+        });
+        try {
+            countDownLatch.await();
+            int sum =list.stream()
+                    .mapToInt(e -> e).sum();
+            System.out.println(sum);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    @Test
+    public void test10(){
+        ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
+        List<Integer> list = new Vector<>();
+        List<Integer> num = new ArrayList();
+        for (int i = 0; i < 500000000; i++) {
+            num.add(i);
+        }
+        final CountDownLatch countDownLatch = new CountDownLatch(500000000);
+
+        num.parallelStream().forEach(e ->{
+            exe.execute(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    list.add(1);
+                    countDownLatch.countDown();
+                }
+            }));
+         });
+        try {
+            countDownLatch.await();
+            int sum =list.stream()
+                    .mapToInt(e -> e).sum();
+            System.out.println(sum);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
