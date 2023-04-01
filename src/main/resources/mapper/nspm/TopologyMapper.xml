@@ -248,10 +248,10 @@
             <if test="userName != null and userName != ''">
                 user_name =  #{userName},
             </if>
-            <if test="content != null and content != null">
+            <if test="content != null and content != ''">
                 content = #{content},
             </if>
-            <if test="baseUrl != null and baseUrl != null">
+            <if test="baseUrl != null and baseUrl != ''">
                 base_url = #{baseUrl},
             </if>
             <if test="suffix != ''">

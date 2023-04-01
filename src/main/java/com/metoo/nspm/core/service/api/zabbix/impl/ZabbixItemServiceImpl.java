@@ -812,7 +812,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
     }
 
     @Override
-    public void labelTheMac() {
+    public void labelTheMac(Date time) {
         StopWatch watch = new StopWatch();
         watch.start();
         List list = new ArrayList();
@@ -988,6 +988,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                 List<MacTemp> macTemps = this.macTempService.selectByMap(params);
                 for(MacTemp macTemp : macTemps){
                     MacTemp instance = new MacTemp();
+                    instance.setAddTime(time);
                     instance.setDeviceName(macTemp.getRemoteDevice());
                     instance.setUuid(macTemp.getRemoteUuid());
                     instance.setInterfaceName("PortN");

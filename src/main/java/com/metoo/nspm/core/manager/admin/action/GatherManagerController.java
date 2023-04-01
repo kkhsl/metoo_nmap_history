@@ -1,17 +1,19 @@
 package com.metoo.nspm.core.manager.admin.action;
 
+import com.metoo.nspm.core.service.nspm.IArpHistoryService;
 import com.metoo.nspm.core.service.nspm.ITerminalService;
 import com.metoo.nspm.core.service.zabbix.IGatherService;
+import com.metoo.nspm.entity.nspm.Arp;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -22,6 +24,8 @@ public class GatherManagerController {
 
     @Autowired
     private IGatherService gatherService;
+    @Autowired
+    private IArpHistoryService arpHistoryService;
 
     @RequestMapping("gatherMac")
     public void test(){
@@ -190,4 +194,19 @@ public class GatherManagerController {
         this.terminalService.syncMacToTerminal();
     }
 
+
+    // 测试删除Arp历史数据
+    @GetMapping("/deleteArpHistory")
+    public void deleteArpHistory(@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date date){
+        Map params = new HashMap();
+        params.put("beforeTime", date);
+        try {
+            List<Arp> arps = this.arpHistoryService.selectObjByMap(params);
+            if(arps.size() > 0){
+                this.arpHistoryService.batchDelete(arps);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.dto.zabbix.ItemDTO;
 import com.metoo.nspm.entity.nspm.IpAddress;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -60,5 +61,5 @@ public interface ZabbixItemService {
 
     void macTag();
 
-    void labelTheMac();
+    void labelTheMac(Date time);
 }

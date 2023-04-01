@@ -250,11 +250,12 @@ public class StaticScheduleTask {
     }
 
 
-    @Scheduled(cron = "0 0 0 */1 * ?")
+//    @Scheduled(cron = "0 0 0 */1 * ?")
+    @Scheduled(cron = "0 */2 * * * ?")
     public void clearHistory(){
 //        ThreadContext.bind(manager);
         if(flag) {
-            Long time=System.currentTimeMillis();
+            Long time = System.currentTimeMillis();
             System.out.println("删除历史数据开始");
             Map params = new HashMap();
             params.put("beforeTime", new Date());

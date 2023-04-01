@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.config.annotation.OperationLogAnno;
 import com.metoo.nspm.core.config.annotation.OperationType;
 import com.metoo.nspm.core.config.website.Properties;
+import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.GroupTools;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixHostInterfaceService;
@@ -645,18 +646,32 @@ public class RsmsDeviceManagerController {
     }
 
     @ApiOperation("设备导出")
-    @RequestMapping(value = "/export")
+    @GetMapping(value = "/export")
     public Object export(HttpServletResponse response, RsmsDevice device){
-        if(device.getIds() == null || device.getIds().size() <= 0){
-            return ResponseUtil.badArgument("请选择要导出的设备");
-        }
-        if(StringUtils.isBlank(device.getExcelName())){
-            return ResponseUtil.badArgument("请选择要导出的文件名");
-        }
+//        if(device.getAll() == null || !device.getAll().equals(1)){
+//            if(device.getIds() == null || device.getIds().size() <= 0){
+//                return ResponseUtil.badArgument("请选择要导出的设备");
+//            }
+//            if(StringUtils.isBlank(device.getExcelName())){
+//                return ResponseUtil.badArgument("请选择要导出的文件名");
+//            }
+//        }
+
+
 //        if(StringUtils.isBlank(device.getExcelName())){
 //            return ResponseUtil.badArgument("请选择要文件导出位置");
 //        }
+        if(StringUtils.isBlank(device.getExcelName())){
+            device.setExcelName("设备台账"+ DateTools.getCurrentDate(new Date()) +".xls");
+        }
         Map params = new HashMap();
+//        List<RsmsDevice> devices = new ArrayList<>();
+////        if(device.getAll() != null && device.getAll().equals(1)){
+////            devices = this.rsmsDeviceService.selectObjByMap(params);
+////        }else{
+////            params.put("ids", device.getIds());
+////            devices = this.rsmsDeviceService.selectObjByMap(params);
+////        }
         params.put("ids", device.getIds());
         List<RsmsDevice> devices = this.rsmsDeviceService.selectObjByMap(params);
         if(devices.size() > 0){
@@ -687,7 +702,7 @@ public class RsmsDeviceManagerController {
                 }
             }
             List<List<Object>> sheetDataList = ExcelUtils.getSheetData(devices);
-            ExcelUtils.export(response, "设备管理", sheetDataList);
+            ExcelUtils.export(response, device.getExcelName(), sheetDataList);
         }
         return ResponseUtil.ok();
     }

@@ -450,6 +450,8 @@ public class TopologyManagerApi {
                     List<Mac> macs = this.macHistoryService.selectByMap(args);
                     this.macUtil.macJoint(macs);
                     this.macUtil.writerType(macs);
+                    Map flux_terminal = new HashMap();
+                    flux_terminal.put("terminal", macs);
                     result.put(item, macs);
                 }
             }

@@ -22,5 +22,6 @@ public interface ITerminalService {
     // 同步DT信息
     void syncMacToTerminal();
 
+    // 同步终端类型
     void syncHistoryMac(Date time);
 }

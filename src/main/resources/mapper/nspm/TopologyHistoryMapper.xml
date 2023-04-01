@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.metoo.nspm.core.mapper.nspm.TopologyHistoryMapper">
 
-
     <resultMap id="Base_Result_Map" type="com.metoo.nspm.entity.nspm.Topology">
         <id column="id" property="id"></id>
         <result column="addTime" property="addTime"></result>
@@ -95,10 +94,10 @@
               <if test="userName != null and userName != ''">
                   user_name,
               </if>
-              <if test="content != null and content != null">
+              <if test="content != null and content != ''">
                   content,
               </if>
-              <if test="baseUrl != null and baseUrl != null">
+              <if test="baseUrl != null and baseUrl != ''">
                   base_url,
               </if>
           </trim>
@@ -136,10 +135,10 @@
             <if test="userName != null and userName != ''">
                 #{userName},
             </if>
-            <if test="content != null and content != null">
+            <if test="content != null and content != ''">
                 #{content},
             </if>
-            <if test="baseUrl != null and baseUrl != null">
+            <if test="baseUrl != null and baseUrl != ''">
                 #{baseUrl},
             </if>
         </trim>

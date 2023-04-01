@@ -456,13 +456,15 @@ public class SubnetManagerController {
 //                            IpAddress address = this.ipAddressService.selectObjByIp(IpUtil.ipConvertDec(ip));
                             if(address != null){
                                 IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(ip));
-                                int time = ipDetail.getTime();
-                                // 每分钟采一次
-                                int hourAll = time / 60;// 一共多少小时
-                                int day = hourAll / 24;
-                                int hour = hourAll % 24;
-                                ipDetail.setDuration(day + "天" + hour + "小时");
-                                address.setIpDetail(ipDetail);
+                                if(ipDetail != null){
+                                    int time = ipDetail.getTime();
+                                    // 每分钟采一次
+                                    int hourAll = time / 60;// 一共多少小时
+                                    int day = hourAll / 24;
+                                    int hour = hourAll % 24;
+                                    ipDetail.setDuration(day + "天" + hour + "小时");
+                                    address.setIpDetail(ipDetail);
+                                }
                             }
                             addresses.put(ip, address);
                         }

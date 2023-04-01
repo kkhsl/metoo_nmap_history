@@ -2,6 +2,7 @@ package com.metoo.nspm.core.manager.admin.action;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.github.pagehelper.util.StringUtil;
 import com.metoo.nspm.core.manager.admin.tools.*;
 import com.metoo.nspm.core.service.nspm.*;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.Response;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -299,6 +301,27 @@ public class TopologyManagerController {
             return ResponseUtil.ok(result);
         }
         return ResponseUtil.badArgument();
+    }
+
+    @ApiOperation("二层信息弹框位置")
+    @PutMapping("/update/location")
+    public Object updateTopologyLocation(@RequestBody(required = false) Topology instance){
+        if(instance.getId() == null || instance.getId().equals("")){
+            return ResponseUtil.badArgument();
+        }
+        Topology topology = this.topologyService.selectObjById(instance.getId());
+        if(topology == null){
+            return ResponseUtil.badArgument();
+        }
+        User user = ShiroUserHolder.currentUser();
+        if(!topology.getGroupId().equals(user.getGroupId())){
+            return ResponseUtil.badArgument();
+        }
+        int i = this.topologyService.update(instance);
+        if(i >= 1){
+            return ResponseUtil.ok();
+        }
+        return ResponseUtil.error();
     }
 
     @DeleteMapping("/delete")
@@ -866,16 +889,14 @@ public class TopologyManagerController {
             return ResponseUtil.badArgument("起点Ip不存在");
         }
         // 终点设备
-//        List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
-//        if(destIpAddress.size() <= 0){
-//            return ResponseUtil.badArgument("终点Ip不存在");
-//        }
+        List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
+        if(destIpAddress.size() <= 0){
+            return ResponseUtil.badArgument("终点Ip不存在");
+        }
 //        map.put("destinationDevice", destIpAddress);
 
         Map params = new HashMap();
         this.routTableService.deleteObjByUserId(ShiroUserHolder.currentUser().getId());// 清除 routTable
-
-
 
         // 保存起点设备到路由表
         // 多起点
@@ -907,14 +928,16 @@ public class TopologyManagerController {
         List<RouteTable> routTableList = this.routTableService.selectObjByMap(params);
         map.put("routTable", routTableList);
 
-        Map param = new HashMap();
         boolean flag = false;
         for (RouteTable routeTable : routTableList) {
-            if(routeTable.getIp().equals(destIp)){
-                flag = true;
-                break;
+            for (IpAddress ipAddress : destIpAddress) {
+                if(ipAddress.getDeviceUuid().equals(routeTable.getDeviceUuid())){
+                    flag = true;
+                    break;
+                }
             }
         }
+
         if(flag){
             map.put("type", 0);
             map.put("msg", "从起点Ip " + srcIp +" 到终点Ip " + destIp +" 路由正常");
@@ -1069,6 +1092,9 @@ public class TopologyManagerController {
 
         List list = new ArrayList();
         Map map = new HashMap();
+        map.put("one", new ArrayList<>());
+        map.put("two", new ArrayList<>());
+        map.put("three", new ArrayList<>());
         if(!queryFlag){
             Map first = new HashMap();
             // 第一段 起点ip至起点ip网关的二层路径查询
@@ -1084,16 +1110,18 @@ public class TopologyManagerController {
                 }else{
                     first = this.routTool.secondLayerHistory(srcMac, destMac, time);
                 }
-                map.put("one", first.get("path"));
-                Map param = new HashMap();
-                if(Boolean.valueOf(first.get("checkPath").toString())){
-                    param.put("type", 0);
-                    param.put("msg", "从起点ip " + srcIp +" 到网关 " + srcGateway +" 二层路径正常");
-                }else{
-                    param.put("type", 1);
-                    param.put("msg", "从起点ip " + srcIp + " 到网关" + srcGateway + " 二层路径异常");
+                if(!first.isEmpty()){
+                    map.put("one", first.get("path"));
+                    Map param = new HashMap();
+                    if(first.get("checkPath") != null && Boolean.valueOf(first.get("checkPath").toString())){
+                        param.put("type", 0);
+                        param.put("msg", "从起点ip " + srcIp +" 到网关 " + srcGateway +" 二层路径正常");
+                    }else{
+                        param.put("type", 1);
+                        param.put("msg", "从起点ip " + srcIp + " 到网关" + srcGateway + " 二层路径异常");
+                    }
+                    list.add(param);
                 }
-                list.add(param);
             }else{
                 map.put("one", new ArrayList<>());
                 StringBuffer msg = new StringBuffer();
@@ -1112,24 +1140,34 @@ public class TopologyManagerController {
 
             // 第二段 起点网关到终点网关的路由查询
             if(first.get("destDevice") != null){
+                // 终点设备
+                List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
                 List<RouteTable> two = this.routTool.queryRoutePath(srcGateway, destGateway, time, (Mac) first.get("destDevice"));
-                map.put("two", two);
-                Map param = new HashMap();
-                boolean flag = false;
-                for (RouteTable routeTable : two) {
-                   if(routeTable.getIp().equals(destGateway)){
-                       flag = true;
-                       break;
-                   }
+                if(two.size() > 0){
+                    map.put("two", two);
+                    Map param = new HashMap();
+                    boolean flag = false;
+                    for (RouteTable routeTable : two) {
+//                        if(routeTable.getIp().equals(destGateway)){
+//                            flag = true;
+//                            break;
+//                        }
+                        for (IpAddress ipAddress : destIpAddress) {
+                            if(ipAddress.getDeviceUuid().equals(routeTable.getDeviceUuid())){
+                                flag = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(flag){
+                        param.put("type", 0);
+                        param.put("msg", "从起点网关 " + srcGateway +" 到终点网关 " + destGateway +" 路由正常");
+                    }else{
+                        param.put("type", 1);
+                        param.put("msg", "从起点网关 " + srcGateway +" 到终点网关 " + destGateway +" 路由异常");
+                    }
+                    list.add(param);
                 }
-                if(flag){
-                    param.put("type", 0);
-                    param.put("msg", "从起点网关 " + srcGateway +" 到终点网关 " + destGateway +" 路由正常");
-                }else{
-                    param.put("type", 1);
-                    param.put("msg", "从起点网关 " + srcGateway +" 到终点网关 " + destGateway +" 路由异常");
-                }
-                list.add(param);
             }else{
                 StringBuffer msg = new StringBuffer();
                 msg.append("路由异常;起点网关 " + srcGateway + " 不存在");
@@ -1150,32 +1188,55 @@ public class TopologyManagerController {
             if(routTableList.size() > 0 && destArp != null){
                 destMac = destArp.getMac();
                 List<Mac> threeList = new ArrayList();
+                List<Mac> destDevices = new ArrayList();
                 for(RouteTable routeTable : routTableList){
                     if(time == null){
-                        List path = this.routTool.secondLayers(routeTable.getDeviceUuid(), destMac);
-                        threeList.addAll(path);
+                        Map result = this.routTool.secondLayers(routeTable.getDeviceUuid(), destMac);
+                        if(result.get("path") != null){
+                            // 正确姿势
+                            List<Mac> path = JSONObject.parseObject(JSONObject.toJSONString(result.get("path")),  new TypeReference<List<Mac>>(){});
+//                            List<Mac> path = JSONObject.parseObject(JSONObject.toJSONString(result.get("path")), List.class);
+                            threeList.addAll(path);
+                        }
+                        if(result.get("destDevice") != null){
+                            destDevices.add(Json.fromJson(Mac.class, JSONObject.toJSONString(result.get("destDevice"))));
+                        }
                     }else{
-                        List path = this.routTool.secondLayersHistory(routeTable.getDeviceUuid(), destMac, time);
-                        threeList.addAll(path);
+                        Map result = this.routTool.secondLayersHistory(routeTable.getDeviceUuid(), destMac, time);
+                        if(result.get("path") != null){
+                            List<Mac> path = JSONObject.parseObject(JSONObject.toJSONString(result.get("path")),  new TypeReference<List<Mac>>(){});
+                            threeList.addAll(path);
+                        }
+                        if(result.get("destDevice") != null){
+                            destDevices.add(Json.fromJson(Mac.class, JSONObject.toJSONString(result.get("destDevice"))));
+                        }
                     }
                 }
-                map.put("three", threeList);
-                Map param = new HashMap();
-                boolean flag = false;
-                for (Mac mac : threeList) {
-                    if(mac.getIp().equals(destIp)){
-                        flag = true;
-                        break;
+                if(threeList.size() > 0){
+                    map.put("three", threeList);
+                    Map param = new HashMap();
+                    boolean flag = false;
+                    for (Mac mac : threeList) {
+//                        if(destDevices.contains(mac)){
+//                            flag = true;
+//                            break;
+//                        }
+                        for (Mac destDevice : destDevices) {
+                            if(destDevice.getUuid().equals(mac.getRemoteUuid())){
+                                flag = true;
+                                break;
+                            }
+                        }
                     }
+                    if(flag){
+                        param.put("type", 0);
+                        param.put("msg", "从终点网关 " + destGateway +" 到终点Ip " + destIp +" 路径正常");
+                    }else{
+                        param.put("type", 1);
+                        param.put("msg", "从终点网关 " + destGateway +" 到终点网关 " + destIp +" 路径异常");
+                    }
+                    list.add(param);
                 }
-                if(flag){
-                    param.put("type", 0);
-                    param.put("msg", "从终点网关 " + destGateway +" 到终点Ip " + destIp +" 路径正常");
-                }else{
-                    param.put("type", 1);
-                    param.put("msg", "从终点网关 " + destGateway +" 到终点网关 " + destIp +" 路径异常");
-                }
-                list.add(param);
             }else{
                 srcArp = this.queryArp(destGateway);
                 if(srcArp != null && destArp != null){
@@ -1187,19 +1248,19 @@ public class TopologyManagerController {
                     }else{
                         third = this.routTool.secondLayerHistory(srcMac, destMac, time);
                     }
-                    map.put("three", third.get("path"));
-
-                    Map param = new HashMap();
-                    if(Boolean.valueOf(third.get("checkPath").toString())){
-                        param.put("type", 0);
-                        param.put("msg", "从终点网关 " + destGateway + " 到终点ip " + destIp + " 二层路径正常");
-                    }else{
-                        param.put("type", 1);
-                        param.put("msg", "从终点网关 " + destGateway + " 到终点ip " + destIp + " 二层路径异常");
+                    if(!third.isEmpty()){
+                        map.put("three", third.get("path"));
+                        Map param = new HashMap();
+                        if(Boolean.valueOf(third.get("checkPath").toString())){
+                            param.put("type", 0);
+                            param.put("msg", "从终点网关 " + destGateway + " 到终点ip " + destIp + " 二层路径正常");
+                        }else{
+                            param.put("type", 1);
+                            param.put("msg", "从终点网关 " + destGateway + " 到终点ip " + destIp + " 二层路径异常");
+                        }
+                        list.add(param);
                     }
-                    list.add(param);
                 }else{
-                    map.put("three", new ArrayList<>());
                     StringBuffer msg = new StringBuffer();
                     msg.append("从终点网关 "+ destGateway + " 到终点ip " + destIp + " 路径异常");
                     if(srcArp == null){
@@ -1228,16 +1289,17 @@ public class TopologyManagerController {
                 }else{
                     first = this.routTool.secondLayerHistory(srcMac, destMac, time);
                 }
-                map.put("one", first.get("path"));
-                Map param = new HashMap();
-                if(Boolean.valueOf(first.get("checkPath").toString())){
-                    param.put("0", "从起点ip " + srcIp + " 到起点网关 " + srcGateway + " 二层路径正常");
-                }else{
-                    param.put("1", "从起点ip " + srcIp + " 到起点网关 " + srcGateway + " 二层路径异常");
+                if(!first.isEmpty()){
+                    map.put("one", first.get("path"));
+                    Map param = new HashMap();
+                    if(Boolean.valueOf(first.get("checkPath").toString())){
+                        param.put("0", "从起点ip " + srcIp + " 到起点网关 " + srcGateway + " 二层路径正常");
+                    }else{
+                        param.put("1", "从起点ip " + srcIp + " 到起点网关 " + srcGateway + " 二层路径异常");
+                    }
+                    map.put("oneMsg", param);
                 }
-                map.put("oneMsg", param);
             }else{
-                map.put("one", new ArrayList<>());
                 StringBuffer msg = new StringBuffer();
                 msg.append("从起点Ip "+ srcIp + " 到起点网关 " + srcGateway +" 路径异常");
                 if(srcArp == null){

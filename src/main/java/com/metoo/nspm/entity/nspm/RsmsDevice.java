@@ -154,6 +154,8 @@ public class RsmsDevice extends IdEntity {
     @ApiModelProperty("项目名")
     private String projectName;
 
+    private Integer all;// 默认  1：全部
+
     private List<Long> ids;
     private String excelPath;
     private String excelName;
