@@ -1,5 +1,6 @@
 package com.metoo.nspm.core.utils.quartz;
 
+import com.metoo.nspm.container.java.collection.Collection;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixService;
 import com.metoo.nspm.core.service.zabbix.IGatherService;
@@ -11,6 +12,7 @@ import com.metoo.nspm.entity.nspm.Mac;
 import com.metoo.nspm.entity.nspm.Route;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @EnableScheduling：Spring系列框架中SpringFramwork自带的定时任务（org.springframework.scheduling.annotation.*）
@@ -251,28 +255,31 @@ public class StaticScheduleTask {
 
 
 //    @Scheduled(cron = "0 0 0 */1 * ?")
-    @Scheduled(cron = "0 */2 * * * ?")
+    @Scheduled(cron = "0 0 0 1,15 * ?")
+//    @Scheduled(cron = "0 */2 * * * ?")
     public void clearHistory(){
 //        ThreadContext.bind(manager);
         if(flag) {
             Long time = System.currentTimeMillis();
             System.out.println("删除历史数据开始");
+
+            Calendar cal = Calendar.getInstance();
+            cal.add(cal.DATE,-15);
+            cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+            Date beginOfDate = cal.getTime();
+
             Map params = new HashMap();
-            params.put("beforeTime", new Date());
+            params.put("addTime", beginOfDate);
+
+            // 删除Arp history
             try {
-                List<Arp> arps = this.arpHistoryService.selectObjByMap(params);
-                if(arps.size() > 0){
-                    this.arpHistoryService.batchDelete(arps);
-                }
+                this.arpHistoryService.deleteObjByMap(params);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             try {
-                List<Mac> macs = this.macHistoryService.selectObjByMap(params);
-                if(macs.size() > 0){
-                    this.macHistoryService.batchDelete(macs);
-                }
+                this.macHistoryService.deleteObjByMap(params);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -280,7 +287,7 @@ public class StaticScheduleTask {
             try {
                 List<Route> routList = this.routHistoryService.selectObjByMap(params);
                 if(routList.size() > 0){
-                    this.routHistoryService.batchDelete(routList);
+                    this.routHistoryService.deleteObjByMap(params);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -289,13 +296,62 @@ public class StaticScheduleTask {
             try {
                 List<IpAddress> ipAddresses = this.iipAddressHistoryService.selectObjByMap(params);
                 if(ipAddresses.size() > 0){
-                    this.iipAddressHistoryService.batchDelete(ipAddresses);
+                    this.iipAddressHistoryService.deleteObjByMap(params);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+
+//            try {
+//                List<Arp> arps = this.arpHistoryService.selectObjByMap(params);
+//                if(arps.size() > 0){
+//                    List<Long> ids = arps.stream().map(Arp::getId).collect(Collectors.toList());
+//                    this.arpHistoryService.deleteObjByMap(params);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+
+//            try {
+//                List<Mac> macs = this.macHistoryService.selectObjByMap(params);
+//                if(macs.size() > 0){
+//                    List<Long> ids = macs.stream().map(Mac::getId).collect(Collectors.toList());
+//                    this.macHistoryService.batchDelete(ids);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+
+//            try {
+//                List<Route> routList = this.routHistoryService.selectObjByMap(params);
+//                if(routList.size() > 0){
+//                    this.routHistoryService.batchDelete(routList);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            try {
+//                List<IpAddress> ipAddresses = this.iipAddressHistoryService.selectObjByMap(params);
+//                if(ipAddresses.size() > 0){
+//                    this.iipAddressHistoryService.batchDelete(ipAddresses);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
             System.out.println("==删除数据耗时：" + (System.currentTimeMillis()-time) + "===");
         }
+    }
+
+    @Test
+    public void test(){
+        Calendar cal = Calendar.getInstance();
+        cal.add(cal.DATE,-15);
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+        Date beginOfDate = cal.getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println ("===:"+formatter.format(beginOfDate) );
     }
 
 }

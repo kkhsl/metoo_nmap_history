@@ -91,6 +91,12 @@
         DESC
     </select>
 
+    <delete id="deleteObjByMap" parameterType="java.util.Map">
+        DELETE FROM rsms_ip_history
+        where
+        addTime &lt;= #{addTime}
+    </delete>
+
     <delete id="batchDelete" parameterType="com.metoo.nspm.entity.nspm.IpAddress">
         DELETE FROM rsms_ip_history where
         <foreach collection="list" item="item"  separator="or">

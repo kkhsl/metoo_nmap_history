@@ -214,10 +214,18 @@
         where id = #{id}
     </update>
 
+    <delete id="deleteObjByMap" parameterType="com.metoo.nspm.entity.nspm.Mac">
+        DELETE FROM rsms_mac_history
+        where
+        addTime &lt;= #{addTime}
+    </delete>
+
     <delete id="batchDelete" parameterType="com.metoo.nspm.entity.nspm.Mac">
-        DELETE FROM rsms_mac_history where
-        <foreach collection="list" item="item"  separator="or">
-            id = #{item.id}
+        DELETE FROM rsms_mac_history
+        where
+        id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+          #{item}
         </foreach>
     </delete>
 

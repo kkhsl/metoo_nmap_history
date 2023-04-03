@@ -17,7 +17,9 @@ public interface IMacHistoryService {
 
     int update(Mac instance);
 
-    int batchDelete(List<Mac> macs);
+    int deleteObjByMap(Map params);
+
+    int batchDelete(List<Long> ids);
 
     void copyMacTemp();
 }

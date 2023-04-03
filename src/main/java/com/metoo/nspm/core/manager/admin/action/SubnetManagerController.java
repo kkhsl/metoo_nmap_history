@@ -288,7 +288,8 @@ public class SubnetManagerController {
         List<Subnet> subnets = this.subnetService.selectSubnetByParentId(null);
         List<IpDetail> ipdetails = this.ipDetailService.selectObjByMap(null);
         if(subnets.size() > 0) {
-            ExecutorService exe = Executors.newFixedThreadPool(subnets.size());
+            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
+            ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
             exe.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -311,6 +312,9 @@ public class SubnetManagerController {
                     }
                 }
             });
+            if(exe != null){
+                exe.shutdown();
+            }
         }
         return ResponseUtil.ok();
     }
@@ -589,9 +593,11 @@ public class SubnetManagerController {
                 Address obj = this.addressService.selectObjByIp(ipDetail.getIp());
                 if(obj != null){
                     obj.setSubnetId(subnet.getId());
+                    obj.setIp(null);
                     int i = this.addressService.update(obj);
                 }else{
                     Address address = new Address();
+                    System.out.println(IpUtil.decConvertIp(Long.parseLong(ipDetail.getIp())));
                     address.setIp(ipDetail.getIp());
                     address.setHostName(ipDetail.getDeviceName());
                     address.setMac(ipDetail.getMac());

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/gather")
@@ -198,15 +199,21 @@ public class GatherManagerController {
     // 测试删除Arp历史数据
     @GetMapping("/deleteArpHistory")
     public void deleteArpHistory(@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.add(cal.MINUTE, -2);
+        Date beginOfDate = cal.getTime();
+
+
         Map params = new HashMap();
-        params.put("beforeTime", date);
+        params.put("addTime", beginOfDate);
+
+        // 删除Arp history
         try {
-            List<Arp> arps = this.arpHistoryService.selectObjByMap(params);
-            if(arps.size() > 0){
-                this.arpHistoryService.batchDelete(arps);
-            }
+            this.arpHistoryService.deleteObjByMap(params);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 }

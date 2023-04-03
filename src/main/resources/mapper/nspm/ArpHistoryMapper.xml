@@ -195,13 +195,22 @@
         ip, mac
     </select>
 
-    <delete id="batchDelete" parameterType="com.metoo.nspm.entity.nspm.Arp">
+    <delete id="deleteObjByMap" parameterType="java.util.Map">
+        DELETE
+        FROM
+        rsms_arp_history
+        where
+        addTime &lt;= #{addTime}
+    </delete>
+
+    <delete id="batchDelete" parameterType="java.lang.Long">
         DELETE
         FROM
           rsms_arp_history
         where
-        <foreach collection="list" item="arp"  separator="or">
-            id = #{arp.id}
+        id in
+        <foreach collection="list" item="item"  open="(" close=")" separator=",">
+            #{item}
         </foreach>
     </delete>
 

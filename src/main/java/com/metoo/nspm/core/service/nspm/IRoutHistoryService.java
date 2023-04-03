@@ -17,6 +17,8 @@ public interface IRoutHistoryService {
 
     Route selectDestDevice(Map params);
 
+    int deleteObjByMap(Map params);
+
     int batchDelete(List<Route> routs);
 
     void copyRoutTemp();

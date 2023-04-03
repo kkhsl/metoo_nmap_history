@@ -47,8 +47,13 @@ public class ArpHistoryServiceImpl implements IArpHistoryService {
     }
 
     @Override
-    public int batchDelete(List<Arp> arp) {
-        return this.arpHistoryMapper.batchDelete(arp);
+    public int deleteObjByMap(Map params) {
+        return this.arpHistoryMapper.deleteObjByMap(params);
+    }
+
+    @Override
+    public int batchDelete(List<Long> ids) {
+        return this.arpHistoryMapper.batchDelete(ids);
     }
 
     @Override
