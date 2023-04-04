@@ -39,10 +39,6 @@ public class UserManagerController {
     @Autowired
     private IRoleService roleService;
     @Autowired
-    private ILiveRoomService liveRoomService;
-    @Autowired
-    private IRoomProgramService roomProgramService;
-    @Autowired
     private IVideoService videoService;
     @Autowired
     private IGroupService groupService;
@@ -70,7 +66,7 @@ public class UserManagerController {
     public Object add() {
         Map params = new HashMap();
         params.put("currentPage", 0);
-        params.put("pageSize", 0);
+        params.put("pageSize", 1000);
         List<Role> roleList = this.roleService.findObjByMap(params);
         if (roleList.size() > 0) {
             Map data = new HashMap();
@@ -105,7 +101,7 @@ public class UserManagerController {
             data.put("obj", obj);
             Map params = new HashMap();
             params.put("currentPage", 0);
-            params.put("pageSize", 0);
+            params.put("pageSize", 1000);
             List<Role> roleList = this.roleService.findObjByMap(params);
             if (roleList.size() > 0) {
                 data.put("roleList", roleList);

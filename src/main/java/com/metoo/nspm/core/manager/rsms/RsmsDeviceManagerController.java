@@ -315,6 +315,16 @@ public class RsmsDeviceManagerController {
             }
         }
 
+        if(instance.getGroupId() != null && !instance.getGroupId().equals("")){
+            Group group = this.groupService.selectObjById(instance.getGroupId());
+            if(group == null){
+                instance.setGroupId(null);
+                instance.setGroupName(null);
+            }else{
+                instance.setGroupName(instance.getName());
+            }
+        }
+
 //        if(instance.getPlantRoomId() != null || instance.getRackId() != null){
 //            if(instance.getStart() <= 0 || instance.getSize() <= 0){
 //                return ResponseUtil.badArgument("未选择设备位置");
@@ -666,7 +676,7 @@ public class RsmsDeviceManagerController {
         }
         Map params = new HashMap();
 //        List<RsmsDevice> devices = new ArrayList<>();
-////        if(device.getAll() != null && device.getAll().equals(1)){
+////        if(device.getAll()g != null && device.getAll().equals(1)){
 ////            devices = this.rsmsDeviceService.selectObjByMap(params);
 ////        }else{
 ////            params.put("ids", device.getIds());
@@ -686,7 +696,9 @@ public class RsmsDeviceManagerController {
                 }
                 if(rsmsDevice.getGroupId() != null && !rsmsDevice.getGroupId().equals("")){
                     Group instance = this.groupService.selectObjById(rsmsDevice.getGroupId());
-                    rsmsDevice.setGroupName(instance.getBranchName());
+                    if(instance != null){
+                        rsmsDevice.setGroupName(instance.getBranchName());
+                    }
                 }
                 if(rsmsDevice.getPlantRoomId() != null && !rsmsDevice.getPlantRoomId().equals("")){
                     PlantRoom instance = this.plantRoomService.getObjById(rsmsDevice.getPlantRoomId());

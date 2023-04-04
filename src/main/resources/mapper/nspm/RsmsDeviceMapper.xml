@@ -318,10 +318,10 @@
             <if test="vendorName != null and vendorName != ''">
                 vendor_name,
             </if>
-            <if test="groupId != null and groupId != ''">
+            <if test="groupId != ''">
                 group_id,
             </if>
-            <if test="groupName != null and groupName != ''">
+            <if test="and groupName != ''">
                 group_name,
             </if>
             <if test="uuid != null and uuid != ''">
@@ -413,10 +413,10 @@
             <if test="vendorName != null and vendorName != ''">
                 #{vendorName},
             </if>
-            <if test="groupId != null and groupId != ''">
+            <if test="groupId != ''">
                 #{groupId},
             </if>
-            <if test="groupName != null and groupName != ''">
+            <if test="groupName != ''">
                 #{groupName},
             </if>
             <if test="uuid != null and uuid != ''">

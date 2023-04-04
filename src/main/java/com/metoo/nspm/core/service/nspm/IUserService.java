@@ -6,6 +6,7 @@ import com.metoo.nspm.vo.UserVo;
 import com.github.pagehelper.Page;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IUserService {
 
@@ -21,6 +22,8 @@ public interface IUserService {
     UserVo findUserUpdate(Long id);
 
     User findObjById(Long id);
+
+    List<User> selectObjByMap(Map params);
 
     Page<UserVo> getObjsByLevel(UserDto dto);
 
