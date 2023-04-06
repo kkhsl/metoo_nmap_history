@@ -28,4 +28,14 @@ public class InterfaceUtil {
         }
         return "-1";
     }
+
+    public Interface getInteface(String ip){
+        Interface obj = this.interfaceService.selectObjByIp(ip);
+        if(obj != null && obj.getAvailable() != null){
+            if(obj.getAvailable().equals("1")){
+                return obj;
+            }
+        }
+        return null;
+    }
 }

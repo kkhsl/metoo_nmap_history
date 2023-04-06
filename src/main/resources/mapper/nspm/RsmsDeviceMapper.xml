@@ -321,7 +321,7 @@
             <if test="groupId != ''">
                 group_id,
             </if>
-            <if test="and groupName != ''">
+            <if test="groupName != ''">
                 group_name,
             </if>
             <if test="uuid != null and uuid != ''">

@@ -90,7 +90,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                 return itemArray;
             }
         }
-        return null;
+        return new JSONArray();
     }
 
     public JSONArray getItemAndTagByIp(String ip, List tags, List output){
@@ -111,7 +111,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             JSONArray itemArray = JSONArray.parseArray(items.getString("result"));
             return itemArray;
         }
-        return null;
+        return new JSONArray();
     }
 
     @Override
@@ -149,7 +149,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                 }
             }
         }
-        return null;
+        return new JSONArray();
     }
 
     @Override
@@ -160,7 +160,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             tags.add(ItemUtil.packaging("ipaddr", "127.0.0.1", 3));
             return this.getItemAndTagByHostId(ip, tags, null);
         }
-        return null;
+        return new JSONArray();
     }
 
     @Override
@@ -174,7 +174,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             output.add("value");
             return this.getItemAndTagByHostId(ip, tags, output);
         }
-        return null;
+        return new JSONArray();
     }
 
     @Override
@@ -191,7 +191,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             output.add("value");
             return this.getItemAndTagByHostId(ip, tags, output);
         }
-        return null;
+        return new JSONArray();
     }
 
 
@@ -208,7 +208,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             output.add("value");
             return this.getItemAndTagByHostId(ip, tags, output);
         }
-        return null;
+        return new JSONArray();
     }
 
     @Override
@@ -224,7 +224,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
 //            output.add("value");
             return this.getItemAndTagByHostId(ip, tags, null);
         }
-        return null;
+        return new JSONArray();
     }
 
     @Override
@@ -241,7 +241,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
 //            output.add("value");
             return this.getItemAndTagByHostId(ip, tags, null);
         }
-        return null;
+        return  new JSONArray();
     }
 
     @Override
@@ -251,7 +251,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             tags.add(ItemUtil.packaging("obj", "mac", 1));
             return this.getItemAndTagByHostId(ip, tags, null);
         }
-        return null;
+        return new JSONArray();
     }
 
 
@@ -265,7 +265,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             output.add("value");
             return this.getItemAndTagByHostId(ip, tags, output);
         }
-        return null;
+        return  new JSONArray();
     }
 
     @Override
@@ -276,7 +276,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             tags.add(ItemUtil.packaging("ifindex", index, 1));
             return this.getItemAndTagByHostId(ip, tags, null);
         }
-        return null;
+        return  new JSONArray();
     }
 
     @Override
@@ -289,7 +289,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
 //            output.add("value");
             return this.getItemAndTagByHostId(ip, tags, null);
         }
-        return null;
+        return  new JSONArray();
     }
 
     @Override
@@ -302,7 +302,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             }
             return this.getItemAndTagByHostId(ip, tags, null);
         }
-        return null;
+        return  new JSONArray();
     }
 
     @Override
@@ -318,7 +318,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             output.add("value");
             return this.getItemAndTagByHostId(ip, tags, output);
         }
-        return null;
+        return  new JSONArray();
     }
 
     @Override
@@ -331,7 +331,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             output.add("value");
             return this.getItemAndTagByHostId(ip, tags, output);
         }
-        return null;
+        return new JSONArray();
     }
 
     @Override
@@ -344,7 +344,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             output.add("value");
             return this.getItemAndTagByHostId(ip, tags, output);
         }
-        return null;
+        return new JSONArray();
     }
 
     @Override
@@ -354,7 +354,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             tags.add(ItemUtil.packaging("obj", "ifbasic", 1));
             return this.getItemAndTagByHostId(ip, tags, null);
         }
-        return null;
+        return  new JSONArray();
     }
 
     @Override
@@ -364,7 +364,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             tags.add(ItemUtil.packaging("obj", "route", 1));
             return this.getItemAndTagByHostId(ip, tags, null);
         }
-        return null;
+        return  new JSONArray();
     }
 
     @Override
@@ -377,7 +377,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             output.add("value");
             return this.getItemAndTagByHostId(ip, tags, output);
         }
-        return null;
+        return new JSONArray();
     }
 
 
@@ -525,7 +525,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
     @Override
     public Map<String, List<Object>> ipAddressCombingByDB(List<IpAddress> ipList) {
         if(ipList.size() == 0){
-            return null;
+            return new HashMap<>();
         }
         Map<String, Integer> map = new HashMap();
         List<Integer> masks = new ArrayList();
