@@ -109,6 +109,18 @@
             <if test="userName != null and userName != ''">
                AND user_name = #{userName}
             </if>
+            <if test="permitConnect != null and permitConnect != ''">
+                AND permit_connect = #{permitConnect}
+            </if>
+            <if test="webUrl != null and webUrl != ''">
+                AND web_url is not null
+            </if>
+            <if test="connectType != null and connectType != ''">
+                AND connect_type = #{connectType}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid}
+            </if>
             <if test="neId != null">
                 AND id != #{neId}
             </if>
@@ -345,10 +357,10 @@
             <if test="sync_device != null">
                 sync_device = #{sync_device},
             </if>
-            <if test="connectType != null">
+            <if test="connectType != ''">
                 connect_type = #{connectType},
             </if>
-            <if test="port != null">
+            <if test="port != ''">
                 port = #{port},
             </if>
             <if test="credentialId != ''">

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.metoo.nspm.core.mapper.nspm.UserMapper">
 
-    <resultMap id="Base_User_Map" type="com.metoo.nspm.entity.nspm.User">
+    <resultMap id="Base_Result_Map" type="com.metoo.nspm.entity.nspm.User">
         <id column="mu_id" property="id"/>
         <result column="mu_addTime" property="addTime"></result>
         <result column="mu_username" property="username"></result>
@@ -158,13 +158,23 @@
         deleteStatus >= 0
     </select>
 
+    <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_user
+        <where>
+            <if test="groupId != null and groupId != ''">
+                AND groupId = #{groupId}
+            </if>
+        </where>
+    </select>
+
     <sql id="Unit_Column_List">
         mu.id mu_id,mu.addTime mu_addTime, mu.username mu_username, mu.password mu_password, mu.sex mu_sex,
         mu.age mu_age,mu.userRole mu_userRole, mu.email mu_email, mu.mobile mu_mobile, mu.note mu_note, mu.groupId mu_groupId, mu.groupName mu_groupName,
         mr.id mr_id
     </sql>
 
-    <select id="findRolesByUserName" parameterType="String" resultMap="Base_User_Map">
+    <select id="findRolesByUserName" parameterType="String" resultMap="Base_Result_Map">
         SELECT <include refid="Unit_Column_List" />
         FROM metoo_user mu
             LEFT JOIN metoo_user_role mur on mu.id=mur.user_id

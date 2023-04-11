@@ -27,21 +27,29 @@
         <result column="terminal_type_id" property="terminalTypeId"></result>
         <result column="terminal_type_name" property="terminalTypeName"></result>
         <result column="interface_status" property="interfaceStatus"></result>
+        <result column="name" property="name"></result>
 
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
+        id, `name`, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
         remote_device_ip, remote_device_type, remote_uuid, interface_index, ip, device_ip, device_type, vlan, `type`, online,
         terminal_type_id, terminal_type_name, interface_status
     </sql>
 
     <sql id="Ntoa_Column_List">
-        id, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
+        id, `name`, device_name, `interface_name`, mac, `index`, tag, uuid, remote_device, remote_interface,
         remote_device_ip, remote_device_type, remote_uuid, interface_index, ip,
         device_ip, device_type, vlan, online,
         terminal_type_id, terminal_type_name, interface_status
     </sql>
+
+    <select id="selectObjById" parameterType="java.lang.Long" resultMap="Base_Result_Map">
+          SELECT <include refid="Base_Column_List"/>
+          FROM rsms_terminal
+          where id = #{id}
+    </select>
+
 
     <select id="selectObjByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
         SELECT <include refid="Ntoa_Column_List"/>
@@ -205,6 +213,9 @@
     <update id="update" parameterType="com.metoo.nspm.entity.nspm.Terminal">
         UPDATE rsms_terminal
         <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
             <if test="deviceName != null and deviceName != ''">
                 device_name = #{deviceName},
             </if>

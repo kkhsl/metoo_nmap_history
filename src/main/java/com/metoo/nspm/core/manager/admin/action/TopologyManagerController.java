@@ -1,11 +1,18 @@
 package com.metoo.nspm.core.manager.admin.action;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.github.pagehelper.util.StringUtil;
+import com.metoo.nspm.core.config.websocket.demo.NoticeWebsocketResp;
 import com.metoo.nspm.core.manager.admin.tools.*;
+import com.metoo.nspm.core.mapper.zabbix.HistoryMapper;
+import com.metoo.nspm.core.service.api.zabbix.ZabbixItemService;
+import com.metoo.nspm.core.service.api.zabbix.ZabbixService;
 import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.manager.admin.tools.CompareUtils;
+import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.file.DownLoadFileUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
@@ -15,9 +22,14 @@ import com.metoo.nspm.dto.TopologyDTO;
 import com.github.pagehelper.Page;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
 import com.metoo.nspm.entity.nspm.*;
+import com.metoo.nspm.entity.zabbix.History;
+import com.metoo.nspm.entity.zabbix.Item;
+import com.metoo.nspm.entity.zabbix.ItemTag;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.junit.Test;
+import org.nutz.json.Json;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,6 +38,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.Response;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -71,6 +84,23 @@ public class TopologyManagerController {
     private RoutTool routTool;
     @Autowired
     private ITerminalService terminalService;
+    @Autowired
+    private ISubnetService subnetService;
+    @Autowired
+    private IVlanService vlanService;
+    @Autowired
+    private MacUtil macUtil;
+    @Autowired
+    private ITerminalTypeService terminalTypeService;
+    @Autowired
+    private ItemService itemService;
+    @Autowired
+    private ZabbixService zabbixService;
+    @Autowired
+    private ZabbixItemService zabbixItemService;
+
+    @Autowired
+    private HistoryMapper historyMapper;
 
     @RequestMapping("/list")
     public Object list(@RequestBody(required = false) TopologyDTO dto){
@@ -298,6 +328,27 @@ public class TopologyManagerController {
             return ResponseUtil.ok(result);
         }
         return ResponseUtil.badArgument();
+    }
+
+    @ApiOperation("二层信息弹框位置")
+    @PutMapping("/update/location")
+    public Object updateTopologyLocation(@RequestBody(required = false) Topology instance){
+        if(instance.getId() == null || instance.getId().equals("")){
+            return ResponseUtil.badArgument();
+        }
+        Topology topology = this.topologyService.selectObjById(instance.getId());
+        if(topology == null){
+            return ResponseUtil.badArgument();
+        }
+        User user = ShiroUserHolder.currentUser();
+        if(!topology.getGroupId().equals(user.getGroupId())){
+            return ResponseUtil.badArgument();
+        }
+        int i = this.topologyService.update(instance);
+        if(i >= 1){
+            return ResponseUtil.ok();
+        }
+        return ResponseUtil.error();
     }
 
     @DeleteMapping("/delete")
@@ -822,7 +873,7 @@ public class TopologyManagerController {
 //            return ResponseUtil.ok(map);
 //    }
 
-    @ApiOperation("二层设备查询")
+    @ApiOperation("路由查询")
     @RequestMapping("/layer_2_device")
     public Object routTable(String srcIp, Integer srcMask, String destIp, Integer destMask,
                             @RequestParam(value = "time", required = false)
@@ -865,16 +916,14 @@ public class TopologyManagerController {
             return ResponseUtil.badArgument("起点Ip不存在");
         }
         // 终点设备
-//        List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
-//        if(destIpAddress.size() <= 0){
-//            return ResponseUtil.badArgument("终点Ip不存在");
-//        }
+        List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
+        if(destIpAddress.size() <= 0){
+            return ResponseUtil.badArgument("终点Ip不存在");
+        }
 //        map.put("destinationDevice", destIpAddress);
 
         Map params = new HashMap();
         this.routTableService.deleteObjByUserId(ShiroUserHolder.currentUser().getId());// 清除 routTable
-
-
 
         // 保存起点设备到路由表
         // 多起点
@@ -905,6 +954,24 @@ public class TopologyManagerController {
         params.put("userId", user.getId());
         List<RouteTable> routTableList = this.routTableService.selectObjByMap(params);
         map.put("routTable", routTableList);
+
+        boolean flag = false;
+        for (RouteTable routeTable : routTableList) {
+            for (IpAddress ipAddress : destIpAddress) {
+                if(ipAddress.getDeviceUuid().equals(routeTable.getDeviceUuid())){
+                    flag = true;
+                    break;
+                }
+            }
+        }
+
+        if(flag){
+            map.put("type", 0);
+            map.put("msg", "从起点Ip " + srcIp +" 到终点Ip " + destIp +" 路由正常");
+        }else{
+            map.put("type", 1);
+            map.put("msg", "从起点Ip " + srcIp +" 到终点Ip " + destIp +" 路由异常");
+        }
 
         // 二层路径
 //        if(type == 1){
@@ -1009,6 +1076,7 @@ public class TopologyManagerController {
         return ResponseUtil.ok(map);
     }
 
+    @ApiOperation("二层路径查询")
     @GetMapping("/Two-layer/equipment/path")
     public Object queryPath(@RequestParam(value = "srcIp") String srcIp,
                             @RequestParam(value = "srcGateway") String srcGateway,
@@ -1049,7 +1117,11 @@ public class TopologyManagerController {
             }
         }
 
+        List list = new ArrayList();
         Map map = new HashMap();
+        map.put("one", new ArrayList<>());
+        map.put("two", new ArrayList<>());
+        map.put("three", new ArrayList<>());
         if(!queryFlag){
             Map first = new HashMap();
             // 第一段 起点ip至起点ip网关的二层路径查询
@@ -1065,18 +1137,74 @@ public class TopologyManagerController {
                 }else{
                     first = this.routTool.secondLayerHistory(srcMac, destMac, time);
                 }
-                map.put("one", first.get("path"));
+                if(!first.isEmpty()){
+                    map.put("one", first.get("path"));
+                    Map param = new HashMap();
+                    if(first.get("checkPath") != null && Boolean.valueOf(first.get("checkPath").toString())){
+                        param.put("type", 0);
+                        param.put("msg", "从起点ip " + srcIp +" 到网关 " + srcGateway +" 二层路径正常");
+                    }else{
+                        param.put("type", 1);
+                        param.put("msg", "从起点ip " + srcIp + " 到网关" + srcGateway + " 二层路径异常");
+                    }
+                    list.add(param);
+                }
             }else{
                 map.put("one", new ArrayList<>());
+                StringBuffer msg = new StringBuffer();
+                msg.append("从起点Ip " + srcIp + " 到网关 "+ srcGateway +" 路径异常");
+                if(srcArp == null){
+                    msg.append(";起点不存在");
+                }
+                if(destArp == null){
+                    msg.append(",").append("终点不存在");
+                }
+                Map param = new HashMap();
+                param.put("type", 1);
+                param.put("msg", msg);
+                list.add(param);
             }
 
-            // 第二段 起点ip网关到终点ip网关的路由查询
+            // 第二段 起点网关到终点网关的路由查询
             if(first.get("destDevice") != null){
-                List two = this.routTool.queryRoutePath(srcGateway, destGateway, time, (Mac) first.get("destDevice"));
-                map.put("two", two);
+                // 终点设备
+                List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
+                List<RouteTable> two = this.routTool.queryRoutePath(srcGateway, destGateway, time, (Mac) first.get("destDevice"));
+                if(two.size() > 0){
+                    map.put("two", two);
+                    Map param = new HashMap();
+                    boolean flag = false;
+                    for (RouteTable routeTable : two) {
+//                        if(routeTable.getIp().equals(destGateway)){
+//                            flag = true;
+//                            break;
+//                        }
+                        for (IpAddress ipAddress : destIpAddress) {
+                            if(ipAddress.getDeviceUuid().equals(routeTable.getDeviceUuid())){
+                                flag = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(flag){
+                        param.put("type", 0);
+                        param.put("msg", "从起点网关 " + srcGateway +" 到终点网关 " + destGateway +" 路由正常");
+                    }else{
+                        param.put("type", 1);
+                        param.put("msg", "从起点网关 " + srcGateway +" 到终点网关 " + destGateway +" 路由异常");
+                    }
+                    list.add(param);
+                }
+            }else{
+                StringBuffer msg = new StringBuffer();
+                msg.append("路由异常;起点网关 " + srcGateway + " 不存在");
+                Map param = new HashMap();
+                param.put("type", 1);
+                param.put("msg", msg);
+                list.add(param);
             }
 
-            // 第三段 终点ip网关到终点ip的二层查询
+            // 第三段 终点网关到终点ip的二层查询
             User user = ShiroUserHolder.currentUser();
             Map params = new HashMap();
             params.clear();
@@ -1086,31 +1214,92 @@ public class TopologyManagerController {
             destArp = this.queryArp(destIp);
             if(routTableList.size() > 0 && destArp != null){
                 destMac = destArp.getMac();
-                List list = new ArrayList();
+                List<Mac> threeList = new ArrayList();
+                List<Mac> destDevices = new ArrayList();
                 for(RouteTable routeTable : routTableList){
                     if(time == null){
-                        List path = this.routTool.secondLayers(routeTable.getDeviceUuid(), destMac);
-                        list.addAll(path);
+                        Map result = this.routTool.secondLayers(routeTable.getDeviceUuid(), destMac);
+                        if(result.get("path") != null){
+                            // 正确姿势
+                            List<Mac> path = JSONObject.parseObject(JSONObject.toJSONString(result.get("path")),  new TypeReference<List<Mac>>(){});
+//                            List<Mac> path = JSONObject.parseObject(JSONObject.toJSONString(result.get("path")), List.class);
+                            threeList.addAll(path);
+                        }
+                        if(result.get("destDevice") != null){
+                            destDevices.add(Json.fromJson(Mac.class, JSONObject.toJSONString(result.get("destDevice"))));
+                        }
                     }else{
-                        List path = this.routTool.secondLayersHistory(routeTable.getDeviceUuid(), destMac, time);
-                        list.addAll(path);
+                        Map result = this.routTool.secondLayersHistory(routeTable.getDeviceUuid(), destMac, time);
+                        if(result.get("path") != null){
+                            List<Mac> path = JSONObject.parseObject(JSONObject.toJSONString(result.get("path")),  new TypeReference<List<Mac>>(){});
+                            threeList.addAll(path);
+                        }
+                        if(result.get("destDevice") != null){
+                            destDevices.add(Json.fromJson(Mac.class, JSONObject.toJSONString(result.get("destDevice"))));
+                        }
                     }
                 }
-                map.put("three", list);
+                if(threeList.size() > 0){
+                    map.put("three", threeList);
+                    Map param = new HashMap();
+                    boolean flag = false;
+                    for (Mac mac : threeList) {
+//                        if(destDevices.contains(mac)){
+//                            flag = true;
+//                            break;
+//                        }
+                        for (Mac destDevice : destDevices) {
+                            if(destDevice.getUuid().equals(mac.getRemoteUuid())){
+                                flag = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(flag){
+                        param.put("type", 0);
+                        param.put("msg", "从终点网关 " + destGateway +" 到终点Ip " + destIp +" 路径正常");
+                    }else{
+                        param.put("type", 1);
+                        param.put("msg", "从终点网关 " + destGateway +" 到终点网关 " + destIp +" 路径异常");
+                    }
+                    list.add(param);
+                }
             }else{
                 srcArp = this.queryArp(destGateway);
                 if(srcArp != null && destArp != null){
                     srcMac = srcArp.getMac();
                     destMac = destArp.getMac();
-                    Map third = null;
+                    Map third = new HashMap();
                     if(time == null){
                         third = this.routTool.secondLayer(srcMac, destMac);
                     }else{
                         third = this.routTool.secondLayerHistory(srcMac, destMac, time);
                     }
-                    map.put("three", third.get("path"));
+                    if(!third.isEmpty()){
+                        map.put("three", third.get("path"));
+                        Map param = new HashMap();
+                        if(Boolean.valueOf(third.get("checkPath").toString())){
+                            param.put("type", 0);
+                            param.put("msg", "从终点网关 " + destGateway + " 到终点ip " + destIp + " 二层路径正常");
+                        }else{
+                            param.put("type", 1);
+                            param.put("msg", "从终点网关 " + destGateway + " 到终点ip " + destIp + " 二层路径异常");
+                        }
+                        list.add(param);
+                    }
                 }else{
-                    map.put("three", new ArrayList<>());
+                    StringBuffer msg = new StringBuffer();
+                    msg.append("从终点网关 "+ destGateway + " 到终点ip " + destIp + " 路径异常");
+                    if(srcArp == null){
+                        msg.append(";终点网关不存在");
+                    }
+                    if(destArp == null){
+                        msg.append(",").append("终点不存在");
+                    }
+                    Map param = new HashMap();
+                    param.put("type", 1);
+                    param.put("msg", msg);
+                    list.add(param);
                 }
             }
         }else{
@@ -1121,17 +1310,38 @@ public class TopologyManagerController {
             if(srcArp != null && destArp != null){
                 srcMac = srcArp.getMac();
                 destMac = destArp.getMac();
-                Map first = null;
+                Map first = new HashMap();
                 if(time == null){
                     first = this.routTool.secondLayer(srcMac, destMac);
                 }else{
                     first = this.routTool.secondLayerHistory(srcMac, destMac, time);
                 }
-                map.put("one", first.get("path"));
+                if(!first.isEmpty()){
+                    map.put("one", first.get("path"));
+                    Map param = new HashMap();
+                    if(Boolean.valueOf(first.get("checkPath").toString())){
+                        param.put("0", "从起点ip " + srcIp + " 到起点网关 " + srcGateway + " 二层路径正常");
+                    }else{
+                        param.put("1", "从起点ip " + srcIp + " 到起点网关 " + srcGateway + " 二层路径异常");
+                    }
+                    map.put("oneMsg", param);
+                }
             }else{
-                map.put("one", new ArrayList<>());
+                StringBuffer msg = new StringBuffer();
+                msg.append("从起点Ip "+ srcIp + " 到起点网关 " + srcGateway +" 路径异常");
+                if(srcArp == null){
+                    msg.append(";起点不存在");
+                }
+                if(destArp == null){
+                    msg.append(",").append("终点不存在");
+                }
+                Map param = new HashMap();
+                param.put("type", 1);
+                param.put("msg", msg);
+                list.add(param);
             }
         }
+        map.put("msg", list);
         return ResponseUtil.ok(map);
     }
 
@@ -1225,5 +1435,58 @@ public class TopologyManagerController {
        return ResponseUtil.badArgument();
     }
 
+    @ApiOperation("设备 流量")
+    @GetMapping(value = {"/terminal/flux"})
+    public Object getObjByUuid(@RequestParam(value = "id", required = false) String id) {
+        if(Strings.isNotBlank(id)){
+            Map params = new HashMap();
+            Terminal terminals = this.terminalService.selectObjById(Long.parseLong(id));
+            if(terminals == null){
+                return ResponseUtil.badArgument();
+            }
+            // 流量
+            Map flux = new HashMap();
+            NetworkElement ne = this.networkElementService.selectObjByUuid(terminals.getUuid());
+            if(ne != null){
+                // 根据端口获取流量
+                // ifreceived
+                params.clear();
+                params.put("ip", ne.getIp());
+                params.put("filterValue", terminals.getInterfaceName());
+                params.put("tag", "ifreceived");
+                params.put("available", 1);
+                params.put("filterTag", "ifname");// 根据名字查询tag
+                List<Item> items = this.itemService.selectTagByMap(params);
+                if(items.size() > 0){
+                    for (Item item : items) {
+                        String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                        flux.put("received", lastvalue);
+                        break;
+                    }
+                } else{
+                    flux.put("received", "0");
+                }
+                // sent
+                params.clear();
+                params.put("ip", ne.getIp());
+                params.put("filterValue", terminals.getInterfaceName());
+                params.put("tag", "ifsent");
+                params.put("available", 1);
+                params.put("filterTag", "ifname");// 根据名字查询tag
+                List<Item> sentItem = this.itemService.selectTagByMap(params);
+                if(sentItem.size() > 0){
+                    for (Item item : sentItem) {
+                        String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                        flux.put("sent", lastvalue);
+                        break;
+                    }
+                }else{
+                    flux.put("sent", "0");
+                }
+            }
+            return ResponseUtil.ok(flux);
+        }
+        return ResponseUtil.ok();
+    }
 
 }

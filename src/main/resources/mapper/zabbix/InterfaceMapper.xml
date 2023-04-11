@@ -7,15 +7,28 @@
         <result column="ip" property="ip"></result>
         <result column="available" property="available"></result>
         <result column="error" property="error"></result>
+        <result column="value" property="value"></result>
     </resultMap>
 
     <sql id="Base_Column_List">
-        hostid, ip, available, error
+        hostid, ip, available, error, value
     </sql>
 
     <select id="selectObjByIp" parameterType="java.lang.String" resultMap="Base_Result_Map">
-        SELECT <include refid="Base_Column_List"/>
-        FROM interface where ip = #{ip}
+      SELECT
+        hostid,(
+            SELECT value
+            FROM
+              host_tag  tag
+            WHERE
+              inf.hostid = tag.hostid
+            AND
+              tag = 'vender'
+          ) value, ip, available, error
+        FROM
+         interface inf
+        WHERE
+          ip = #{ip}
     </select>
 
 </mapper>

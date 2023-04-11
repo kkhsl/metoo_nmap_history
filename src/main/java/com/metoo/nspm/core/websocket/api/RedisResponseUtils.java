@@ -3,13 +3,18 @@ package com.metoo.nspm.core.websocket.api;
 import com.metoo.nspm.core.config.redis.util.MyRedisManager;
 import com.metoo.nspm.core.manager.admin.tools.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RedisResponseUtils {
 
     @Autowired
     private static MyRedisManager redisWss = new MyRedisManager("ws");
 
-    public static void syncRedis(String sessionid, Object result, Integer type){
+    // 0:未变化 1：有变化
+    @Async
+    public void syncRedis(String sessionid, Object result, Integer type){
         if(sessionid != null && !sessionid.equals("")){
             String key = sessionid + ":" + type;
             String key0 = key + ":0";

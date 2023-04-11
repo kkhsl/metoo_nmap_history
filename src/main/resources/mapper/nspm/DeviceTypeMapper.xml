@@ -24,11 +24,16 @@
             <result column="user_id" property="userId"></result>
             <result column="user_name" property="userName"></result>
             <result column="uuid" property="uuid"></result>
+            <result column="connect_type" property="connectType"></result>
+            <result column="port" property="port"></result>
+            <result column="credential_id" property="credentialId"></result>
+            <result column="web_url" property="webUrl"></result>
+            <result column="permit_connect" property="permitConnect"></result>
         </collection>
     </resultMap>
 
     <sql id="Join_Column_List">
-        dt.id, dt.addTime, dt.deleteStatus, dt.name, n.id n_id, n.*,
+        dt.id, dt.addTime, dt.deleteStatus, dt.name, n.id ne_id, n.*,
         (
 			SELECT COUNT(*)
 			FROM metoo_ne n

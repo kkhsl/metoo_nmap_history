@@ -59,6 +59,11 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public List<User> selectObjByMap(Map params) {
+        return this.userMapper.selectObjByMap(params);
+    }
+
+    @Override
     public Page<UserVo> getObjsByLevel(UserDto dto) {
         if(dto.getGroupLevel() == null || dto.getGroupLevel().equals("")){
             User currentUser = ShiroUserHolder.currentUser();

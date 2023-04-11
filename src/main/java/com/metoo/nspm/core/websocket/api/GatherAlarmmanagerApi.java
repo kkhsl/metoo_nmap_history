@@ -24,6 +24,8 @@ import java.util.Map;
 public class GatherAlarmmanagerApi {
 
     @Autowired
+    private RedisResponseUtils redisResponseUtils;
+    @Autowired
     private IGatherAlarmService gatherAlarmService;
 
     @RequestMapping("/list")
@@ -35,7 +37,7 @@ public class GatherAlarmmanagerApi {
         Page<GatherAlarm> page = this.gatherAlarmService.selectConditionQuery(dto);
         rep.setNoticeType("10");
         rep.setNoticeInfo(new PageInfo<GatherAlarm>(page));
-        RedisResponseUtils.syncRedis(sessionId, new PageInfo<GatherAlarm>(page), 10);
+        this.redisResponseUtils.syncRedis(sessionId, new PageInfo<GatherAlarm>(page), 10);
         return rep;
     }
 

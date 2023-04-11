@@ -142,14 +142,14 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Object MissingServletRequestParameterException(MissingServletRequestParameterException e){
         System.out.println(e.getMessage());
-        return ResponseUtil.missingparameter();
+        return ResponseUtil.missingParameter();
     }
 
     @ExceptionHandler(value = InvalidFormatException.class)
     @ResponseBody
     public Object InvalidFormatException(InvalidFormatException e){
         System.out.println(e.getMessage());
-        return ResponseUtil.missingparameter();
+        return ResponseUtil.missingParameter();
     }
 
     @ExceptionHandler(value = ClientAbortException.class)

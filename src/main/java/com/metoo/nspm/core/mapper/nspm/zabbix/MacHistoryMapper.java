@@ -18,7 +18,9 @@ public interface MacHistoryMapper {
 
     int update(Mac instance);
 
-    int batchDelete(List<Mac> macs);
+    int deleteObjByMap(Map params);
+
+    int batchDelete(List<Long> ids);
 
     void copyMacTemp();
 }

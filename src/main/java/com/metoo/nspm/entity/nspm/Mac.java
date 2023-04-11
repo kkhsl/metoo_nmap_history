@@ -16,11 +16,11 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class Mac extends IdEntity {
 
-    @ApiModelProperty("设备名称")
+    @ApiModelProperty("设备Ip")
     private String deviceIp;
     @ApiModelProperty("设备名称")
     private String deviceName;
-    @ApiModelProperty("设备名称")
+    @ApiModelProperty("设备类型")
     private String deviceType;
     @ApiModelProperty("接口名称")
     private String interfaceName;

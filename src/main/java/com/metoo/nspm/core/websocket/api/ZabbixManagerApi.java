@@ -20,6 +20,8 @@ public class ZabbixManagerApi {
     private ItemService itemService;
     @Autowired
     private ZabbixService zabbixService;
+    @Autowired
+    private RedisResponseUtils redisResponseUtils;
 
     public static void main(String[] args){
         Scanner sc=new Scanner(System.in);
@@ -81,7 +83,7 @@ public class ZabbixManagerApi {
                 }
                 rep.setNoticeType("3");
                 rep.setNoticeInfo(map);
-                RedisResponseUtils.syncRedis(sessionId, result, 3);
+                this.redisResponseUtils.syncRedis(sessionId, result, 3);
                 return rep;
             }
         }

@@ -18,6 +18,8 @@ public interface RouteHistoryMapper {
 
     Route selectDestDevice(Map params);
 
+    int deleteObjByMap(Map params);
+
     int batchDelete(List<Route> macs);
 
     void copyRoutTemp();

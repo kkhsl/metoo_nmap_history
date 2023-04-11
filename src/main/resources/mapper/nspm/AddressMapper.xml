@@ -53,6 +53,9 @@
             <if test="subnetId != null and subnetId != ''">
                 AND subnet_id = #{subnetId}
             </if>
+            <if test="begin_ip != null and end_ip  != ''">
+                AND ip BETWEEN #{begin_ip} and #{end_ip}
+            </if>
             <if test="subnetIds != null and subnetIds != ''">
                 AND subnet_id in
                 <foreach collection="subnetIds" index = "index" item="item" separator="," open="(" close=")">

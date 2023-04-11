@@ -17,6 +17,8 @@ public interface IpAddressHistoryMapper {
 
     List<IpAddress> querySrcDevice(Map params);
 
+    int deleteObjByMap(Map params);
+
     int batchDelete(List<IpAddress> ipAddresses);
 
     void copyIpAddressTemp();

@@ -23,7 +23,8 @@ import java.util.*;
 public class ProblemManagerApi {
 
     @Autowired
-    private IProblemService problemService;
+    private IProblemService problemService;@Autowired
+    private RedisResponseUtils redisResponseUtils;
 
 
     @ApiOperation("告警信息")
@@ -38,7 +39,7 @@ public class ProblemManagerApi {
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
         rep.setNoticeType("6");
         rep.setNoticeInfo(problemList);
-        RedisResponseUtils.syncRedis(sessionId, problemList, 6);
+        this.redisResponseUtils.syncRedis(sessionId, problemList, 6);
         if(problemList.size() > 0){
             rep.setNoticeStatus(1);
         }else{
@@ -82,7 +83,7 @@ public class ProblemManagerApi {
             rep.setNoticeStatus(1);
             rep.setNoticeType("7");
             rep.setNoticeInfo(result);
-            RedisResponseUtils.syncRedis(sessionId, result, 7);
+            this.redisResponseUtils.syncRedis(sessionId, result, 7);
             return rep;
         }
         rep.setNoticeType("7");
@@ -106,7 +107,7 @@ public class ProblemManagerApi {
         rep.setNoticeType("8");
         rep.setNoticeStatus(1);
         rep.setNoticeInfo(new PageInfo<Problem>(page));
-        RedisResponseUtils.syncRedis(sessionId, new PageInfo<Problem>(page), 8);
+        this.redisResponseUtils.syncRedis(sessionId, new PageInfo<Problem>(page), 8);
 //        if(true){// 清除数据，并抛出异常；
 //            throw new ClientAbortException("a");
 //        }

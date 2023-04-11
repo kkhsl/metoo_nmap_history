@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/admin/group")
 @RestController
@@ -70,8 +72,16 @@ public class GroupManagerController {
     @RequestMapping("/del")
     public Object del(@RequestBody GroupDto dto){
         Group group = this.groupService.selectObjById(dto.getId());
+        if(group == null){
+            return ResponseUtil.badArgument();
+        }
+        Map params = new HashMap();
+        params.put("groupId", group.getId());
+        List<User> users = this.userService.selectObjByMap(params);
+        if(users.size() > 0){
+            return ResponseUtil.badArgument("请先删除部门中的用户");
+        }
         if (this.delGroup(group.getId())){
-
             return ResponseUtil.ok();
         }
         return ResponseUtil.error();

@@ -7,6 +7,7 @@ import com.metoo.nspm.vo.UserVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface UserMapper {
@@ -39,6 +40,9 @@ public interface UserMapper {
      * @return
      */
     UserVo findUserUpdate(Long id);
+
+
+    List<User> selectObjByMap(Map params);
 
     /**
      * 保存一个User对象

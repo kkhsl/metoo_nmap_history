@@ -17,7 +17,9 @@ public interface IArpHistoryService {
 
     List<Arp> selectDistinctObjByMap(Map params);
 
-    int batchDelete(List<Arp> arp);
+    int deleteObjByMap(Map params);
+
+    int batchDelete(List<Long> ids);
 
     void copyArpTemp();
 }

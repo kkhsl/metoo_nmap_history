@@ -83,7 +83,7 @@ public class ZabbixManagerCongtroller {
         this.zabbixService.gatherArp(cal.getTime());
     }
 
-    @ApiOperation("采集Arp")
+    @ApiOperation("采集Awozhaoyixia rp")
     @RequestMapping("/arp2")
     public void getArp2() {
         Calendar cal = Calendar.getInstance();// 设置采集时间

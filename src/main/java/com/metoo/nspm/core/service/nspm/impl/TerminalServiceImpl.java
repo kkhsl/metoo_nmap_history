@@ -33,6 +33,11 @@ public class TerminalServiceImpl implements ITerminalService {
     private ItemService itemService;
 
     @Override
+    public Terminal selectObjById(Long id) {
+        return this.terminalMapper.selectObjById(id);
+    }
+
+    @Override
     public List<Terminal> selectObjByMap(Map params) {
         return this.terminalMapper.selectObjByMap(params);
     }
@@ -90,7 +95,7 @@ public class TerminalServiceImpl implements ITerminalService {
     }
 
     @Override
-    public void syncMac() {
+    public void syncMacToTerminal() {
         Map params = new HashMap();
         params.clear();
         params.put("tag", "DT");
@@ -100,12 +105,16 @@ public class TerminalServiceImpl implements ITerminalService {
             terminals = terminals.stream().map(e -> {
                         if(e.getOnline() == 1){
                             e.setOnline(0);
+                            if(e.getInterfaceName().equals("PortN")){
+                                e.setInterfaceStatus(1);
+                            }
                             return e;
                         }
                         return null;
                     }
             ).collect(Collectors.toList());
             if(terminals.size() > 0){
+
                 this.terminalMapper.batchUpdate(terminals);
             }
         }else{
@@ -125,7 +134,8 @@ public class TerminalServiceImpl implements ITerminalService {
                         if(t.getOnline() == 0){
                             t.setOnline(1);
                         }
-                        if(t.getInterfaceStatus() != ifup){
+                        if(t.getInterfaceStatus() != ifup
+                                && !t.getInterfaceName().equals("PortN")){
                             t.setInterfaceStatus(ifup);
                         }
                         if(!t.getUuid().equals(e.getUuid())
@@ -144,7 +154,11 @@ public class TerminalServiceImpl implements ITerminalService {
                     BeanUtils.copyProperties(e, terminal);
                     terminal.setOnline(1);
                     terminal.setTerminalTypeId(terminalType.getId());
-                    terminal.setInterfaceStatus(ifup);
+                    if(e.getInterfaceName().equals("PortN")){
+                        terminal.setInterfaceStatus(1);
+                    }else{
+                        terminal.setInterfaceStatus(ifup);
+                    }
                     this.terminalMapper.insert(terminal);
                     ids.add(terminal.getId());
                 }

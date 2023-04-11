@@ -18,7 +18,7 @@ public class MyAccessControlFilter extends AccessControlFilter {
 
     @Override
     protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
-        //判断用户是通过记住我功能自动登录,此时session失效
+           //判断用户是通过记住我功能自动登录,此时session失效
 //        if(env.equalsIgnoreCase("dev")){
 //            return true;
 //        }

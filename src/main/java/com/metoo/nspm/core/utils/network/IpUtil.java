@@ -1,5 +1,6 @@
 package com.metoo.nspm.core.utils.network;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.commons.net.util.SubnetUtils;
 import org.junit.Test;
@@ -19,6 +20,43 @@ public class IpUtil {
         Long restValue = (sc.nextLong() << 24) + (sc.nextLong() << 16) + (sc.nextLong() << 8) + (sc.nextLong());
         sc.close();
         return restValue;
+    }
+
+    @Test
+    public void testIpv4ToNumeric(){
+        String ip = "192.168.0.0";
+        Scanner sc = new Scanner(ip).useDelimiter("\\.");
+        System.out.println(sc.nextLong() << 24);
+        Long restValue = (sc.nextLong() << 24) + (sc.nextLong() << 16) + (sc.nextLong() << 8) + (sc.nextLong());
+        sc.close();
+        System.out.println(restValue);
+    }
+
+    @Test
+    public void testSubnetNum(){
+        String ip = "192.168.0.0";
+
+        List list = new ArrayList();
+        list.add("192.168.0.0");
+        list.add("192.168.0.1");
+        System.out.println(list.contains(ip));
+
+        Scanner sc = new Scanner(ip).useDelimiter("\\.");
+        StringBuffer sb = new StringBuffer();
+        sb.append(sc.nextLong()).append(".").append(sc.nextLong()).append(".").append(sc.nextLong());
+        System.out.println(sb.toString());
+
+//        Map<String, String> subnet = IpUtil.getNetworkIp(ip, "255.255.0.0");
+//        System.out.println(subnet.get("network"));
+//        System.out.println(subnet.get("broadcast"));
+//
+//        int mask = 16;
+//        if(!StringUtil.isEmpty(ip) && mask >= 1 && mask <= 32){
+//            SubnetUtils utils = new SubnetUtils(ip + "/" +  mask);
+//            String[] allIps = utils.getInfo().getAllAddresses();
+//            System.out.println(allIps.length/255);
+//            System.out.println(Arrays.asList(allIps));
+//        }
     }
 
     @Test
@@ -343,6 +381,21 @@ public class IpUtil {
             return broadcast;
         }
         return network;
+    }
+
+
+    /**
+     *
+     */
+    @Test
+    public void testSubnetList() {
+        String ip = "192.168.1.0";
+        int mask = 16;
+        if(!StringUtil.isEmpty(ip) && mask >= 1 && mask <= 32){
+            SubnetUtils utils = new SubnetUtils(ip + "/" +  mask);
+            String[] allIps = utils.getInfo().getAllAddresses();
+            System.out.println(Arrays.asList(allIps));
+        }
     }
 
 

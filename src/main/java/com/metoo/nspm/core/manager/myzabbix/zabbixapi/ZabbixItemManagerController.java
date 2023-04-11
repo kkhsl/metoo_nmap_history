@@ -459,46 +459,6 @@ public class ZabbixItemManagerController {
         return ResponseUtil.ok();
     }
 
-    @GetMapping("/batch/delete/arp")
-    public void batchArp(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date time){
-        Map params = new HashMap();
-        params.put("beforeTime", time);
-        try {
-            List<Arp> arps = this.arpHistoryService.selectObjByMap(params);
-            if(arps.size() > 0){
-                this.arpHistoryService.batchDelete(arps);
-            }
-            try {
-                List<Mac> macs = this.macHistoryService.selectObjByMap(params);
-                if(macs.size() > 0){
-                    this.macHistoryService.batchDelete(macs);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
-                List<Route> routList = this.routHistoryService.selectObjByMap(params);
-                if(routList.size() > 0){
-                    this.routHistoryService.batchDelete(routList);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
-                List<IpAddress> ipAddresses = this.iipAddressHistoryService.selectObjByMap(params);
-                if(ipAddresses.size() > 0){
-                    this.iipAddressHistoryService.batchDelete(ipAddresses);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @ApiOperation("arp 列表")
     @GetMapping(value = {"/obj/arp"})
     public Object arp(@RequestParam(value = "uuid", required = false) String uuid,

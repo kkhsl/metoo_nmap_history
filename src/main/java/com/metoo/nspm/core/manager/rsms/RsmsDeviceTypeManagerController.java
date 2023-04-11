@@ -24,7 +24,6 @@ public class RsmsDeviceTypeManagerController {
     @Autowired
     private IDeviceTypeService deviceTypeService;
 
-
     @GetMapping("/count")
     public Object getCount(){
         List<DeviceType> deviceTypes = this.deviceTypeService.selectDeviceTypeAndNeByJoin();

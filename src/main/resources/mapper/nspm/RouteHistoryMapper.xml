@@ -163,6 +163,12 @@
         LIMIT 1
     </select>
 
+    <delete id="deleteObjByMap" parameterType="java.util.Map">
+        DELETE FROM rsms_route_history
+        where
+        addTime &lt;= #{addTime}
+    </delete>
+
     <delete id="batchDelete" parameterType="com.metoo.nspm.entity.nspm.Route">
         DELETE FROM rsms_route_history where
         <foreach collection="list" item="item"  separator="or">
@@ -172,7 +178,7 @@
 
     <insert id="copyRoutTemp">
         INSERT INTO rsms_route_history (<include refid="Copy_Column_List"/>)
-        SELECT <include refid="Copy_Column_List"/> FROM rsms_rout_temp
+        SELECT <include refid="Copy_Column_List"/> FROM rsms_route_temp
     </insert>
 
 </mapper>

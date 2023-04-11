@@ -194,6 +194,12 @@
             <if test="id != null and id != ''">
                 AND id = #{id}
             </if>
+            <if test="ids != null and ids.size() > 0">
+              AND id in
+                <foreach collection="ids" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="name != null and name != ''">
                 AND `name` = #{name}
             </if>
@@ -312,10 +318,10 @@
             <if test="vendorName != null and vendorName != ''">
                 vendor_name,
             </if>
-            <if test="groupId != null and groupId != ''">
+            <if test="groupId != ''">
                 group_id,
             </if>
-            <if test="groupName != null and groupName != ''">
+            <if test="groupName != ''">
                 group_name,
             </if>
             <if test="uuid != null and uuid != ''">
@@ -407,10 +413,10 @@
             <if test="vendorName != null and vendorName != ''">
                 #{vendorName},
             </if>
-            <if test="groupId != null and groupId != ''">
+            <if test="groupId != ''">
                 #{groupId},
             </if>
-            <if test="groupName != null and groupName != ''">
+            <if test="groupName != ''">
                 #{groupName},
             </if>
             <if test="uuid != null and uuid != ''">

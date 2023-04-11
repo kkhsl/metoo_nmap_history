@@ -38,6 +38,11 @@ public class IpAddressHistoryServiceImpl implements IIPAddressHistoryService {
     }
 
     @Override
+    public int deleteObjByMap(Map params) {
+        return this.ipAddressHistoryMapper.deleteObjByMap(params);
+    }
+
+    @Override
     public int batchDelete(List<IpAddress> ipAddresses) {
         return this.ipAddressHistoryMapper.batchDelete(ipAddresses);
     }

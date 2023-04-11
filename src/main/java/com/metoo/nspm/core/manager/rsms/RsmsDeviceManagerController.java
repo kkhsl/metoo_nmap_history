@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.config.annotation.OperationLogAnno;
 import com.metoo.nspm.core.config.annotation.OperationType;
 import com.metoo.nspm.core.config.website.Properties;
+import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.GroupTools;
 import com.metoo.nspm.core.manager.admin.tools.ShiroUserHolder;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixHostInterfaceService;
@@ -22,7 +23,6 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.aspectj.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -119,7 +120,8 @@ public class RsmsDeviceManagerController {
     public Object type(){
         List<DeviceType> deviceTypeList = this.deviceTypeService.selectCountByJoin();
         if(deviceTypeList.size() > 0){
-            ExecutorService exe = Executors.newFixedThreadPool(deviceTypeList.size());
+            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
+            ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
             for(DeviceType deviceType : deviceTypeList){
                 if(deviceType.getNetworkElementList().size() > 0){
                     for(NetworkElement ne : deviceType.getNetworkElementList()){
@@ -254,7 +256,8 @@ public class RsmsDeviceManagerController {
 //    }
 
     @GetMapping("/verify")
-    public Object verifyIp(@RequestParam(value = "ip", required = true) String ip){
+    public Object verifyIp(@RequestParam(value = "id", required = false) Long id,
+                           @RequestParam(value = "ip", required = true) String ip){
         // 校验Ip
         if(!StringUtils.isEmpty(ip)){
             boolean flag = IpUtil.verifyIp(ip);
@@ -262,6 +265,7 @@ public class RsmsDeviceManagerController {
                 Map params = new HashMap();
                 params.clear();
                 params.put("ip", ip);
+                params.put("deviceId", id);
                 List<RsmsDevice> deviceListIp = this.rsmsDeviceService.selectObjByMap(params);
                 if(deviceListIp.size() > 0){
                     return ResponseUtil.badArgument("Ip已存在");
@@ -310,6 +314,16 @@ public class RsmsDeviceManagerController {
             if(rsmsDeviceList.size() > 0){
                 RsmsDevice rsmsDevice = rsmsDeviceList.get(0);
                 return ResponseUtil.badArgument("主机名与(" + rsmsDevice.getName() + ")设备重复");
+            }
+        }
+
+        if(instance.getGroupId() != null && !instance.getGroupId().equals("")){
+            Group group = this.groupService.selectObjById(instance.getGroupId());
+            if(group == null){
+                instance.setGroupId(null);
+                instance.setGroupName(null);
+            }else{
+                instance.setGroupName(instance.getName());
             }
         }
 
@@ -641,6 +655,70 @@ public class RsmsDeviceManagerController {
             }
         }
         return ResponseUtil.badArgument("文件不存在");
+    }
+
+    @ApiOperation("设备导出")
+    @GetMapping(value = "/export")
+    public Object export(HttpServletResponse response, RsmsDevice device){
+//        if(device.getAll() == null || !device.getAll().equals(1)){
+//            if(device.getIds() == null || device.getIds().size() <= 0){
+//                return ResponseUtil.badArgument("请选择要导出的设备");
+//            }
+//            if(StringUtils.isBlank(device.getExcelName())){
+//                return ResponseUtil.badArgument("请选择要导出的文件名");
+//            }
+//        }
+
+
+//        if(StringUtils.isBlank(device.getExcelName())){
+//            return ResponseUtil.badArgument("请选择要文件导出位置");
+//        }
+        if(StringUtils.isBlank(device.getExcelName())){
+            device.setExcelName("设备台账"+ DateTools.getCurrentDate(new Date()) +".xls");
+        }
+        Map params = new HashMap();
+//        List<RsmsDevice> devices = new ArrayList<>();
+////        if(device.getAll()g != null && device.getAll().equals(1)){
+////            devices = this.rsmsDeviceService.selectObjByMap(params);
+////        }else{
+////            params.put("ids", device.getIds());
+////            devices = this.rsmsDeviceService.selectObjByMap(params);
+////        }
+        params.put("ids", device.getIds());
+        List<RsmsDevice> devices = this.rsmsDeviceService.selectObjByMap(params);
+        if(devices.size() > 0){
+            for (RsmsDevice rsmsDevice : devices) {
+                if(rsmsDevice.getDeviceTypeId() != null && !rsmsDevice.getDeviceTypeId().equals("")){
+                    DeviceType instance = this.deviceTypeService.selectObjById(rsmsDevice.getDeviceTypeId());
+                    rsmsDevice.setDeviceTypeName(instance.getName());
+                }
+                if(rsmsDevice.getVendorId() != null && !rsmsDevice.getVendorId().equals("")){
+                    Vendor instance = this.vendorService.selectObjById(rsmsDevice.getVendorId());
+                    rsmsDevice.setVendorName(instance.getName());
+                }
+                if(rsmsDevice.getGroupId() != null && !rsmsDevice.getGroupId().equals("")){
+                    Group instance = this.groupService.selectObjById(rsmsDevice.getGroupId());
+                    if(instance != null){
+                        rsmsDevice.setGroupName(instance.getBranchName());
+                    }
+                }
+                if(rsmsDevice.getPlantRoomId() != null && !rsmsDevice.getPlantRoomId().equals("")){
+                    PlantRoom instance = this.plantRoomService.getObjById(rsmsDevice.getPlantRoomId());
+                    rsmsDevice.setPlantRoomName(instance.getName());
+                }
+                if(rsmsDevice.getRackId() != null && !rsmsDevice.getRackId().equals("")){
+                    Rack instance = this.rackService.getObjById(rsmsDevice.getRackId());
+                    rsmsDevice.setRackName(instance.getName());
+                }
+                if(rsmsDevice.getProjectId() != null && !rsmsDevice.getProjectId().equals("")){
+                    Project instance = this.projectService.selectObjById(rsmsDevice.getProjectId());
+                    rsmsDevice.setProjectName(instance.getName());
+                }
+            }
+            List<List<Object>> sheetDataList = ExcelUtils.getSheetData(devices);
+            ExcelUtils.export(response, device.getExcelName(), sheetDataList);
+        }
+        return ResponseUtil.ok();
     }
 
     @Autowired

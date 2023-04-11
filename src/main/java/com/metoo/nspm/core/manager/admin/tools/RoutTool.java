@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Component
@@ -403,7 +404,7 @@ public class RoutTool {
                 Mac srcDevice = srcDevices.get(0);
                 Mac destDevice = destDevices.get(0);
                 String tag = "";
-                List path = new ArrayList();
+                List<Mac> path = new ArrayList();
                 if(destDevice.getTag().equals("L")){
                     path = this.nextHop(srcDevice.getUuid(), destDevice, "L");
                 }else{
@@ -411,12 +412,27 @@ public class RoutTool {
                 }
                 path.add(destDevice);
                 path.add(srcDevice);
+                map.put("srcDevice", srcDevice);
                 map.put("destDevice", destDevice);
                 map.put("path", path);
+                // 检查路径是否有终点
+                boolean checkResult = this.checkPath(path, destDevice);
+                map.put("checkPath", checkResult);
                 return map;
             }
         }
         return new HashMap();
+    }
+
+    public boolean checkPath(List<Mac> path, Mac destMac){
+        if(path.size() > 0 && destMac != null){
+            for (Mac mac : path) {
+                if(mac.getRemoteUuid().equals(destMac.getUuid())){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public Map secondLayerHistory(String srcMac, String destMac, Date time){
@@ -482,13 +498,56 @@ public class RoutTool {
                 path.add(srcDevice);
                 map.put("destDevice", destDevice);
                 map.put("path", path);
+                // 检查路径是否有终点
+                boolean checkResult = this.checkPath(path, destDevice);
+                map.put("checkPath", checkResult);
                 return map;
             }
         }
         return new HashMap();
     }
 
-    public List secondLayers(String srcUuid, String destMac){
+//    public List<Mac> secondLayers(String srcUuid, String destMac){
+//        // 查询起点设备
+//        Map params = new HashMap();
+//        if(StringUtils.isNotEmpty(srcUuid)){
+//            List<Mac> destDevices = new ArrayList<>();
+//            if(destMac.contains("00:00:5e")){
+//                params.put("tag", "LV");
+//                params.put("mac", destMac);
+//                destDevices = this.macService.selectByMap(params);
+//            }
+//            if(destDevices.size() <= 0){
+//                params.clear();
+//                params.put("tag", "DT");
+//                params.put("mac", destMac);
+//                destDevices = this.macService.selectByMap(params);
+//                if(destDevices.size() <= 0){
+//                    params.clear();
+//                    params.put("tag", "L");
+//                    params.put("mac", destMac);
+//                    destDevices = this.macService.selectByMap(params);
+//                }
+//            }
+//            if(destDevices.size() > 0){
+//                // 查询下一跳
+//                Mac destDevice = destDevices.get(0);
+//                String tag = "";
+//                List<Mac> path = new ArrayList();
+//                if(destDevice.getTag().equals("L")){
+//                    path = this.nextHop(srcUuid, destDevice, "L");
+//                }else{
+//                    path = this.recursionLayPath(srcUuid, destDevice, tag);
+//                }
+////                List path = this.recursionLayPath(srcUuid, destDevice, tag);
+//
+//                return path;
+//            }
+//        }
+//        return new ArrayList<Mac>();
+//    }
+
+    public Map<String, Object> secondLayers(String srcUuid, String destMac){
         // 查询起点设备
         Map params = new HashMap();
         if(StringUtils.isNotEmpty(srcUuid)){
@@ -514,21 +573,65 @@ public class RoutTool {
                 // 查询下一跳
                 Mac destDevice = destDevices.get(0);
                 String tag = "";
-                List path = new ArrayList();
+                List<Mac> path = new ArrayList();
                 if(destDevice.getTag().equals("L")){
                     path = this.nextHop(srcUuid, destDevice, "L");
                 }else{
                     path = this.recursionLayPath(srcUuid, destDevice, tag);
                 }
 //                List path = this.recursionLayPath(srcUuid, destDevice, tag);
-
-                return path;
+                Map map = new HashMap();
+                map.put("path", path);
+                map.put("destDevice", destDevice);
+                return map;
             }
         }
-        return new ArrayList<>();
+        return new HashMap();
     }
 
-    public List secondLayersHistory(String srcUuid, String destMac, Date time){
+//    public List<Mac> secondLayersHistory(String srcUuid, String destMac, Date time){
+//        // 查询起点设备
+//        Map params = new HashMap();
+//        if(StringUtils.isNotEmpty(srcUuid)){
+//            List<Mac> destDevices = new ArrayList<>();
+//            if(destMac.contains("00:00:5e")){
+//                params.put("tag", "LV");
+//                params.put("mac", destMac);
+//                params.put("time", DateTools.getCurrentTimeNoSecond(time));
+//                destDevices = this.macHistoryService.selectObjByMap(params);
+//            }
+//            if(destDevices.size() <= 0){
+//                params.clear();
+//                params.put("tag", "DT");
+//                params.put("mac", destMac);
+//                params.put("time", DateTools.getCurrentTimeNoSecond(time));
+//                destDevices = this.macHistoryService.selectObjByMap(params);
+//                if(destDevices.size() <= 0){
+//                    params.clear();
+//                    params.put("tag", "L");
+//                    params.put("mac", destMac);
+//                    params.put("time", DateTools.getCurrentTimeNoSecond(time));
+//                    destDevices = this.macHistoryService.selectObjByMap(params);
+//                }
+//            }
+//            if(destDevices.size() > 0){
+//                // 查询下一跳
+//                Mac destDevice = destDevices.get(0);
+//                String tag = "";
+//                List<Mac> path = new ArrayList();
+//                if(destDevice.getTag().equals("L")){
+//                    path = this.nextHopHistory(srcUuid, destDevice, time);
+//                }else{
+//                    path = this.recursionLayPathHistory(srcUuid, destDevice, tag, time);
+//                }
+//                return path;
+//            }
+//        }
+//        return new ArrayList<Mac>();
+//    }
+
+
+    public Map<String, Object> secondLayersHistory(String srcUuid, String destMac, Date time){
         // 查询起点设备
         Map params = new HashMap();
         if(StringUtils.isNotEmpty(srcUuid)){
@@ -557,16 +660,19 @@ public class RoutTool {
                 // 查询下一跳
                 Mac destDevice = destDevices.get(0);
                 String tag = "";
-                List path = new ArrayList();
+                List<Mac> path = new ArrayList();
                 if(destDevice.getTag().equals("L")){
                     path = this.nextHopHistory(srcUuid, destDevice, time);
                 }else{
                     path = this.recursionLayPathHistory(srcUuid, destDevice, tag, time);
                 }
-                return path;
+                Map map = new HashMap();
+                map.put("path", path);
+                map.put("destDevice", destDevice);
+                return map;
             }
         }
-        return new ArrayList<>();
+        return new HashMap();
     }
 
     // 递归查询二层路径
@@ -612,8 +718,8 @@ public class RoutTool {
     }
 
     // 递归查询二层路径
-    public List recursionLayPathHistory(String srcUuid, Mac destDevice, String tag, Date time){
-        List list = new ArrayList();
+    public List<Mac> recursionLayPathHistory(String srcUuid, Mac destDevice, String tag, Date time){
+        List<Mac> list = new ArrayList();
         Map params = new HashMap();
         params.clear();
         params.put("uuid", srcUuid);
@@ -652,15 +758,15 @@ public class RoutTool {
             }
             return list;
         }
-        return new ArrayList();
+        return new ArrayList<Mac>();
     }
 
-    public List nextHop(String srcUuid, Mac destDevice, String tag){
+    public List<Mac> nextHop(String srcUuid, Mac destDevice, String tag){
 //        List nextHop_1 = this.nextHop_1(srcUuid, destDevice, tag);
 //        if(nextHop_1.size() > 0){
 //            return nextHop_1;
 //        }
-        List nextHop_2 = this.nextHop_2(srcUuid, destDevice);
+        List<Mac> nextHop_2 = this.nextHop_2(srcUuid, destDevice);
         if(nextHop_2.size() > 0){
             return nextHop_2;
         }
@@ -718,8 +824,8 @@ public class RoutTool {
      * @param destDevice
      * @return
      */
-    public List nextHop_2(String srcUuid, Mac destDevice){
-        List list = new ArrayList();
+    public List<Mac> nextHop_2(String srcUuid, Mac destDevice){
+        List<Mac> list = new ArrayList();
         Map params = new HashMap();
             params.clear();
             params.put("uuid", srcUuid);
@@ -1139,47 +1245,41 @@ public class RoutTool {
         return srcMacs;
     }
 
-    public List queryRoutePath(String srcIp, String destIp, Date time, Mac destDevice){
+    public List<RouteTable> queryRoutePath(String src, String dest, Date time, Mac destDevice){
         User user = ShiroUserHolder.currentUser();
-        List<IpAddress> srcIpAddresses = this.queryRoutDevice(srcIp, time);
+        List<IpAddress> srcIpAddresses = this.queryRoutDevice(src, time);
         if(srcIpAddresses.size() >= 0){
-        // 终点设备
-    //          List<IpAddress> destIpAddress = this.queryRoutDevice(destIp, time);
-    //          if(destIpAddress.size() <= 0){
-    //                return ResponseUtil.badArgument("终点Ip不存在");
-    //          }
-    //          map.put("destinationDevice", destIpAddress);
-        Map params = new HashMap();
-        this.routTableService.deleteObjByUserId(user.getId());// 清除 routTable
-        // 保存起点设备到路由表
-        // 多起点
-        for (IpAddress srcIpAddress : srcIpAddresses) {
-            boolean flag = true;
-            if(destDevice != null
-                    && !srcIpAddress.getDeviceUuid().equals(destDevice.getUuid())) {
-                flag = false;
-            }
-            if(flag){
-                params.clear();
-                params.put("ip", srcIpAddress.getIp());
-                params.put("mask", srcIpAddress.getMask());
-                params.put("deviceName", srcIpAddress.getDeviceName());
-                params.put("interfaceName", srcIpAddress.getInterfaceName());
-                params.put("mac", srcIpAddress.getMac());
-                params.put("userId", user.getId());
-                List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
-                RouteTable routTable = null;
-                if(routTables.size() > 0){
-                    routTable = routTables.get(0);
-                }else{
-                    routTable = new RouteTable();
+            Map params = new HashMap();
+            this.routTableService.deleteObjByUserId(user.getId());// 清除 routTable
+            // 保存起点设备到路由表
+            // 多起点
+            for (IpAddress srcIpAddress : srcIpAddresses) {
+                boolean flag = true;
+                if(destDevice != null
+                        && !srcIpAddress.getDeviceUuid().equals(destDevice.getUuid())) {
+                    flag = false;
                 }
-                String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
-                BeanUtils.copyProperties(srcIpAddress, routTable, IGNORE_ISOLATOR_PROPERTIES);
-                routTable.setUserId(user.getId());
-                this.routTableService.save(routTable);
-                // 路由查询
-                this.generatorRout(srcIpAddress, destIp, time, user.getId());
+                if(flag){
+                    params.clear();
+                    params.put("ip", srcIpAddress.getIp());
+                    params.put("mask", srcIpAddress.getMask());
+                    params.put("deviceName", srcIpAddress.getDeviceName());
+                    params.put("interfaceName", srcIpAddress.getInterfaceName());
+                    params.put("mac", srcIpAddress.getMac());
+                    params.put("userId", user.getId());
+                    List<RouteTable> routTables = this.routTableService.selectObjByMap(params);
+                    RouteTable routTable = null;
+                    if(routTables.size() > 0){
+                        routTable = routTables.get(0);
+                    }else{
+                        routTable = new RouteTable();
+                    }
+                    String[] IGNORE_ISOLATOR_PROPERTIES = new String[]{"id"};
+                    BeanUtils.copyProperties(srcIpAddress, routTable, IGNORE_ISOLATOR_PROPERTIES);
+                    routTable.setUserId(user.getId());
+                    this.routTableService.save(routTable);
+                    // 路由查询
+                    this.generatorRout(srcIpAddress, dest, time, user.getId());
                 }
             }
         }

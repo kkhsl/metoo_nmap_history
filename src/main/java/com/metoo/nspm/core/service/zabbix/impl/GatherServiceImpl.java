@@ -7,6 +7,7 @@ import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.service.zabbix.IGatherService;
 import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.core.utils.SystemOutputLogUtils;
+import com.metoo.nspm.entity.nspm.Arp;
 import com.metoo.nspm.entity.nspm.ArpTemp;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Test;
@@ -14,11 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -121,7 +125,7 @@ public class GatherServiceImpl implements IGatherService {
 
         watch.reset();
         watch.start();
-        this.zabbixItemService.labelTheMac();
+        this.zabbixItemService.labelTheMac(time);
         watch.stop();
         log.info("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
 
@@ -152,7 +156,7 @@ public class GatherServiceImpl implements IGatherService {
 
         watch.reset();
         watch.start();
-        this.zabbixItemService.labelTheMac();
+        this.zabbixItemService.labelTheMac(time);
         watch.stop();
         System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
@@ -183,15 +187,16 @@ public class GatherServiceImpl implements IGatherService {
 
         watch.reset();
         watch.start();
-        this.zabbixItemService.labelTheMac();
-        watch.stop();
-        System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
-
-        watch.reset();
-        watch.start();
         this.itemService.topologySyncToMacBatch(time);
         watch.stop();
         System.out.println("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+
+
+        watch.reset();
+        watch.start();
+        this.zabbixItemService.labelTheMac(time);
+        watch.stop();
+        System.out.println("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
 
         watch.reset();
         watch.start();
@@ -206,7 +211,7 @@ public class GatherServiceImpl implements IGatherService {
         watch.stop();
 
 
-        this.terminalService.syncMac();
+        this.terminalService.syncMacToTerminal();
 
 
 
@@ -234,7 +239,7 @@ public class GatherServiceImpl implements IGatherService {
         exe.execute(new Runnable() {
             @Override
             public void run() {
-                zabbixItemService.labelTheMac();
+                zabbixItemService.labelTheMac(time);
             }
         });
 
@@ -266,6 +271,56 @@ public class GatherServiceImpl implements IGatherService {
         });
         watch.stop();
         System.out.println("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");
+    }
+
+    @Override
+    public void gatherMacThreadPool3(Date time) {
+        this.itemService.testGatherMacThreadPool(time);
+    }
+
+    @Override
+    public void gatherMacThreadPool4(Date time) {
+
+        StopWatch watch = new StopWatch();
+        watch.start();
+        this.itemService.gatherMacCallable(time);
+        watch.stop();
+
+        log.info("Mac采集-写入 耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
+
+        watch.reset();
+        watch.start();
+        this.itemService.topologySyncToMacBatch(time);
+        watch.stop();
+
+        log.info("Mac-topology采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
+
+        watch.reset();
+        watch.start();
+        this.zabbixItemService.labelTheMac(time);
+        watch.stop();
+
+        log.info("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
+
+        watch.reset();
+        watch.start();
+
+        // 同步网元数据到Mac
+
+        this.macService.truncateTable();
+
+        this.macService.copyMacTemp();
+
+        this.terminalService.syncHistoryMac(time);
+
+        this.macHistoryService.copyMacTemp();
+        watch.stop();
+
+        this.terminalService.syncMacToTerminal();
+
+        log.info("Mac-tag采集耗时：" + watch.getTime(TimeUnit.SECONDS) + "秒.");
+
+
     }
 
     @Override
@@ -317,4 +372,6 @@ public class GatherServiceImpl implements IGatherService {
         this.spanningTreeProtocolHistoryService.truncateTable();
         this.spanningTreeProtocolHistoryService.copyMacTemp();
     }
+
+
 }

@@ -45,6 +45,11 @@ public class RoutHistoryServiceImpl implements IRoutHistoryService {
     }
 
     @Override
+    public int deleteObjByMap(Map params) {
+        return this.deleteObjByMap(params);
+    }
+
+    @Override
     public int batchDelete(List<Route> routs) {
         return this.routHistoryMapper.batchDelete(routs);
     }

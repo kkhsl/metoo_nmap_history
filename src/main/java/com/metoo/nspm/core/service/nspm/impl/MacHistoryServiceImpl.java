@@ -51,8 +51,13 @@ public class MacHistoryServiceImpl implements IMacHistoryService {
     }
 
     @Override
-    public int batchDelete(List<Mac> macs) {
-        return this.macHistoryMapper.batchDelete(macs);
+    public int deleteObjByMap(Map params) {
+        return this.deleteObjByMap(params);
+    }
+
+    @Override
+    public int batchDelete(List<Long> ids) {
+        return this.macHistoryMapper.batchDelete(ids);
     }
 
     @Override

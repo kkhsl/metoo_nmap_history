@@ -9,6 +9,8 @@ import java.util.Map;
 
 public interface ITerminalService {
 
+    Terminal selectObjById(Long id);
+
     List<Terminal> selectObjByMap(Map params);
 
     int insert(Terminal instance);
@@ -20,7 +22,8 @@ public interface ITerminalService {
     int batchUpdate(List<Terminal> instances);
 
     // 同步DT信息
-    void syncMac();
+    void syncMacToTerminal();
 
+    // 同步终端类型
     void syncHistoryMac(Date time);
 }

@@ -56,24 +56,24 @@ public class NspmApplication extends SpringBootServletInitializer {
     }
 
 //     在容器启动成功后的最后一步回调（类似开机自启动）
-    @Component
-    @Order(0)
-    static class Runner implements CommandLineRunner{
-
+//    @Component
+//    @Order(0)
+//    static class Runner implements CommandLineRunner{
+//
 //        @Autowired
 //        private ITopologyTokenService topologyTokenService;
 //        @Autowired
 //        private TestInitService testInitService;
 
-        @Override
-        public void run(String... args) {
-            Long time=System.currentTimeMillis();
-            System.out.println("begin======================================");
+//        @Override
+//        public void run(String... args) {
+//            Long time=System.currentTimeMillis();
+//            System.out.println("begin======================================");
 //            this.topologyTokenService.initToken();
 //            this.testInitService.init();
-            System.out.println("Init time：" + (System.currentTimeMillis() - time));
-        }
-    }
+//            System.out.println("Init time：" + (System.currentTimeMillis() - time));
+//        }
+//    }
 
 }
 

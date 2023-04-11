@@ -2,6 +2,7 @@ package com.metoo.nspm.core.service.zabbix.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.container.juc.callable.MyCallable;
 import com.metoo.nspm.core.config.redis.util.MyRedisManager;
 import com.metoo.nspm.core.manager.admin.tools.DateTools;
 import com.metoo.nspm.core.manager.admin.tools.MacUtil;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -37,7 +39,7 @@ import java.util.stream.Collectors;
 import static java.lang.Thread.sleep;
 
 @Service
-//@Transactional
+//@Transactional(rollbackFor = Exception.class)
 public class ItemServiceImpl implements ItemService {
 
     Logger log = LoggerFactory.getLogger(ItemServiceImpl.class);
@@ -76,6 +78,10 @@ public class ItemServiceImpl implements ItemService {
     private IMacService macService;
     @Autowired
     private IpAlterationService ipAlterationService;
+    @Autowired
+    private INetworkElementService networkElementService;
+    @Autowired
+    private IDeviceTypeService deviceTypeService;
 
     @Autowired
     private static MyRedisManager redisManager = new MyRedisManager("arp");
@@ -826,7 +832,7 @@ public class ItemServiceImpl implements ItemService {
                 List<Item> items = itemMapper.gatherItemByTag(params);
                 if (items.size() > 0) {
                     final  Map<String, String> macVlan = macMap;
-                        items.parallelStream().forEach(item -> {
+                        items.stream().forEach(item -> {
                         List<ItemTag> tags = item.getItemTags();
                         MacTemp macTemp = new MacTemp();
                         macTemp.setAddTime(time);
@@ -861,8 +867,8 @@ public class ItemServiceImpl implements ItemService {
                                 }
                             }
                             // 保存Mac条目
-                            if (StringUtils.isNotEmpty(macTemp.getInterfaceName())
-                                    && StringUtils.isNotEmpty(macTemp.getMac())
+                            if (StringUtils.isNotBlank(macTemp.getInterfaceName())
+                                    && StringUtils.isNotBlank(macTemp.getMac())
                                     && !macTemp.getMac().equals("{#MAC}")
                                     && !macTemp.getMac().equals("{#IFMAC}")) {
                                 macTemp.setTag("L");
@@ -887,7 +893,7 @@ public class ItemServiceImpl implements ItemService {
                 // Begin(item)
                 if (itemTagList.size() > 0) {
                     final  Map<String, String> macVlan = macMap;
-                    itemTagList.parallelStream().forEach(item -> {
+                    itemTagList.stream().forEach(item -> {
                         List<ItemTag> tags = item.getItemTags();
                         MacTemp macTemp = new MacTemp();
                         macTemp.setAddTime(time);
@@ -939,8 +945,8 @@ public class ItemServiceImpl implements ItemService {
                                 }
                             }
                             // 保存Mac条目
-                            if(StringUtils.isNotEmpty(macTemp.getInterfaceName())
-                                    && StringUtils.isNotEmpty(macTemp.getMac())
+                            if(StringUtils.isNotBlank(macTemp.getInterfaceName())
+                                    && StringUtils.isNotBlank(macTemp.getMac())
                                     && !macTemp.getMac().equals("{#MAC}")
                                     && !macTemp.getMac().equals("{#IFMAC}")){
                                 if(macTemp.getTag() == null || "".equals(macTemp.getTag())){
@@ -966,7 +972,7 @@ public class ItemServiceImpl implements ItemService {
 //                    List<Item> arpList = itemMapper.gatherItemByTagAndRtdata(params);
                     List<Item> arpList = itemMapper.gatherItemByTag(params);
                     if (arpList.size() > 0) {
-                        arpList.parallelStream().forEach(item -> {
+                        arpList.stream().forEach(item -> {
                             List<ItemTag> tags = item.getItemTags();
                             ArpTemp arpTemp = new ArpTemp();
                             arpTemp.setDeviceName(deviceName);
@@ -1014,9 +1020,9 @@ public class ItemServiceImpl implements ItemService {
                                     }
                                 }
                                 // 获取arp，写入mac
-                                if (StringUtils.isNotEmpty(arpTemp.getIp())
-                                        && StringUtils.isNotEmpty(arpTemp.getInterfaceName())
-                                        && StringUtils.isNotEmpty(arpTemp.getMac())
+                                if (StringUtils.isNotBlank(arpTemp.getIp())
+                                        && StringUtils.isNotBlank(arpTemp.getInterfaceName())
+                                        && StringUtils.isNotBlank(arpTemp.getMac())
                                         && "dynamic".equals(arpTemp.getType())) {
                                     MacTemp macTemp = new MacTemp();
                                     macTemp.setAddTime(time);
@@ -1042,7 +1048,14 @@ public class ItemServiceImpl implements ItemService {
                 watch.reset();
                 watch.start();
                 try {
-                    List<MacTemp> list2 = batchInsert.parallelStream().collect(
+                    int i = 0;
+                    for (MacTemp macTemp : batchInsert) {
+                        i++;
+                        if(macTemp == null){
+                            System.out.println(i);
+                        }
+                    }
+                    List<MacTemp> list2 = batchInsert.stream().filter(e -> e != null).collect(
                             Collectors.collectingAndThen(
                                     Collectors.toCollection(() -> new TreeSet<>(Comparator
                                             .comparing(MacTemp::getDeviceName, Comparator.nullsLast(String::compareTo))
@@ -1879,17 +1892,17 @@ public class ItemServiceImpl implements ItemService {
         StopWatch watch = StopWatch.createStarted();
         List<Map> devices = this.topoNodeService.queryNetworkElement();
         if (devices != null && devices.size() > 0) {
-//            final CountDownLatch latch = new CountDownLatch(devices.size());
-//            IListUtils listUtils = new IListUtils();
-            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 24);
+            final CountDownLatch latch = new CountDownLatch(devices.size());
+            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
             ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
-//            ThreadPool threadPool = ThreadPool.getInstance();
-            List<MacTemp> batchInsert = new Vector<>();
+            List<MacTemp> batchInsert = new Vector();
             Map params = new HashMap();
             this.macTempService.truncateTable();
             devices.parallelStream().forEach(map ->{
-                exe.execute(new Thread(() -> {
-                    synchronized (this){// 锁对象需要优化
+                exe.execute(
+                        new Thread(
+                                () -> {
+//                    synchronized (batchInsert){
                         System.out.println(Thread.currentThread().getName());
                         String deviceName = String.valueOf(map.get("deviceName"));
                         String deviceType = String.valueOf(map.get("deviceType"));
@@ -1914,7 +1927,7 @@ public class ItemServiceImpl implements ItemService {
                         List<Item> items = itemMapper.gatherItemByTagAndRtdata(params);
                         if (items.size() > 0) {
                             final  Map<String, String> macVlan = macMap;
-                            items.parallelStream().forEach(item -> {
+                            items.stream().forEach(item -> {
                                 List<ItemTag> tags = item.getItemTags();
                                 MacTemp macTemp = new MacTemp();
                                 macTemp.setAddTime(time);
@@ -1973,7 +1986,7 @@ public class ItemServiceImpl implements ItemService {
                         // Begin(item)
                         if (itemTagList.size() > 0) {
                             final  Map<String, String> macVlan = macMap;
-                            itemTagList.parallelStream().forEach(item -> {
+                            itemTagList.stream().forEach(item -> {
                                 List<ItemTag> tags = item.getItemTags();
                                 MacTemp macTemp = new MacTemp();
                                 macTemp.setAddTime(time);
@@ -2050,7 +2063,7 @@ public class ItemServiceImpl implements ItemService {
                             params.put("name_relevance", "ifname");
                             List<Item> arpList = itemMapper.gatherItemByTagAndRtdata(params);
                             if (arpList.size() > 0) {
-                                arpList.parallelStream().forEach(item -> {
+                                arpList.stream().forEach(item -> {
                                     List<ItemTag> tags = item.getItemTags();
                                     ArpTemp arpTemp = new ArpTemp();
                                     arpTemp.setDeviceName(deviceName);
@@ -2118,6 +2131,248 @@ public class ItemServiceImpl implements ItemService {
                                 });
                             }
                         }
+                        latch.countDown();
+                        log.info("采集中");
+//                    }
+                }));
+            });
+//            if(exe != null){
+//                exe.shutdown();
+//            }
+            try {
+                latch.await();
+                watch.stop();
+                log.info("Mac-采集 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+
+                watch.reset();
+                watch.start();
+                try {
+                    List<MacTemp> list2 = batchInsert.parallelStream().collect(
+                            Collectors.collectingAndThen(
+                                    Collectors.toCollection(() -> new TreeSet<>(
+                                            Comparator
+                                                    .comparing(MacTemp::getDeviceName)
+                                                    .thenComparing(MacTemp::getInterfaceName)
+                                                    .thenComparing(MacTemp::getMac))),
+                                    ArrayList::new));
+                    System.out.println("批量插入");
+                    this.macTempService.batchInsert(list2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.info("Mac采集异常：" + e.getMessage());
+                }
+                watch.stop();
+                log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+                // 等待并发Stream处理完成
+
+//            while (true) {
+//                if (exe.isTerminated()) {
+//                    if(batchInsert.size() > 0){
+//                        watch.reset();
+//                        watch.start();
+//                        try {
+//                            List<MacTemp> list2 = batchInsert.parallelStream().collect(
+//                                    Collectors.collectingAndThen(
+//                                            Collectors.toCollection(() -> new TreeSet<>(
+//                                                    Comparator
+//                                                            .comparing(MacTemp::getDeviceName)
+//                                                            .thenComparing(MacTemp::getInterfaceName)
+//                                                            .thenComparing(MacTemp::getMac))),
+//                                            ArrayList::new));
+//                            System.out.println("批量插入");
+//                            this.macTempService.batchInsert(list2);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            log.info("Mac采集异常：" + e.getMessage());
+//                        }
+//                        watch.stop();
+//                        log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+//                        // 等待并发Stream处理完成
+//                    }
+//                    break;
+//                }
+//            }
+        }
+    }
+
+
+    private static int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
+    private static ExecutorService staticExe = Executors.newFixedThreadPool(POOL_SIZE);
+
+    @Override
+    public void gatherMacCallable(Date time){
+        StopWatch watch = StopWatch.createStarted();
+        List<Map> devices = this.topoNodeService.queryNetworkElement();
+        if (devices != null && devices.size() > 0) {
+            final CountDownLatch latch = new CountDownLatch(devices.size());
+//            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
+//            ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
+            List<MacTemp> batchInsert = new Vector<>();
+            this.macTempService.truncateTable();
+            devices.parallelStream().forEach(map ->{
+                Future<List<MacTemp>> future = staticExe.submit(new MyCallable(time, map, itemMapper));
+                try {
+                    List<MacTemp> macTemps = future.get();
+                    batchInsert.addAll(macTemps);
+                    latch.countDown();
+//                    if(future.isDone()){
+//                        List<MacTemp> macTemps = future.get();
+//                        batchInsert.addAll(macTemps);
+//                        latch.countDown();
+//                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            });
+            try {
+                latch.await();
+                watch.stop();
+                log.info("Mac-采集耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+
+                if(batchInsert.size() > 0){
+                    watch.reset();
+                    watch.start();
+                    try {
+                        Vector<MacTemp> list2 = batchInsert.parallelStream().collect(
+                                Collectors.collectingAndThen(
+                                        Collectors.toCollection(() -> new TreeSet<>(
+                                                Comparator
+                                                        .comparing(MacTemp::getDeviceName)
+                                                        .thenComparing(MacTemp::getInterfaceName)
+                                                        .thenComparing(MacTemp::getMac))),
+                                        Vector::new));
+                        this.macTempService.batchInsert(list2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        log.info("Mac采集异常：" + e.getMessage());
+                    }
+                    watch.stop();
+                    log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }finally {
+//                exe.shutdown();
+            }
+
+        }
+    }
+
+    @Override
+    public void testGatherMacThreadPool(Date time) {
+        StopWatch watch = StopWatch.createStarted();
+        List<Map> devices = this.topoNodeService.queryNetworkElement();
+        if (devices != null && devices.size() > 0) {
+//            final CountDownLatch latch = new CountDownLatch(devices.size());
+//            IListUtils listUtils = new IListUtils();
+            int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
+            ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
+//            ThreadPool threadPool = ThreadPool.getInstance();
+            List<MacTemp> batchInsert = new ArrayList<>();
+            Map params = new HashMap();
+            this.macTempService.truncateTable();
+            devices.parallelStream().forEach(map ->{
+                exe.execute(new Thread(() -> {
+                    synchronized (batchInsert){
+                        System.out.println(Thread.currentThread().getName());
+                        String deviceName = String.valueOf(map.get("deviceName"));
+                        String deviceType = String.valueOf(map.get("deviceType"));
+                        String ip = String.valueOf(map.get("ip"));
+                        String uuid = String.valueOf(map.get("uuid"));
+                        params.clear();
+                        params.put("ip", ip);
+                        params.put("tag", "macvlan");
+                        List<Item> vlanMacList = itemMapper.gatherItemByTagAndRtdata(params);
+                        Map<String, String> macMap = null;
+                        if(vlanMacList.size() > 0){
+                            macMap = macVlan(vlanMacList);
+                        }
+
+                        params.clear();
+                        params.put("ip", ip);
+                        params.put("tag", "mac");
+                        params.put("index", "portindex");
+                        params.put("tag_relevance", "ifbasic");
+                        params.put("index_relevance", "ifindex");
+                        params.put("name_relevance", "ifname");
+                        List<Item> items = itemMapper.gatherItemByTagAndRtdata(params);
+                        if (items.size() > 0) {
+                            final  Map<String, String> macVlan = macMap;
+                            items.stream().forEach(item -> {
+                                List<ItemTag> tags = item.getItemTags();
+                                MacTemp macTemp = new MacTemp();
+                                macTemp.setAddTime(time);
+                                macTemp.setDeviceName(deviceName);
+                                macTemp.setDeviceType(deviceType);
+                                macTemp.setUuid(uuid);
+                                macTemp.setDeviceIp(ip);
+                                if (tags != null && tags.size() > 0) {
+                                    for (ItemTag tag : tags) {
+                                        String value = tag.getValue();
+                                        if (tag.getTag().equals("mac")) {
+                                            // 格式化Mac
+                                            if(!value.contains(":")){
+                                                value = value.trim().replaceAll(" ", ":");
+                                            }
+                                            String mac = macUtil.supplement(value);
+                                            macTemp.setMac(mac);
+                                            if(macVlan != null && !macVlan.isEmpty()){
+                                                String vlan = macVlan.get(value);
+                                                macTemp.setVlan(vlan);
+                                            }
+                                        }
+                                        if (tag.getTag().equals("portindex")) {
+                                            macTemp.setInterfaceName(tag.getName());
+                                            macTemp.setIndex(value);
+                                        }
+                                        if (tag.getTag().equals("attr")) {
+                                            switch (value){
+                                                case "5":
+                                                    value = "static";
+                                                    break;
+                                                case "4":
+                                                    value = "local";
+                                                    break;
+                                                case "3":
+                                                    value = "dynamic";
+                                                    break;
+                                                case "2":
+                                                    value = "invalid";
+                                                    break;
+                                                case "1":
+                                                    value = "other";
+                                                    break;
+                                                default:
+                                                    value = null;
+                                                    break;
+                                            }
+                                            macTemp.setType(value);
+                                        }
+                                    }
+                                    // 保存Mac条目
+                                    if(StringUtils.isNotEmpty(macTemp.getInterfaceName())
+                                            && StringUtils.isNotEmpty(macTemp.getMac())
+                                            && !macTemp.getMac().equals("{#MAC}")
+                                            && !macTemp.getMac().equals("{#IFMAC}")){
+                                        if(macTemp.getTag() == null || "".equals(macTemp.getTag())){
+                                            if(macTemp.getType() != null && "local".equals(macTemp.getType())
+                                                    && macTemp.getMac().contains("00:00:5e")){
+                                                macTemp.setTag("LV");
+                                            }else if(macTemp.getMac().contains("00:00:5e")){
+                                                macTemp.setTag("V");
+                                            }
+                                        }
+                                        batchInsert.add(macTemp);
+                                    }
+                                }
+                            });
+                        }
                         System.out.println("采集中");
                     }
                 }));
@@ -2149,7 +2404,6 @@ public class ItemServiceImpl implements ItemService {
                         }
                         watch.stop();
                         log.info("Mac-批量插入 耗时：" + watch.getTime(TimeUnit.MILLISECONDS) + "毫秒.");
-                        // 等待并发Stream处理完成
                     }
                     break;
                 }
@@ -2838,13 +3092,13 @@ public class ItemServiceImpl implements ItemService {
         // 获取拓扑列表
         List<Topology> topologies = this.topologyService.selectObjByMap(null);
         if(topologies.size() > 0){
+            List<MacTemp> list = new ArrayList();
             for (Topology topology : topologies) {
                 if(topology.getContent() != null){
                     Map content = JSONObject.parseObject(topology.getContent().toString(), Map.class);
                     if(content.get("links") != null){
                         JSONArray links = JSONArray.parseArray(content.get("links").toString());
                         if(links.size() > 0) {
-                            List<MacTemp> list = new ArrayList();
                             for (Object object : links) {
                                 Map link = JSONObject.parseObject(object.toString(), Map.class);
                                 if(link.get("category") == null || !"deviceTeamLink".equals(link.get("category"))){
@@ -2870,6 +3124,13 @@ public class ItemServiceImpl implements ItemService {
                                         String name = String.valueOf(toNode.get("name"));
                                         fromMac.setRemoteDevice(name);
                                     }
+                                    NetworkElement toDevice = this.networkElementService.selectObjByUuid(to);
+                                    if(toDevice != null){
+                                        DeviceType deviceType = this.deviceTypeService.selectObjById(toDevice.getDeviceTypeId());
+                                        if(deviceType != null){
+                                            fromMac.setRemoteDeviceType(deviceType.getName());
+                                        }
+                                    }
                                     MacTemp toMac = new MacTemp();
                                     toMac.setAddTime(time);
                                     toMac.setTag("DE");
@@ -2887,27 +3148,35 @@ public class ItemServiceImpl implements ItemService {
                                         toMac.setRemoteDevice(name);
                                     }
 
+                                    NetworkElement fromDevice = this.networkElementService.selectObjByUuid(from);
+                                    if(fromDevice != null){
+                                        DeviceType deviceType = this.deviceTypeService.selectObjById(fromDevice.getDeviceTypeId());
+                                        if(deviceType != null){
+                                            toMac.setRemoteDeviceType(deviceType.getName());
+                                        }
+                                    }
                                     list.add(fromMac);
                                     list.add(toMac);
                                 }
                             }
-                            if(list.size() > 0){
-                                // 执行去重
-                                List<MacTemp> batchInsert = list.stream().collect(
-                                        Collectors.collectingAndThen(
-                                                Collectors.toCollection(() -> new TreeSet<>(Comparator
-                                                        .comparing(MacTemp::getUuid, Comparator.nullsLast(String::compareTo))
-                                                        .thenComparing(MacTemp::getInterfaceName, Comparator.nullsLast(String::compareTo))
-                                                        .thenComparing(MacTemp::getMac, Comparator.nullsLast(String::compareTo))
-                                                        .thenComparing(MacTemp::getRemoteUuid, Comparator.nullsLast(String::compareTo))
-                                                        .thenComparing(MacTemp::getRemoteInterface, Comparator.nullsLast(String::compareTo))
-                                                )),
-                                                ArrayList::new));
-                                this.macTempService.batchInsert(batchInsert);
-                            }
+
                         }
                     }
                 }
+            }
+            if(list.size() > 0){
+                // 执行去重
+                List<MacTemp> batchInsert = list.stream().collect(
+                        Collectors.collectingAndThen(
+                                Collectors.toCollection(() -> new TreeSet<>(Comparator
+                                        .comparing(MacTemp::getUuid, Comparator.nullsLast(String::compareTo))
+                                        .thenComparing(MacTemp::getInterfaceName, Comparator.nullsLast(String::compareTo))
+                                        .thenComparing(MacTemp::getMac, Comparator.nullsLast(String::compareTo))
+                                        .thenComparing(MacTemp::getRemoteUuid, Comparator.nullsLast(String::compareTo))
+                                        .thenComparing(MacTemp::getRemoteInterface, Comparator.nullsLast(String::compareTo))
+                                )),
+                                ArrayList::new));
+                this.macTempService.batchInsert(batchInsert);
             }
         }
     }

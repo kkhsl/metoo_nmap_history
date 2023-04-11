@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Terminal extends IdEntity {
 
+    private String name;
     @ApiModelProperty("设备名称")
     private String deviceIp;
     @ApiModelProperty("设备名称")

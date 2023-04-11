@@ -13,6 +13,7 @@ import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.dto.TopoNodeDto;
 import com.metoo.nspm.entity.nspm.NetworkElement;
 import com.metoo.nspm.entity.nspm.SysConfig;
+import com.metoo.nspm.entity.zabbix.Interface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -84,22 +85,23 @@ public class TopoNodeServiceImpl implements ITopoNodeService {
     @Override
     public List<Map> queryNetworkElement() {
         List<NetworkElement> nes = this.networkElementService.selectObjByMap(null);
-        List<Map> ipList = new ArrayList<>();
+        List<Map> devices = new ArrayList<>();
         if(nes.size() > 0) {
             for (NetworkElement ne : nes) {
-                boolean available = this.interfaceUtil.verifyHostIsAvailable(ne.getIp());
+                Interface obj = this.interfaceUtil.getInteface(ne.getIp());
                 // 校验主机是否宕机
-                if(available){
+                if(obj != null){
                     Map map = new HashMap();
                     map.put("ip", ne.getIp());
                     map.put("deviceName", ne.getDeviceName());
                     map.put("uuid", ne.getUuid());
                     map.put("deviceType", ne.getDeviceTypeName());
-                    ipList.add(map);
+                    map.put("type", obj.getValue());
+                    devices.add(map);
                 }
             }
         }
-        return ipList;
+        return devices;
     }
 
     public static void main(String[] args) {

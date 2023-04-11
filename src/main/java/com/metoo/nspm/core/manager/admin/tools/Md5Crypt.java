@@ -31,6 +31,12 @@ public class Md5Crypt {
     public static boolean getDiffrent(Object o1, Object o2) {
         long st = System.currentTimeMillis();
         /** 使用Security的md5方法进行加密 */
+        if(o1 instanceof ArrayList && o2 instanceof ArrayList) {
+            String str = md5(o1.toString(), "aa");
+            String str1 = md5(o2.toString(), "aa");
+            System.out.println("消耗时间为： " + (System.currentTimeMillis() - st));
+            return str.equals(str1);
+        }
         String str = md5(JSONObject.toJSONString(o1), "aa");
         String str1 = md5(JSONObject.toJSONString(o2), "aa");
         System.out.println("消耗时间为： " + (System.currentTimeMillis() - st));
