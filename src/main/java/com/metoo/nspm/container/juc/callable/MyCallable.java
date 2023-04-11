@@ -144,7 +144,8 @@ public class MyCallable implements Callable<List<MacTemp>> {
                                 Map<String, String> map = this.macVlan(value);
                                 if(map != null){
                                     for (Map.Entry<String, String> entry : map.entrySet()) {
-                                        macTemp.setMac(entry.getKey());
+                                        String mac = supplement(entry.getKey());
+                                        macTemp.setMac(mac);
                                         macTemp.setVlan(entry.getValue());
                                         break;
                                     }

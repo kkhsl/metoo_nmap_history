@@ -224,21 +224,21 @@
     </select>
 
     <select id="directTerminal" resultMap="Base_Result_Map">
-        SELECT
-            mac.id, REPLACE(mac.tag, 'UT', 'DT') tag, mac.mac, arp.ip
-        FROM (
-            SELECT INET_NTOA(ip) ip, mac
-            FROM rsms_arp
-            GROUP BY mac) AS arp
-        RIGHT JOIN
-          rsms_mac_temp mac
-        ON
-          arp.mac = mac.mac
-        WHERE
-          mac.tag = 'UT'
-        OR
-          mac.tag = 'RT'
-        order by mac.device_name desc, mac.interface_name desc
+      SELECT *
+          FROM (
+	            SELECT
+						REPLACE(mac.tag, 'UT', 'DT') tag, mac.id, mac.mac, arp.ip
+					FROM (
+							SELECT INET_NTOA(ip) ip, mac
+							FROM rsms_arp
+							GROUP BY mac) AS arp
+					RIGHT JOIN
+						rsms_mac_temp mac
+					ON
+						arp.mac = mac.mac 	WHERE
+						mac.tag = 'RT' or mac.tag = 'UT'
+					order by mac.device_name desc, mac.interface_name desc) result where ip is not null
+
     </select>
 
     <insert id="save" parameterType="com.metoo.nspm.entity.nspm.MacTemp">

@@ -59,6 +59,8 @@ public class NetWorkManagerApi {
     private ITerminalService terminalService;
     @Autowired
     private ITerminalTypeService terminalTypeService;
+    @Autowired
+    private RedisResponseUtils redisResponseUtils;
 
     public static void main(String[] args) {
         String i = "\\.";
@@ -102,7 +104,7 @@ public class NetWorkManagerApi {
                 rep.setNoticeType("1");
                 rep.setNoticeStatus(1);
                 rep.setNoticeInfo(result);
-                RedisResponseUtils.syncRedis(sessionId, result, 1);
+                this.redisResponseUtils.syncRedis(sessionId, result, 1);
             }
         }
         rep.setNoticeStatus(0);
@@ -198,7 +200,7 @@ public class NetWorkManagerApi {
             rep.setNoticeStatus(1);
             rep.setNoticeType("5");
             rep.setNoticeInfo(result);
-            RedisResponseUtils.syncRedis(sessionId, result, 5);
+            this.redisResponseUtils.syncRedis(sessionId, result, 5);
             return rep;
         }
         rep.setNoticeType("5");
@@ -343,337 +345,13 @@ public class NetWorkManagerApi {
             }
             rep.setNoticeType("2");
             rep.setNoticeInfo(result);
-            RedisResponseUtils.syncRedis(sessionId, result, 2);
+            this.redisResponseUtils.syncRedis(sessionId, result, 2);
             return rep;
         }
         rep.setNoticeType("2");
         return rep;
     }
 
-//    @ApiOperation("9：网元|端口列表")
-//    @GetMapping("/ne/interface/all")
-//    public NoticeWebsocketResp neInterfaces(@RequestParam(value = "requestParams", required = false) String requestParams){
-//        Map params = JSONObject.parseObject(requestParams, Map.class);
-//        if(!params.isEmpty()){
-//            Map subarea = new HashMap();
-//            for(Object key : params.keySet()){
-//                String value = params.get(key).toString();
-//                JSONArray ary = JSONArray.parseArray(value);
-//                if(ary.size() > 0){
-//                    Map map = new HashMap();
-//                    for (Object param : ary) {
-//                        JSONObject ele = JSONObject.parseObject(param.toString());
-//                        String uuid = ele.getString("uuid");
-//                        String time = ele.getString("time");
-//                        NetworkElement ne = this.networkElementService.selectObjByUuid(uuid);
-//                        if(ne != null){
-//                            // 端口列表
-//                            String interfaces = ele.getString("interface");
-//                            JSONArray array = JSONArray.parseArray(interfaces);
-//                            if(array.size() > 0){
-//                                Map interfaceMap = new HashMap();
-//                                for(Object inf : array){
-//                                    Map flux_terminal = new HashMap();
-//                                    Map args = new HashMap();
-//                                    args.put("uuid", uuid);
-//                                    args.put("interfaceName", inf);
-//                                    args.put("tag", "DT");
-//                                    args.put("uuid", uuid);
-//                                    args.put("orderBy", "ip");
-//                                    args.put("orderType", "ASC");
-//                                    List<Mac> macs = null;
-//                                    if(time != null && !"".equals(time)){
-//                                        Date date = DateTools.parseDate(time, "yyyy-MM-dd HH:mm");
-//                                        args.put("time", date);
-//                                        macs = this.macHistoryService.selectObjByMap(args);
-//                                    }else{
-//                                        macs = this.macService.selectByMap(args);
-//                                    }
-//                                    if(macs != null && macs.size() > 0){
-//                                        macUtil.macJoint(macs);
-//                                        flux_terminal.put("terminal", macs);
-//                                    }else{
-//                                        List a = new ArrayList<>();
-//                                        flux_terminal.put("terminal", a);
-//                                    }
-//                                    if(time == null || "".equals(time)){
-//                                        // 流量
-//                                        Map flux = new HashMap();
-//                                        args.clear();
-//                                        args.put("ip", ne.getIp());
-//                                        // 采集ifbasic,然后查询端口对应的历史流量
-//                                        args.put("tag", "ifreceived");
-//                                        args.put("available", 1);
-//                                        List<Item> items = this.itemService.selectTagByMap(args);
-////                                Map ele = new HashMap();
-//                                        if(items.size() > 0){
-//                                            for (Item item : items) {
-//                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-//                                                flux.put("received", lastvalue);
-//                                                break;
-//                                            }
-//                                        } else{
-//                                            flux.put("received", "0");
-//                                        }
-//                                        args.clear();
-//                                        args.put("ip", ne.getIp());
-//                                        // 采集ifbasic,然后查询端口对应的历史流量
-//                                        args.put("tag", "ifsent");
-//                                        args.put("available", 1);
-//                                        List<Item> ifsents = this.itemService.selectTagByMap(args);
-//                                        if(ifsents.size() > 0){
-//                                            for (Item item : ifsents) {
-//                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-//                                                flux.put("sent", lastvalue);
-//                                                break;
-//                                            }
-//                                        }else{
-//                                            flux.put("sent", "0");
-//                                        }
-//                                        flux_terminal.put("flux", flux);
-//                                    }
-//                                    interfaceMap.put(inf, flux_terminal);
-//                                }
-//                                map.put(uuid, interfaceMap);
-//                            }
-//                        }
-//                    }
-//                    subarea.put(key, map);
-//                }
-//            }
-//
-//            NoticeWebsocketResp rep = new NoticeWebsocketResp();
-//            rep.setNoticeType("9");
-//            rep.setNoticeStatus(1);
-//            rep.setNoticeInfo(subarea);
-//            return rep;
-//
-//
-//        }
-//        NoticeWebsocketResp rep = new NoticeWebsocketResp();
-//        rep.setNoticeType("9");
-//        rep.setNoticeStatus(0);
-//        return rep;
-//    }
-
-//    @ApiOperation("9：网元|端口列表")
-//    @GetMapping("/ne/interface/all")
-//    public NoticeWebsocketResp neInterfaces(@RequestParam(value = "requestParams", required = false) String requestParams){
-//        Map requestParam = JSONObject.parseObject(requestParams, Map.class);
-//        if(!requestParam.isEmpty()){
-//            Map subarea = new HashMap();
-//            Date time = DateTools.parseDate(String.valueOf(requestParam.get("time")), "yyyy-MM-dd HH:mm");
-//            Map params = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
-//            for(Object key : params.keySet()){
-//                String value = params.get(key).toString();
-//                JSONArray ary = JSONArray.parseArray(value);
-//                if(ary.size() > 0){
-//                    Map map = new HashMap();
-//                    for (Object param : ary) {
-//                        JSONObject ele = JSONObject.parseObject(param.toString());
-//                        String uuid = ele.getString("uuid");
-//                        NetworkElement ne = this.networkElementService.selectObjByUuid(uuid);
-//                        if(ne != null){
-//                            // 端口列表
-//                            String interfaces = ele.getString("interface");
-//                            JSONArray array = JSONArray.parseArray(interfaces);
-//                            if(array.size() > 0){
-//                                Map interfaceMap = new HashMap();
-//                                for(Object inf : array){
-//                                    Map flux_terminal = new HashMap();
-//                                    Map args = new HashMap();
-//                                    args.put("uuid", uuid);
-//                                    args.put("interfaceName", inf);
-//                                    args.put("tag", "DT");
-//                                    args.put("uuid", uuid);
-//                                    args.put("orderBy", "ip");
-//                                    args.put("orderType", "ASC");
-//                                    if(time != null && !"".equals(time)){
-//                                        args.put("time", time);
-//                                        List<Mac> macs = this.macHistoryService.selectObjByMap(args);
-//                                        if(macs != null && macs.size() > 0){
-//                                            macUtil.macJoint(macs);
-//                                            flux_terminal.put("terminal", macs);
-//                                        }else{
-//                                            List a = new ArrayList<>();
-//                                            flux_terminal.put("terminal", a);
-//                                        }
-//                                    }else{
-//                                        List<Terminal> terminals = this.terminalService.selectObjByMap(args);
-//                                        if(terminals != null && terminals.size() > 0){
-//                                            macUtil.terminalJoint(terminals);
-//                                            terminals.stream().forEach(e ->{
-//                                                TerminalType terminalType = this.terminalTypeService.selectObjById(e.getTerminalTypeId());
-//                                                e.setTerminalTypeName(terminalType.getName());
-//                                            });
-//                                            flux_terminal.put("terminal", terminals);
-//                                        }else{
-//                                            List a = new ArrayList<>();
-//                                            flux_terminal.put("terminal", a);
-//                                        }
-//                                    }
-//                                    if(time == null || "".equals(time)){
-//                                        // 流量
-//                                        Map flux = new HashMap();
-//                                        args.clear();
-//                                        args.put("ip", ne.getIp());
-//                                        // 采集ifbasic,然后查询端口对应的历史流量
-//                                        args.put("tag", "ifreceived");
-//                                        args.put("available", 1);
-//                                        List<Item> items = this.itemService.selectTagByMap(args);
-////                                Map ele = new HashMap();
-//                                        if(items.size() > 0){
-//                                            for (Item item : items) {
-//                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-//                                                flux.put("received", lastvalue);
-//                                                break;
-//                                            }
-//                                        } else{
-//                                            flux.put("received", "0");
-//                                        }
-//                                        args.clear();
-//                                        args.put("ip", ne.getIp());
-//                                        // 采集ifbasic,然后查询端口对应的历史流量
-//                                        args.put("tag", "ifsent");
-//                                        args.put("available", 1);
-//                                        List<Item> ifsents = this.itemService.selectTagByMap(args);
-//                                        if(ifsents.size() > 0){
-//                                            for (Item item : ifsents) {
-//                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-//                                                flux.put("sent", lastvalue);
-//                                                break;
-//                                            }
-//                                        }else{
-//                                            flux.put("sent", "0");
-//                                        }
-//                                        flux_terminal.put("flux", flux);
-//                                    }
-//                                    interfaceMap.put(inf, flux_terminal);
-//                                }
-//                                map.put(uuid, interfaceMap);
-//                            }
-//                        }
-//                    }
-//                    subarea.put(key, map);
-//                }
-//            }
-//
-//            NoticeWebsocketResp rep = new NoticeWebsocketResp();
-//            rep.setNoticeType("9");
-//            rep.setNoticeStatus(1);
-//            rep.setNoticeInfo(subarea);
-//            return rep;
-//        }
-//        NoticeWebsocketResp rep = new NoticeWebsocketResp();
-//        rep.setNoticeType("9");
-//        rep.setNoticeStatus(0);
-//        return rep;
-//    }
-
-//    @ApiOperation("9：网元|端口列表")
-//    @GetMapping("/ne/interface/all")
-//    public NoticeWebsocketResp neInterfaces(@RequestParam(value = "requestParams", required = false) String requestParams){
-//        Map requestParam = JSONObject.parseObject(requestParams, Map.class);
-//        if(!requestParam.isEmpty()){
-//            Map subarea = new HashMap();
-//            Date time = DateTools.parseDate(String.valueOf(requestParam.get("time")), "yyyy-MM-dd HH:mm");
-//            Map params = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
-//            for(Object key : params.keySet()){
-//                String value = params.get(key).toString();
-//                JSONArray ary = JSONArray.parseArray(value);
-//                if(ary.size() > 0){
-//                    Map map = new HashMap();
-//                    for (Object param : ary) {
-//                        JSONObject ele = JSONObject.parseObject(param.toString());
-//                        String uuid = ele.getString("uuid");
-//                        NetworkElement ne = this.networkElementService.selectObjByUuid(uuid);
-//                        if(ne != null){
-//                            // 端口列表
-//                            String interfaces = ele.getString("interface");
-//                            JSONArray array = JSONArray.parseArray(interfaces);
-//                            if(array.size() > 0){
-//                                Map interfaceMap = new HashMap();
-//                                for(Object inf : array){
-//                                    Map flux_terminal = new HashMap();
-//                                    Map args = new HashMap();
-//                                    args.put("uuid", uuid);
-//                                    args.put("interfaceName", inf);
-//                                    args.put("tag", "DT");
-//                                    args.put("uuid", uuid);
-//                                    args.put("orderBy", "ip");
-//                                    args.put("orderType", "ASC");
-//                                    List<Mac> macs = null;
-//                                    if(time != null && !"".equals(time)){
-//                                        args.put("time", time);
-//                                        macs = this.macHistoryService.selectObjByMap(args);
-//                                    }else{
-//                                        macs = this.macService.selectByMap(args);
-//                                    }
-//                                    if(macs != null && macs.size() > 0){
-//                                        this.macUtil.macJoint(macs);
-//                                        this.macUtil.writerType(macs);
-//                                        flux_terminal.put("terminal", macs);
-//                                    }else{
-//                                        List a = new ArrayList<>();
-//                                        flux_terminal.put("terminal", a);
-//                                    }
-//                                    if(time == null || "".equals(time)){
-//                                        // 流量
-//                                        Map flux = new HashMap();
-//                                        args.clear();
-//                                        args.put("ip", ne.getIp());
-//                                        // 采集ifbasic,然后查询端口对应的历史流量
-//                                        args.put("tag", "ifreceived");
-//                                        args.put("available", 1);
-//                                        List<Item> items = this.itemService.selectTagByMap(args);
-////                                Map ele = new HashMap();
-//                                        if(items.size() > 0){
-//                                            for (Item item : items) {
-//                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-//                                                flux.put("received", lastvalue);
-//                                                break;
-//                                            }
-//                                        } else{
-//                                            flux.put("received", "0");
-//                                        }
-//                                        args.clear();
-//                                        args.put("ip", ne.getIp());
-//                                        // 采集ifbasic,然后查询端口对应的历史流量
-//                                        args.put("tag", "ifsent");
-//                                        args.put("available", 1);
-//                                        List<Item> ifsents = this.itemService.selectTagByMap(args);
-//                                        if(ifsents.size() > 0){
-//                                            for (Item item : ifsents) {
-//                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-//                                                flux.put("sent", lastvalue);
-//                                                break;
-//                                            }
-//                                        }else{
-//                                            flux.put("sent", "0");
-//                                        }
-//                                        flux_terminal.put("flux", flux);
-//                                    }
-//                                    interfaceMap.put(inf, flux_terminal);
-//                                }
-//                                map.put(uuid, interfaceMap);
-//                            }
-//                        }
-//                    }
-//                    subarea.put(key, map);
-//                }
-//            }
-//
-//            NoticeWebsocketResp rep = new NoticeWebsocketResp();
-//            rep.setNoticeType("9");
-//            rep.setNoticeStatus(1);
-//            rep.setNoticeInfo(subarea);
-//            return rep;
-//        }
-//        NoticeWebsocketResp rep = new NoticeWebsocketResp();
-//        rep.setNoticeType("9");
-//        rep.setNoticeStatus(0);
-//        return rep;
-//    }
 
     @ApiOperation("9：网元|端口列表")
     @GetMapping("/ne/interface/all")
@@ -698,9 +376,7 @@ public class NetWorkManagerApi {
                             String interfaces = ele.getString("interface");
                             JSONArray array = JSONArray.parseArray(interfaces);
                             if(array.size() > 0){
-                                Map interfaceMap = new HashMap();
                                 for(Object inf : array){
-                                    Map flux_terminal = new HashMap();
                                     Map args = new HashMap();
                                     args.put("uuid", uuid);
                                     args.put("interfaceName", inf);
@@ -714,10 +390,7 @@ public class NetWorkManagerApi {
                                         if(macs != null && macs.size() > 0){
                                             this.macUtil.macJoint(macs);
                                             this.macUtil.writerType(macs);
-                                            flux_terminal.put("terminal", macs);
-                                        }else{
-                                            List a = new ArrayList<>();
-                                            flux_terminal.put("terminal", a);
+                                            map.put(uuid, macs);
                                         }
                                     }else {
                                         args.put("online", 1);
@@ -730,65 +403,22 @@ public class NetWorkManagerApi {
                                             });
                                             this.macUtil.terminalJoint(terminals);
                                             if (terminals != null && terminals.size() > 0) {
-                                                flux_terminal.put("terminal", terminals);
-                                            } else {
-                                                List a = new ArrayList<>();
-                                                flux_terminal.put("terminal", a);
+                                                map.put(uuid, terminals);
                                             }
                                         }
                                     }
-
-                                    if(time == null || "".equals(time)){
-                                        // 流量
-                                        Map flux = new HashMap();
-                                        args.clear();
-                                        args.put("ip", ne.getIp());
-                                        // 采集ifbasic,然后查询端口对应的历史流量
-                                        args.put("tag", "ifreceived");
-                                        args.put("available", 1);
-                                        List<Item> items = this.itemService.selectTagByMap(args);
-//                                Map ele = new HashMap();
-                                        if(items.size() > 0){
-                                            for (Item item : items) {
-                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-                                                flux.put("received", lastvalue);
-                                                break;
-                                            }
-                                        } else{
-                                            flux.put("received", "0");
-                                        }
-                                        args.clear();
-                                        args.put("ip", ne.getIp());
-                                        // 采集ifbasic,然后查询端口对应的历史流量
-                                        args.put("tag", "ifsent");
-                                        args.put("available", 1);
-                                        List<Item> ifsents = this.itemService.selectTagByMap(args);
-                                        if(ifsents.size() > 0){
-                                            for (Item item : ifsents) {
-                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-                                                flux.put("sent", lastvalue);
-                                                break;
-                                            }
-                                        }else{
-                                            flux.put("sent", "0");
-                                        }
-                                        flux_terminal.put("flux", flux);
-                                    }
-                                    interfaceMap.put(inf, flux_terminal);
                                 }
-                                map.put(uuid, interfaceMap);
                             }
                         }
                     }
                     subarea.put(key, map);
                 }
             }
-
             NoticeWebsocketResp rep = new NoticeWebsocketResp();
             rep.setNoticeType("9");
             rep.setNoticeStatus(1);
             rep.setNoticeInfo(subarea);
-            RedisResponseUtils.syncRedis(sessionId, subarea, 9);
+            this.redisResponseUtils.syncRedis(sessionId, subarea, 9);
             return rep;
         }
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
@@ -797,13 +427,135 @@ public class NetWorkManagerApi {
         return rep;
     }
 
+//
+//
+//    @ApiOperation("9：网元|端口列表")
+//    @GetMapping("/ne/interface/all")
+//    public NoticeWebsocketResp neInterfaces(@RequestParam(value = "requestParams", required = false) String requestParams){
+//        Map requestParam = JSONObject.parseObject(requestParams, Map.class);
+//        if(!requestParam.isEmpty()){
+//            String sessionId = (String) requestParam.get("sessionId");
+//            Map subarea = new HashMap();
+//            Map param = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
+//            Date time = DateTools.parseDate(String.valueOf(param.get("time")), "yyyy-MM-dd HH:mm");
+//            for(Object key : param.keySet()){
+//                String value = param.get(key).toString();
+//                JSONArray ary = JSONArray.parseArray(value);
+//                if(ary.size() > 0){
+//                    Map map = new HashMap();
+//                    for (Object obj : ary) {
+//                        JSONObject ele = JSONObject.parseObject(obj.toString());
+//                        String uuid = ele.getString("uuid");
+//                        NetworkElement ne = this.networkElementService.selectObjByUuid(uuid);
+//                        if(ne != null){
+//                            // 端口列表
+//                            String interfaces = ele.getString("interface");
+//                            JSONArray array = JSONArray.parseArray(interfaces);
+//                            if(array.size() > 0){
+//                                Map interfaceMap = new HashMap();
+//                                for(Object inf : array){
+//                                    Map flux_terminal = new HashMap();
+//                                    Map args = new HashMap();
+//                                    args.put("uuid", uuid);
+//                                    args.put("interfaceName", inf);
+//                                    args.put("tag", "DT");
+//                                    args.put("orderBy", "ip");
+//                                    args.put("orderType", "ASC");
+//                                    List<Mac> macs = null;
+//                                    if(time != null && !"".equals(time)){
+//                                        args.put("time", time);
+//                                        macs = this.macHistoryService.selectObjByMap(args);
+//                                        if(macs != null && macs.size() > 0){
+//                                            this.macUtil.macJoint(macs);
+//                                            this.macUtil.writerType(macs);
+//                                            flux_terminal.put("terminal", macs);
+//                                        }else{
+//                                            List a = new ArrayList<>();
+//                                            flux_terminal.put("terminal", a);
+//                                        }
+//                                    }else {
+//                                        args.put("online", 1);
+//                                        List<Terminal> terminals = this.terminalService.selectObjByMap(args);
+//                                        if (terminals != null && terminals.size() > 0) {
+//                                            macUtil.terminalJoint(terminals);
+//                                            terminals.stream().forEach(e -> {
+//                                                TerminalType terminalType = this.terminalTypeService.selectObjById(e.getTerminalTypeId());
+//                                                e.setTerminalTypeName(terminalType.getName());
+//                                            });
+//                                            this.macUtil.terminalJoint(terminals);
+//                                            if (terminals != null && terminals.size() > 0) {
+//                                                flux_terminal.put("terminal", terminals);
+//                                            } else {
+//                                                List a = new ArrayList<>();
+//                                                flux_terminal.put("terminal", a);
+//                                            }
+//                                        }
+//                                    }
+//
+//                                    if(time == null || "".equals(time)){
+//                                        // 流量
+//                                        Map flux = new HashMap();
+//                                        args.clear();
+//                                        args.put("ip", ne.getIp());
+//                                        // 采集ifbasic,然后查询端口对应的历史流量
+//                                        args.put("tag", "ifreceived");
+//                                        args.put("available", 1);
+//                                        List<Item> items = this.itemService.selectTagByMap(args);
+////                                Map ele = new HashMap();
+//                                        if(items.size() > 0){
+//                                            for (Item item : items) {
+//                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+//                                                flux.put("received", lastvalue);
+//                                                break;
+//                                            }
+//                                        } else{
+//                                            flux.put("received", "0");
+//                                        }
+//                                        args.clear();
+//                                        args.put("ip", ne.getIp());
+//                                        // 采集ifbasic,然后查询端口对应的历史流量
+//                                        args.put("tag", "ifsent");
+//                                        args.put("available", 1);
+//                                        List<Item> ifsents = this.itemService.selectTagByMap(args);
+//                                        if(ifsents.size() > 0){
+//                                            for (Item item : ifsents) {
+//                                                String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+//                                                flux.put("sent", lastvalue);
+//                                                break;
+//                                            }
+//                                        }else{
+//                                            flux.put("sent", "0");
+//                                        }
+//                                        flux_terminal.put("flux", flux);
+//                                    }
+//                                    interfaceMap.put(inf, flux_terminal);
+//                                }
+//                                map.put(uuid, interfaceMap);
+//                            }
+//                        }
+//                    }
+//                    subarea.put(key, map);
+//                }
+//            }
+//
+//            NoticeWebsocketResp rep = new NoticeWebsocketResp();
+//            rep.setNoticeType("9");
+//            rep.setNoticeStatus(1);
+//            rep.setNoticeInfo(subarea);
+//            this.redisResponseUtils.syncRedis(sessionId, subarea, 9);
+//            return rep;
+//        }
+//        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+//        rep.setNoticeType("9");
+//        rep.setNoticeStatus(0);
+//        return rep;
+//    }
+
     @ApiOperation("11：网元|设备状态")
     @GetMapping("/ne/partition/terminal")
     public NoticeWebsocketResp partitionTerminal(@RequestParam(value = "requestParams", required = false) String requestParams){
-
         Map<String, Object> requestParam = JSONObject.parseObject(requestParams, Map.class);
         String sessionId = (String) requestParam.get("sessionId");
-
         Map<String, JSONArray> param = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
         Map result = new HashMap();
         if(!param.isEmpty()){
@@ -813,50 +565,15 @@ public class NetWorkManagerApi {
                 if(entry.getValue() != null && entry.getValue().size() > 0){
                     List list = new ArrayList<>();
                     entry.getValue().stream().forEach(m ->{
-                        Map flux_terminal = new HashMap();
                         params.clear();
                         params.put("mac", m);
                         List<Terminal> terminals = this.terminalService.selectObjByMap(params);
+                        macUtil.terminalJoint(terminals);
                         if(terminals.size() > 0){
                             Terminal terminal = terminals.get(0);
                             TerminalType terminalType = this.terminalTypeService.selectObjById(terminal.getTerminalTypeId());
                             terminal.setTerminalTypeName(terminalType.getName());
-                            // 流量
-                            Map flux = new HashMap();
-                            Map args = new HashMap();
-                            args.clear();
-                            args.put("ip", terminal.getDeviceIp());
-                            // 采集ifbasic,然后查询端口对应的历史流量
-                            args.put("tag", "ifreceived");
-                            args.put("available", 1);
-                            List<Item> items = this.itemService.selectTagByMap(args);
-                            if(items.size() > 0){
-                                for (Item item : items) {
-                                    String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-                                    flux.put("received", lastvalue);
-                                    break;
-                                }
-                            } else{
-                                flux.put("received", "0");
-                            }
-                            args.clear();
-                            args.put("ip", terminal.getDeviceIp());
-                            // 采集ifbasic,然后查询端口对应的历史流量
-                            args.put("tag", "ifsent");
-                            args.put("available", 1);
-                            List<Item> ifsents = this.itemService.selectTagByMap(args);
-                            if(ifsents.size() > 0){
-                                for (Item item : ifsents) {
-                                    String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
-                                    flux.put("sent", lastvalue);
-                                    break;
-                                }
-                            }else{
-                                flux.put("sent", "0");
-                            }
-                            flux_terminal.put("terminal", terminal);
-                            flux_terminal.put("flux", flux);
-                            list.add(flux_terminal);
+                            list.add(terminal);
                         }
                     });
                     result.put(entry.getKey(), list);
@@ -867,7 +584,7 @@ public class NetWorkManagerApi {
             rep.setNoticeType("11");
             rep.setNoticeStatus(1);
             rep.setNoticeInfo(result);
-            RedisResponseUtils.syncRedis(sessionId, result, 11);
+            this.redisResponseUtils.syncRedis(sessionId, result, 11);
             return rep;
         }
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
@@ -875,6 +592,86 @@ public class NetWorkManagerApi {
         rep.setNoticeStatus(0);
         return rep;
     }
+
+//    @ApiOperation("11：网元|设备状态")
+//    @GetMapping("/ne/partition/terminal")
+//    public NoticeWebsocketResp partitionTerminal(@RequestParam(value = "requestParams", required = false) String requestParams){
+//
+//        Map<String, Object> requestParam = JSONObject.parseObject(requestParams, Map.class);
+//        String sessionId = (String) requestParam.get("sessionId");
+//
+//        Map<String, JSONArray> param = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
+//        Map result = new HashMap();
+//        if(!param.isEmpty()){
+//            Map params = new HashMap();
+//            Set<Map.Entry<String, JSONArray>> keys = param.entrySet();
+//            for (Map.Entry<String, JSONArray> entry : keys) {
+//                if(entry.getValue() != null && entry.getValue().size() > 0){
+//                    List list = new ArrayList<>();
+//                    entry.getValue().stream().forEach(m ->{
+//                        Map flux_terminal = new HashMap();
+//                        params.clear();
+//                        params.put("mac", m);
+//                        List<Terminal> terminals = this.terminalService.selectObjByMap(params);
+//                        macUtil.terminalJoint(terminals);
+//                        if(terminals.size() > 0){
+//                            Terminal terminal = terminals.get(0);
+//                            TerminalType terminalType = this.terminalTypeService.selectObjById(terminal.getTerminalTypeId());
+//                            terminal.setTerminalTypeName(terminalType.getName());
+//                            // 流量
+//                            Map flux = new HashMap();
+//                            Map args = new HashMap();
+//                            args.clear();
+//                            args.put("ip", terminal.getDeviceIp());
+//                            // 采集ifbasic,然后查询端口对应的历史流量
+//                            args.put("tag", "ifreceived");
+//                            args.put("available", 1);
+//                            List<Item> items = this.itemService.selectTagByMap(args);
+//                            if(items.size() > 0){
+//                                for (Item item : items) {
+//                                    String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+//                                    flux.put("received", lastvalue);
+//                                    break;
+//                                }
+//                            } else{
+//                                flux.put("received", "0");
+//                            }
+//                            args.clear();
+//                            args.put("ip", terminal.getDeviceIp());
+//                            // 采集ifbasic,然后查询端口对应的历史流量
+//                            args.put("tag", "ifsent");
+//                            args.put("available", 1);
+//                            List<Item> ifsents = this.itemService.selectTagByMap(args);
+//                            if(ifsents.size() > 0){
+//                                for (Item item : ifsents) {
+//                                    String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+//                                    flux.put("sent", lastvalue);
+//                                    break;
+//                                }
+//                            }else{
+//                                flux.put("sent", "0");
+//                            }
+//                            flux_terminal.put("terminal", terminal);
+//                            flux_terminal.put("flux", flux);
+//                            list.add(flux_terminal);
+//                        }
+//                    });
+//                    result.put(entry.getKey(), list);
+//                }
+//            }
+//
+//            NoticeWebsocketResp rep = new NoticeWebsocketResp();
+//            rep.setNoticeType("11");
+//            rep.setNoticeStatus(1);
+//            rep.setNoticeInfo(result);
+//            this.redisResponseUtils.syncRedis(sessionId, result, 11);
+//            return rep;
+//        }
+//        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+//        rep.setNoticeType("11");
+//        rep.setNoticeStatus(0);
+//        return rep;
+//    }
 
 //    @ApiOperation("11：网元|设备状态")
 //    @GetMapping("/ne/partition/terminal")

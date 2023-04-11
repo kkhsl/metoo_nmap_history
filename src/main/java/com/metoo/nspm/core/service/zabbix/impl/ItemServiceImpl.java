@@ -3092,13 +3092,13 @@ public class ItemServiceImpl implements ItemService {
         // 获取拓扑列表
         List<Topology> topologies = this.topologyService.selectObjByMap(null);
         if(topologies.size() > 0){
+            List<MacTemp> list = new ArrayList();
             for (Topology topology : topologies) {
                 if(topology.getContent() != null){
                     Map content = JSONObject.parseObject(topology.getContent().toString(), Map.class);
                     if(content.get("links") != null){
                         JSONArray links = JSONArray.parseArray(content.get("links").toString());
                         if(links.size() > 0) {
-                            List<MacTemp> list = new ArrayList();
                             for (Object object : links) {
                                 Map link = JSONObject.parseObject(object.toString(), Map.class);
                                 if(link.get("category") == null || !"deviceTeamLink".equals(link.get("category"))){
@@ -3159,23 +3159,24 @@ public class ItemServiceImpl implements ItemService {
                                     list.add(toMac);
                                 }
                             }
-                            if(list.size() > 0){
-                                // 执行去重
-                                List<MacTemp> batchInsert = list.stream().collect(
-                                        Collectors.collectingAndThen(
-                                                Collectors.toCollection(() -> new TreeSet<>(Comparator
-                                                        .comparing(MacTemp::getUuid, Comparator.nullsLast(String::compareTo))
-                                                        .thenComparing(MacTemp::getInterfaceName, Comparator.nullsLast(String::compareTo))
-                                                        .thenComparing(MacTemp::getMac, Comparator.nullsLast(String::compareTo))
-                                                        .thenComparing(MacTemp::getRemoteUuid, Comparator.nullsLast(String::compareTo))
-                                                        .thenComparing(MacTemp::getRemoteInterface, Comparator.nullsLast(String::compareTo))
-                                                )),
-                                                ArrayList::new));
-                                this.macTempService.batchInsert(batchInsert);
-                            }
+
                         }
                     }
                 }
+            }
+            if(list.size() > 0){
+                // 执行去重
+                List<MacTemp> batchInsert = list.stream().collect(
+                        Collectors.collectingAndThen(
+                                Collectors.toCollection(() -> new TreeSet<>(Comparator
+                                        .comparing(MacTemp::getUuid, Comparator.nullsLast(String::compareTo))
+                                        .thenComparing(MacTemp::getInterfaceName, Comparator.nullsLast(String::compareTo))
+                                        .thenComparing(MacTemp::getMac, Comparator.nullsLast(String::compareTo))
+                                        .thenComparing(MacTemp::getRemoteUuid, Comparator.nullsLast(String::compareTo))
+                                        .thenComparing(MacTemp::getRemoteInterface, Comparator.nullsLast(String::compareTo))
+                                )),
+                                ArrayList::new));
+                this.macTempService.batchInsert(batchInsert);
             }
         }
     }

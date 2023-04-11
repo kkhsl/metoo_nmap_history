@@ -33,6 +33,11 @@ public class TerminalServiceImpl implements ITerminalService {
     private ItemService itemService;
 
     @Override
+    public Terminal selectObjById(Long id) {
+        return this.terminalMapper.selectObjById(id);
+    }
+
+    @Override
     public List<Terminal> selectObjByMap(Map params) {
         return this.terminalMapper.selectObjByMap(params);
     }

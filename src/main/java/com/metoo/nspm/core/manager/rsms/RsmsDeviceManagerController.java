@@ -256,7 +256,8 @@ public class RsmsDeviceManagerController {
 //    }
 
     @GetMapping("/verify")
-    public Object verifyIp(@RequestParam(value = "ip", required = true) String ip){
+    public Object verifyIp(@RequestParam(value = "id", required = false) Long id,
+                           @RequestParam(value = "ip", required = true) String ip){
         // 校验Ip
         if(!StringUtils.isEmpty(ip)){
             boolean flag = IpUtil.verifyIp(ip);
@@ -264,6 +265,7 @@ public class RsmsDeviceManagerController {
                 Map params = new HashMap();
                 params.clear();
                 params.put("ip", ip);
+                params.put("deviceId", id);
                 List<RsmsDevice> deviceListIp = this.rsmsDeviceService.selectObjByMap(params);
                 if(deviceListIp.size() > 0){
                     return ResponseUtil.badArgument("Ip已存在");

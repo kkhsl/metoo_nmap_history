@@ -46,6 +46,8 @@ public class TopologyManagerApi {
     private ITerminalService terminalService;
     @Autowired
     private ITerminalTypeService terminalTypeService;
+    @Autowired
+    private RedisResponseUtils redisResponseUtils;
 
     @Autowired
     private static MyRedisManager redisWss = new MyRedisManager("ws");
@@ -354,11 +356,78 @@ public class TopologyManagerApi {
 //        return rep;
 //    }
 
-
-
     @ApiOperation("设备 Mac (DT))")
     @GetMapping(value = {"/mac/dt"})
     public NoticeWebsocketResp getObjMac(@RequestParam(value = "requestParams", required = false) String requestParams) throws Exception {
+        NoticeWebsocketResp rep = new NoticeWebsocketResp();
+        if(!String.valueOf(requestParams).equals("")){
+            Map params = JSONObject.parseObject(String.valueOf(requestParams), Map.class);
+            String sessionId = (String)  params.get("sessionId");
+            Date time = DateTools.parseDate(String.valueOf(params.get("time")), "yyyy-MM-dd HH:mm");
+            List<String> list = JSONObject.parseObject(String.valueOf(params.get("params")), List.class);
+            Map result = new HashMap();
+            Map args = new HashMap();
+            if(time == null){
+                for (String uuid : list) {
+                    Map flux_terminal = new HashMap();
+                    args.clear();
+                    args.put("uuid", uuid);
+                    args.put("online", 1);
+                    args.put("interfaceStatus", 1);
+                    args.put("tag", "DT");
+                    List<Terminal> terminals = this.terminalService.selectObjByMap(args);
+                    terminals.stream().forEach(item -> {
+                        String terminalIp = item.getIp();
+                        if(StringUtils.isNotEmpty(terminalIp) && StringUtils.isEmpty(item.getVlan())){
+                            // 获取网络地址
+                            String network = IpUtil.getNBIP(terminalIp,"255.255.255.255", 0);
+                            Subnet subnet = this.subnetService.selectObjByIp(network);
+                            if(subnet != null){
+                                if(subnet.getVlanId() != null && !subnet.getVlanId().equals("")){
+                                    Vlan vlan = this.vlanService.selectObjById(subnet.getVlanId());
+                                    if(vlan != null){
+                                        item.setVlan(vlan.getName());
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    this.macUtil.terminalJoint(terminals);
+                    terminals.stream().forEach(e -> {
+                        if(e.getTerminalTypeId() != null
+                                && !e.getTerminalTypeId().equals("")){
+                            TerminalType terminalType = this.terminalTypeService.selectObjById(e.getTerminalTypeId());
+                            e.setTerminalTypeName(terminalType.getName());
+                        }
+                    });
+                    result.put(uuid, terminals);
+                }
+            }else{
+                for (String item : list) {
+                    args.clear();
+                    args.put("uuid", item);
+                    args.put("tag", "DT");
+                    args.put("time", time);
+                    List<Mac> macs = this.macHistoryService.selectByMap(args);
+                    this.macUtil.macJoint(macs);
+                    this.macUtil.writerType(macs);
+                    result.put(item, macs);
+                }
+            }
+            rep.setNoticeType("4");
+            rep.setNoticeStatus(1);
+            rep.setNoticeInfo(result);
+            this.redisResponseUtils.syncRedis(sessionId, result, 4);
+            return rep;
+        }
+        rep.setNoticeType("4");
+        rep.setNoticeStatus(0);
+        return rep;
+    }
+
+    @ApiOperation("设备 Mac (DT))")
+    @GetMapping(value = {"/mac/dt1"})
+    public NoticeWebsocketResp getObjMac1(@RequestParam(value = "requestParams", required = false) String requestParams) throws Exception {
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
         if(!String.valueOf(requestParams).equals("")){
             Map params = JSONObject.parseObject(String.valueOf(requestParams), Map.class);
@@ -458,12 +527,13 @@ public class TopologyManagerApi {
             rep.setNoticeType("4");
             rep.setNoticeStatus(1);
             rep.setNoticeInfo(result);
-            RedisResponseUtils.syncRedis(sessionId, result, 4);
+            this.redisResponseUtils.syncRedis(sessionId, result, 4);
             return rep;
         }
         rep.setNoticeType("4");
         rep.setNoticeStatus(0);
         return rep;
     }
+
 
 }

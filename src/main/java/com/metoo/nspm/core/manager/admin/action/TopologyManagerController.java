@@ -1,12 +1,18 @@
 package com.metoo.nspm.core.manager.admin.action;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.github.pagehelper.util.StringUtil;
+import com.metoo.nspm.core.config.websocket.demo.NoticeWebsocketResp;
 import com.metoo.nspm.core.manager.admin.tools.*;
+import com.metoo.nspm.core.mapper.zabbix.HistoryMapper;
+import com.metoo.nspm.core.service.api.zabbix.ZabbixItemService;
+import com.metoo.nspm.core.service.api.zabbix.ZabbixService;
 import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.manager.admin.tools.CompareUtils;
+import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.file.DownLoadFileUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
@@ -16,8 +22,12 @@ import com.metoo.nspm.dto.TopologyDTO;
 import com.github.pagehelper.Page;
 import com.metoo.nspm.dto.zabbix.RoutDTO;
 import com.metoo.nspm.entity.nspm.*;
+import com.metoo.nspm.entity.zabbix.History;
+import com.metoo.nspm.entity.zabbix.Item;
+import com.metoo.nspm.entity.zabbix.ItemTag;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.junit.Test;
 import org.nutz.json.Json;
 import org.springframework.beans.BeanUtils;
@@ -74,6 +84,23 @@ public class TopologyManagerController {
     private RoutTool routTool;
     @Autowired
     private ITerminalService terminalService;
+    @Autowired
+    private ISubnetService subnetService;
+    @Autowired
+    private IVlanService vlanService;
+    @Autowired
+    private MacUtil macUtil;
+    @Autowired
+    private ITerminalTypeService terminalTypeService;
+    @Autowired
+    private ItemService itemService;
+    @Autowired
+    private ZabbixService zabbixService;
+    @Autowired
+    private ZabbixItemService zabbixItemService;
+
+    @Autowired
+    private HistoryMapper historyMapper;
 
     @RequestMapping("/list")
     public Object list(@RequestBody(required = false) TopologyDTO dto){
@@ -1408,5 +1435,58 @@ public class TopologyManagerController {
        return ResponseUtil.badArgument();
     }
 
+    @ApiOperation("设备 流量")
+    @GetMapping(value = {"/terminal/flux"})
+    public Object getObjByUuid(@RequestParam(value = "id", required = false) String id) {
+        if(Strings.isNotBlank(id)){
+            Map params = new HashMap();
+            Terminal terminals = this.terminalService.selectObjById(Long.parseLong(id));
+            if(terminals == null){
+                return ResponseUtil.badArgument();
+            }
+            // 流量
+            Map flux = new HashMap();
+            NetworkElement ne = this.networkElementService.selectObjByUuid(terminals.getUuid());
+            if(ne != null){
+                // 根据端口获取流量
+                // ifreceived
+                params.clear();
+                params.put("ip", ne.getIp());
+                params.put("filterValue", terminals.getInterfaceName());
+                params.put("tag", "ifreceived");
+                params.put("available", 1);
+                params.put("filterTag", "ifname");// 根据名字查询tag
+                List<Item> items = this.itemService.selectTagByMap(params);
+                if(items.size() > 0){
+                    for (Item item : items) {
+                        String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                        flux.put("received", lastvalue);
+                        break;
+                    }
+                } else{
+                    flux.put("received", "0");
+                }
+                // sent
+                params.clear();
+                params.put("ip", ne.getIp());
+                params.put("filterValue", terminals.getInterfaceName());
+                params.put("tag", "ifsent");
+                params.put("available", 1);
+                params.put("filterTag", "ifname");// 根据名字查询tag
+                List<Item> sentItem = this.itemService.selectTagByMap(params);
+                if(sentItem.size() > 0){
+                    for (Item item : sentItem) {
+                        String lastvalue = this.zabbixService.getItemLastvalueByItemId(item.getItemid().intValue());
+                        flux.put("sent", lastvalue);
+                        break;
+                    }
+                }else{
+                    flux.put("sent", "0");
+                }
+            }
+            return ResponseUtil.ok(flux);
+        }
+        return ResponseUtil.ok();
+    }
 
 }

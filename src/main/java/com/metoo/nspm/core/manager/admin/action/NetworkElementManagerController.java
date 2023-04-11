@@ -638,8 +638,8 @@ public class NetworkElementManagerController {
                                         && layout.get("type").equals("device")
                                         && layout.get("nodeMessage") != null){
                                     Map nodeMessage = JSONObject.parseObject(layout.get("nodeMessage").toString(), Map.class);
-                                    if(nodeMessage.get("ip").equals(ip)
-                                            && nodeMessage.get("name").equals(name)){
+                                    if(nodeMessage.get("ip") != null && nodeMessage.get("ip").equals(ip)
+                                        && nodeMessage.get("name") != null && nodeMessage.get("name").equals(name)){
                                         if(type.equals("update")){
                                             layout.put("text", newName);
                                             layout.put("nodeType", deviceType);
@@ -668,8 +668,8 @@ public class NetworkElementManagerController {
                                 Map link = JSONObject.parseObject(object.toString(), Map.class);
                                 if(link.get("fromNode") != null){
                                     Map fromNode = JSONObject.parseObject(link.get("fromNode").toString(), Map.class);
-                                    if(fromNode.get("ip").equals(ip)
-                                            && fromNode.get("name").equals(name)){
+                                    if(fromNode.get("ip") != null && fromNode.get("ip").equals(ip)
+                                          && fromNode.get("name") != null  && fromNode.get("name").equals(name)){
                                         fromNode.put("ip", newIp);
                                         fromNode.put("name", newName);
                                         link.put("fromNode", fromNode);
@@ -677,8 +677,8 @@ public class NetworkElementManagerController {
                                 }
                                 if(link.get("toNode") != null){
                                     Map toNode = JSONObject.parseObject(link.get("toNode").toString(), Map.class);
-                                    if(toNode.get("ip").equals(ip)
-                                            && toNode.get("name").equals(name)){
+                                    if(toNode.get("ip") != null && toNode.get("ip").equals(ip)
+                                            && toNode.get("name") != null && toNode.get("name").equals(name)){
                                         toNode.put("ip", newIp);
                                         toNode.put("name", newName);
                                         link.put("toNode", toNode);

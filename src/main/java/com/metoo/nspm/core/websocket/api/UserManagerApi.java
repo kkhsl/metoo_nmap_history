@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserManagerApi {
 
     @Autowired
-    private IUserService userService;
+    private IUserService userService;@Autowired
+    private RedisResponseUtils redisResponseUtils;
 
     @GetMapping
     private Object user(@RequestParam(value = "userId") Long id){

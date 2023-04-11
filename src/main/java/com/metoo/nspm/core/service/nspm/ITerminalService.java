@@ -9,6 +9,8 @@ import java.util.Map;
 
 public interface ITerminalService {
 
+    Terminal selectObjById(Long id);
+
     List<Terminal> selectObjByMap(Map params);
 
     int insert(Terminal instance);

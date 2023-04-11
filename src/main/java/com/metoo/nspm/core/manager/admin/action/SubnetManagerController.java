@@ -11,12 +11,14 @@ import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Api("子网管理")
 @RequestMapping("/admin/subnet")
@@ -442,11 +444,11 @@ public class SubnetManagerController {
                 Map map = new HashMap();
                 map.put("subnet", subnet);
                 // 获取从子网列表
-                List<Subnet> subnets = this.subnetService.selectSubnetByParentId(id);
+                List<Subnet> subnetList = this.subnetService.selectSubnetByParentId(id);
                 //
-                map.put("subnets", subnets);
+                map.put("subnets", subnetList);
                 // 查询IP addresses in subnets
-                if(subnets.size() <= 0 && subnet.getMask() >= 21){
+                if(subnetList.size() <= 0 && subnet.getMask() >= 24){
                     // 获取地址列表
                     // 获取最大Ip地址和最小Ip地址
                     String mask = IpUtil.bitMaskConvertMask(subnet.getMask());
@@ -457,7 +459,6 @@ public class SubnetManagerController {
                         Map addresses = new LinkedHashMap();
                         for(String ip : ips){
                             Address address = this.addressService.selectObjByIp(IpUtil.ipConvertDec(ip));
-//                            IpAddress address = this.ipAddressService.selectObjByIp(IpUtil.ipConvertDec(ip));
                             if(address != null){
                                 IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(ip));
                                 if(ipDetail != null){
@@ -474,7 +475,25 @@ public class SubnetManagerController {
                         }
                         map.put("addresses", addresses);
                     }
-                }else{
+                }else if(subnetList.size() <= 0 && subnet.getMask() < 24 && subnet.getMask() >= 16){
+                    // 获取网段数量
+                    String mask = IpUtil.bitMaskConvertMask(subnet.getMask());
+                    Map networkMap = IpUtil.getNetworkIp(subnet.getIp(), mask);
+                    String[] ips = IpUtil.getSubnetList(networkMap.get("network").toString(),
+                            subnet.getMask());
+                    int sum = ips.length / 255;
+                    List list = new ArrayList();
+                    if(sum > 0){
+                        for (int i = 0; i < sum; i++) {
+                            String ip = subnet.getIp();
+                            String[] seg = ip.split("\\.");
+                            StringBuffer buffer = new StringBuffer();
+                            buffer.append(seg[0]).append(".").append(seg[1]).append(".").append(i).append(".").append(seg[3]).append("-").append("255");
+                            list.add(buffer);
+                        }
+                    }
+                    map.put("segmentation", list);
+                }else {
                     // 查询子网ip地址列表
                     Map params = new HashMap();
                     params.put("subnetId", subnet.getId());
@@ -487,6 +506,142 @@ public class SubnetManagerController {
         }
         return ResponseUtil.ok();
     }
+
+    @GetMapping("/ips/{id}/{ip}")
+    public Object getSubnetIp(@PathVariable(value = "id") Long id, @PathVariable(value = "ip") String ip){
+        if(id != null && Strings.isNotBlank(ip)){
+            Subnet subnet = this.subnetService.selectObjById(id);
+            if(subnet == null){
+                return ResponseUtil.badArgument();
+            }
+            if(subnet.getMask() < 24 && subnet.getMask() >= 16){
+                int mask = subnet.getMask();
+                String[] str = ip.split("-");
+                if(str[0] != null){
+                    boolean flag = IpUtil.verifyIp(str[0]);
+                    if(flag){
+                        Scanner sc = new Scanner(ip).useDelimiter("\\.");
+                        StringBuffer sb = new StringBuffer();
+                        sb.append(sc.nextLong()).append(".").append(sc.nextLong()).append(".").append(sc.nextLong());
+                        String begin_ip = sb.toString();
+                        sb.append(".255");
+                        Map params = new HashMap();
+                        params.put("begin_ip", IpUtil.ipConvertDec(str[0]));
+                        params.put("end_ip", IpUtil.ipConvertDec(sb.toString()));
+                        List<Address> addresses = this.addressService.selectObjByMap(params);
+                        Set<String> ips = addresses.stream().map(Address::getIp).filter(Objects::nonNull).collect(Collectors.toSet());
+                        List list = new ArrayList();
+                        Map map = new LinkedHashMap();
+                        for (int i = 1; i <= 255 ; i++) {
+                            StringBuffer sb2 = new StringBuffer(begin_ip);
+                            sb2.append("." + i);
+                            Optional<Address> obj = addresses.stream().filter(address -> address.getIp().equals(sb2.toString())).findAny();
+                            if(obj.isPresent()){
+                                Address address = obj.get();
+                                IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(address.getIp()));
+                                if(ipDetail != null){
+                                    int time = ipDetail.getTime();
+                                    // 每分钟采一次
+                                    int hourAll = time / 60;// 一共多少小时
+                                    int day = hourAll / 24;
+                                    int hour = hourAll % 24;
+                                    ipDetail.setDuration(day + "天" + hour + "小时");
+                                    address.setIpDetail(ipDetail);
+                                }
+                                map.put(sb2.toString(), address);
+                            }else{
+                                map.put(sb2.toString(), null);
+                            }
+
+//                            if(ips.contains(sb2.toString())){
+//                                IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(ip));
+//                                if(ipDetail != null){
+//                                    int time = ipDetail.getTime();
+//                                    // 每分钟采一次
+//                                    int hourAll = time / 60;// 一共多少小时
+//                                    int day = hourAll / 24;
+//                                    int hour = hourAll % 24;
+//                                    ipDetail.setDuration(day + "天" + hour + "小时");
+//
+//                                    address.setIpDetail(ipDetail);
+//                                }
+//                            }
+                        }
+                        return ResponseUtil.ok(map);
+                    }
+                }
+            }
+        }
+        return ResponseUtil.badArgument();
+    }
+
+//    @ApiOperation("根据网段Ip查询直接从属子网")
+//    @GetMapping(value = {"","/{id}"})
+//    public Object getSubnet(@PathVariable(value = "id", required = false) Long id){
+//        if(id == null){
+//            // 获取所有子网一级
+//            List<Subnet> parentList = this.subnetService.selectSubnetByParentId(null);
+//            if(parentList.size() > 0){
+//                for (Subnet subnet : parentList) {
+//                    this.genericSubnet(subnet);
+//                }
+//                return ResponseUtil.ok(parentList);
+//            }
+//        }else{
+//            // 校验子网是否存在
+//            Subnet subnet = this.subnetService.selectObjById(id);
+//            if(subnet != null){
+//                // 当前网段
+//                Map map = new HashMap();
+//                map.put("subnet", subnet);
+//                // 获取从子网列表
+//                List<Subnet> subnets = this.subnetService.selectSubnetByParentId(id);
+//                //
+//                map.put("subnets", subnets);
+//                // 查询IP addresses in subnets
+//                if(subnets.size() <= 0 && subnet.getMask() >= 16){
+//                    // 获取地址列表
+//                    // 获取最大Ip地址和最小Ip地址
+//                    String mask = IpUtil.bitMaskConvertMask(subnet.getMask());
+//                    Map networkMap = IpUtil.getNetworkIp(subnet.getIp(), mask);
+//                    String[] ips = IpUtil.getSubnetList(networkMap.get("network").toString(),
+//                            subnet.getMask());
+//                    if(ips.length > 0){
+//                        Map addresses = new LinkedHashMap();
+//                        for(String ip : ips){
+//                            Address address = this.addressService.selectObjByIp(IpUtil.ipConvertDec(ip));
+////                            IpAddress address = this.ipAddressService.selectObjByIp(IpUtil.ipConvertDec(ip));
+//                            if(address != null){
+//                                IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(ip));
+//                                if(ipDetail != null){
+//                                    int time = ipDetail.getTime();
+//                                    // 每分钟采一次
+//                                    int hourAll = time / 60;// 一共多少小时
+//                                    int day = hourAll / 24;
+//                                    int hour = hourAll % 24;
+//                                    ipDetail.setDuration(day + "天" + hour + "小时");
+//                                    address.setIpDetail(ipDetail);
+//                                }
+//                            }
+//                            addresses.put(ip, address);
+//                        }
+//                        map.put("addresses", addresses);
+//                    }
+//                }else if(subnets.size() <= 0 && subnet.getMask() >= 16){
+//
+//                }else {
+//                    // 查询子网ip地址列表
+//                    Map params = new HashMap();
+//                    params.put("subnetId", subnet.getId());
+//                    List<Address> address = this.addressService.selectObjByMap(params);
+//                    map.put("mastSubnetAddress", address);
+//                }
+//                return ResponseUtil.ok(map);
+//            }
+//            return ResponseUtil.badArgument("网段不存在");
+//        }
+//        return ResponseUtil.ok();
+//    }
 
     @ApiOperation("删除网段")
     @DeleteMapping
