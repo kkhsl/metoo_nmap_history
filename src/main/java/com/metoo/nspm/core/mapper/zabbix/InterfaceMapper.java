@@ -8,4 +8,6 @@ public interface InterfaceMapper {
 
     Interface selectObjByIp(String ip);
 
+    Interface selectInfAndTag(String ip);
+
 }

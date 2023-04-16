@@ -193,10 +193,10 @@
             <if test="uuid != null">
                 uuid,
             </if>
-            <if test="connectType != null">
+            <if test="connectType != null or connectType == 0">
                 connect_type,
             </if>
-            <if test="port != null">
+            <if test="port != null or port == 0">
                 port,
             </if>
             <if test="credentialId != null">
@@ -258,10 +258,10 @@
                 <if test="uuid != null">
                     #{uuid},
                 </if>
-                <if test="connectType != null">
+                <if test="connectType != null or connectType == 0">
                     #{connectType},
                 </if>
-                <if test="port != null">
+                <if test="port != null or port == 0">
                     #{port},
                 </if>
                 <if test="credentialId != null">
@@ -357,10 +357,10 @@
             <if test="sync_device != null">
                 sync_device = #{sync_device},
             </if>
-            <if test="connectType != ''">
+            <if test="connectType != '' or connectType == 0">
                 connect_type = #{connectType},
             </if>
-            <if test="port != ''">
+            <if test="port != '' or port == 0">
                 port = #{port},
             </if>
             <if test="credentialId != ''">

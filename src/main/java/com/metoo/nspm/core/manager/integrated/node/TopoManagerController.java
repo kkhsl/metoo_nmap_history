@@ -25,10 +25,8 @@ import com.metoo.nspm.dto.zabbix.ProblemDTO;
 import com.metoo.nspm.dto.zabbix.UserMacroDTO;
 import com.metoo.nspm.entity.nspm.*;
 import com.github.pagehelper.util.StringUtil;
-import com.metoo.nspm.entity.zabbix.History;
-import com.metoo.nspm.entity.zabbix.Interface;
+import com.metoo.nspm.entity.zabbix.*;
 import com.metoo.nspm.entity.zabbix.Item;
-import com.metoo.nspm.entity.zabbix.ItemTag;
 import com.metoo.nspm.vo.ItemTagBoardVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -498,7 +496,45 @@ public class TopoManagerController {
         boolean available = this.interfaceUtil.verifyHostIsAvailable(ip);
         if(available){
             Map map = new HashMap();
-            List<ItemTag> itemTags = this.itemTagService.queryBoard(ip);
+
+            // 确定标签
+            Interface anInterface = this.interfaceService.selectInfAndTag(ip);
+            if(anInterface == null){
+                return new ArrayList<>();
+            }
+            String cpu = "BOARDCPU";// BOARDCPU
+            String mem = "BOARDMEM";// BOARDMEM
+            String temp = "BOARDTEMP";// BOARDTEMP
+
+            if(anInterface.getItemTags().size() > 0){
+                String vendor = "";// H3C
+                String model = "";// S10508
+                for (InterfaceTag itemTag : anInterface.getItemTags()) {
+                    if(itemTag.getTag().equals("vender")){
+                        vendor = itemTag.getValue();
+                    }
+                    if(itemTag.getTag().equals("model")){
+                        model = itemTag.getValue();
+                    }
+                }
+                if(vendor.equals("H3C")){
+                    if(model.equals("S10508")){
+                        cpu = "S10508BOARDCPU";
+                        mem = "S10508BOARDMEM";
+                        temp = "S10508BOARDTEMP";
+                    }else{
+                        cpu = "H3CBOARDCPU";
+                        mem = "H3CBOARDMEM";
+                        temp = "H3CBOARDTEMP";
+                    }
+                }
+            }
+            Map params = new HashMap();
+            params.put("ip", ip);
+            params.put("cpu", cpu);
+            params.put("mem", mem);
+            params.put("temp", temp);
+            List<ItemTag> itemTags = this.itemTagService.queryBoardByMap(params);
             if(itemTags.size() > 0){
                 // 查找是否存在 boardcpu|不在查询CPu和内存使用率
                 List<ItemTagBoardVO> boards = this.itemTagService.selectBoard(ip, dto.getTime_from(),  dto.getTime_till());

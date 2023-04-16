@@ -19,13 +19,14 @@
         <result column="uuid" property="uuid"></result>
         <result column="project_id" property="projectId"></result>
         <result column="project_name" property="projectName"></result>
+        <result column="department_id" property="departmentId"></result>
     </resultMap>
     
     <sql id="Base_Column_List">
         id, addTime, `name`, ip, device_type_id, plant_room_id, user_id, rack_id, start,
         `size`, description, device_type_name, plant_room_name, rack_name,rear, asset_number, host_name,
         status, model, purchase_time, warranty_time, price, serial_number, duty, change_reasons, vendor_id,
-        vendor_name, group_id, group_name, uuid, project_id, project_name
+        vendor_name, group_id, group_name, uuid, project_id, project_name, mac, location, department_id
     </sql>
 
     <sql id="Join_Column_List">
@@ -34,7 +35,7 @@
         rpr.name plant_room_name, rr.name rack_name, rd.rear, rd.asset_number, rd.host_name,
         rd.status, rd.model, rd.purchase_time, rd.warranty_time, rd.price, rd.serial_number, rd.duty, rd.change_reasons,
 		rd.vendor_id, rd.vendor_name, rd.group_id, mg.branchName group_name, uuid,
-		mp.id project_id, mp.name project_name
+		mp.id project_id, mp.name project_name, mac, location, department_id
     </sql>
 
     <select id="getObjById" parameterType="java.lang.Long" resultMap="Base_Result_Map">
@@ -333,6 +334,15 @@
             <if test="projectName != null and projectName != ''">
                 project_name,
             </if>
+            <if test="mac != null and mac != ''">
+                mac,
+            </if>
+            <if test="location != null and location != ''">
+                location,
+            </if>
+            <if test="departmentId != null and departmentId != ''">
+                department_id,
+            </if>
         </trim>
         <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
             <if test="addTime != null">
@@ -427,6 +437,15 @@
             </if>
             <if test="projectName != null and projectName != ''">
                 #{projectName},
+            </if>
+            <if test="mac != null and mac != ''">
+                #{mac},
+            </if>
+            <if test="location != null and location != ''">
+                #{location},
+            </if>
+            <if test="departmentId != null and departmentId != ''">
+                #{departmentId},
             </if>
         </trim>
     </insert>
@@ -527,6 +546,15 @@
             <if test="projectName != null and projectName != ''">
                 project_name = #{projectName},
             </if>
+            <if test="mac != null and mac != ''">
+                mac = #{mac},
+            </if>
+            <if test="location != null and location != ''">
+                location = #{location},
+            </if>
+            <if test="departmentId != null and departmentId != ''">
+                department_id = #{departmentId},
+            </if>
         </set>
         where id = #{id}
     </update>
@@ -546,7 +574,7 @@
         INSERT INTO  rsms_device(addTime, uuid, `name`, host_name, asset_number, status, ip,
          device_type_id, device_type_name, group_id, group_name,  vendor_id, vendor_name,
          model, project_id, project_name, plant_room_id, plant_room_name, rack_id, rack_name, start, `size`,
-         duty, user_id, purchase_time, warranty_time)
+         duty, user_id, purchase_time, warranty_time, mac, location, department_id)
         VALUES
         <foreach collection ="list" item="item" separator ="," >
             (
@@ -575,8 +603,12 @@
                 #{item.duty},
                 #{item.userId},
                 #{item.purchase_time},
-                #{item.warranty_time}
+                #{item.warranty_time},
+                #{item.mac},
+                #{item.location},
+                #{item.departmentId}
             )
         </foreach>
     </insert>
+
 </mapper>

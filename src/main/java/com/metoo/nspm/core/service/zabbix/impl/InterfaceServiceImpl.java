@@ -18,4 +18,9 @@ public class InterfaceServiceImpl implements InterfaceService {
     public Interface selectObjByIp(String ip) {
         return this.interfaceMapper.selectObjByIp(ip);
     }
+
+    @Override
+    public Interface selectInfAndTag(String ip) {
+        return this.interfaceMapper.selectInfAndTag(ip);
+    }
 }

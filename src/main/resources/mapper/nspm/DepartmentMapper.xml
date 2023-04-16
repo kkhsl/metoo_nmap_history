@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.metoo.nspm.core.mapper.nspm.DepartmentMapper">
+
+    <resultMap id="Base_Result_Map" type="com.metoo.nspm.entity.nspm.Department">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="parent_id" property="parentId"></result>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, parent_id
+    </sql>
+
+    <select id="selectObjById" resultType="java.lang.Long" resultMap="Base_Result_Map">
+        SELECT
+          <include refid="Base_Column_List" />
+        FROM
+          rsms_department
+        WHERE
+          id = #{id}
+    </select>
+
+    <select id="selectObjByMap" resultType="java.util.Map" resultMap="Base_Result_Map">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM
+        rsms_department
+        <where>
+            <if test="parentId != null and parentId != ''">
+                AND parent_id = #{parentId}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test="orderType != null and orderType != ''">
+            ${orderType}
+        </if>
+    </select>
+
+</mapper>

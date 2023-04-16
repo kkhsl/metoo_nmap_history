@@ -58,4 +58,8 @@ public class Terminal extends IdEntity {
     private Long terminalTypeId;
     private String terminalTypeName;
 
+    private String location;
+    private Long departmentId;
+    private String duty;
+
 }

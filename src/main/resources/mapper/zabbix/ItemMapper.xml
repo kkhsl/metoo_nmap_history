@@ -36,7 +36,6 @@
         </collection>
     </resultMap>
 
-
     <select id="query" parameterType="java.lang.String" resultMap="ItemArp_Result_Map">
         SELECT item_tag.*
         FROM (

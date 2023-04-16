@@ -18,4 +18,6 @@ public interface ItemTagMapper {
     List<ItemTagBoardVO> selectBoardByTag(Map params);
 
     List<ItemTag> queryBoard(String ip);
+
+    List<ItemTag> queryBoardByMap(Map params);
 }

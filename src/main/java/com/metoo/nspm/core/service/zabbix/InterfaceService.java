@@ -5,4 +5,5 @@ import com.metoo.nspm.entity.zabbix.Interface;
 public interface InterfaceService {
 
     Interface selectObjByIp(String ip);
+    Interface selectInfAndTag(String ip);
 }

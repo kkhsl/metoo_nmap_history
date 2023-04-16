@@ -165,4 +165,20 @@ public class RsmsDevice extends IdEntity {
     private String rowData;
     private String rowTips;
 
+    // Mac地址 位置、部门
+    @ExcelExport(value = "mac地址", sort = 22)
+    @ExcelImport("mac地址")
+    @ApiModelProperty("终端Mac地址")
+    private String mac;
+    @ExcelExport(value = "位置", sort = 23)
+    @ExcelImport("位置")
+    @ApiModelProperty("设备位置：摄像头等")
+    private String location;
+    @ApiModelProperty("部门Id")
+    private Long departmentId;
+    @ExcelExport(value = "部门", sort = 24)
+    @ExcelImport("部门")
+    @ApiModelProperty("部门名称")
+    private String departmentName;
+
 }

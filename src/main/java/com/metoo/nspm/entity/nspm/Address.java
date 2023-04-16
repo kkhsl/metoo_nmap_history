@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @ApiModel("IP地址表")
 @Data
 @Accessors(chain = true)
@@ -28,5 +31,10 @@ public class Address extends IdEntity {
     private String description;
     private IpDetail ipDetail;
 
+    private Map deviceInfo = new HashMap();
+
+    private String location;
+    private Long departmentId;
+    private String duty;
 
 }

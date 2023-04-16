@@ -63,6 +63,8 @@ public class RsmsDeviceManagerController {
     private ZabbixHostInterfaceService zabbixHostInterfaceService;
     @Autowired
     private IProjectService projectService;
+    @Autowired
+    private IDepartmentService departmentService;
 
 
     @GetMapping("/get")
@@ -93,27 +95,42 @@ public class RsmsDeviceManagerController {
             }
         }
         Page<RsmsDevice> page = this.rsmsDeviceService.selectConditionQuery(dto);
-            Map map = new HashMap();
-            // 设备类型
-            List<DeviceType> deviceTypeList = this.deviceTypeService.selectObjByMap(null);
-            map.put("deviceTypeList", deviceTypeList);
-            // 分组
-            Group parent = this.groupService.selectObjById(user.getGroupId());
-            List<Group> groupList = new ArrayList<>();
-            if(parent != null){
-                this.groupTools.genericGroup(parent);
-                groupList.add(parent);
-            }
-            map.put("group", groupList);
-            // 厂商
-            List<Vendor> vendors = this.vendorService.selectConditionQuery(null);
-            map.put("vendor", vendors);
-            // 项目
-            Map params = new HashMap();
-            params.put("userId", user.getId());
-            List<Project> projectList = this.projectService.selectObjByMap(params);
-            map.put("project", projectList);
-            return ResponseUtil.ok(new PageInfo<Rack>(page, map));
+        if(page.getResult().size() > 0){
+            page.getResult().stream().forEach(e -> {
+                if(e.getDepartmentId() != null){
+                    Department department = this.departmentService.selectObjById(e.getDepartmentId());
+                    if(department != null){
+                        e.setDepartmentName(department.getName());
+                    }
+                }
+            });
+        }
+        Map map = new HashMap();
+        // 设备类型
+        List<DeviceType> deviceTypeList = this.deviceTypeService.selectObjByMap(null);
+        map.put("deviceTypeList", deviceTypeList);
+        // 分组
+        Group parent = this.groupService.selectObjById(user.getGroupId());
+        List<Group> groupList = new ArrayList<>();
+        if(parent != null){
+            this.groupTools.genericGroup(parent);
+            groupList.add(parent);
+        }
+        map.put("group", groupList);
+        // 厂商
+        List<Vendor> vendors = this.vendorService.selectConditionQuery(null);
+        map.put("vendor", vendors);
+        // 项目
+        Map params = new HashMap();
+        params.put("userId", user.getId());
+        List<Project> projectList = this.projectService.selectObjByMap(params);
+        map.put("project", projectList);
+        params.clear();
+        params.put("orderBy", "sequence");
+        params.put("orderType", "desc");
+        List<Department> departments= this.departmentService.selectObjByMap(params);
+        map.put("department", departments);
+        return ResponseUtil.ok(new PageInfo<Rack>(page, map));
     }
 
     @RequestMapping("/type/list")
@@ -183,6 +200,11 @@ public class RsmsDeviceManagerController {
         params.put("userId", user.getId());
         List<Project> projectList = this.projectService.selectObjByMap(params);
         map.put("project", projectList);
+        params.clear();
+        params.put("orderBy", "sequence");
+        params.put("orderType", "desc");
+        List<Department> departments= this.departmentService.selectObjByMap(params);
+        map.put("department", departments);
         return ResponseUtil.ok(map);
     }
 
@@ -226,6 +248,11 @@ public class RsmsDeviceManagerController {
             params.put("userId", user.getId());
             List<Project> projectList = this.projectService.selectObjByMap(params);
             map.put("project", projectList);
+            params.clear();
+            params.put("orderBy", "sequence");
+            params.put("orderType", "desc");
+            List<Department> departments= this.departmentService.selectObjByMap(params);
+            map.put("department", departments);
             return ResponseUtil.ok(map);
         }
         return ResponseUtil.badArgument();
@@ -406,6 +433,13 @@ public class RsmsDeviceManagerController {
                 return ResponseUtil.badArgument("请输入正确项目参数");
             }
         }
+        // 验证部门
+        if(instance.getDepartmentId() != null){
+            Department department = this.departmentService.selectObjById(instance.getDepartmentId());
+            if(department == null){
+                return ResponseUtil.badArgument("请输入正确部门信息");
+            }
+        }
 
         int flag = this.rsmsDeviceService.save(instance);
         if (flag != 0){
@@ -544,7 +578,7 @@ public class RsmsDeviceManagerController {
                             }
                         }
                         // 品牌
-                        if(device.getVendorName() != null ||device.getVendorName().equals("")){
+                        if(device.getVendorName() != null && device.getVendorName().equals("")){
                             Vendor vendor = this.vendorService.selectObjByName(device.getVendorName());
                             if(vendor == null){
                                 msg = "第" + (i + 2) + "行,品牌不存在";
@@ -635,6 +669,19 @@ public class RsmsDeviceManagerController {
                                 return ResponseUtil.badArgument("过保时间必须大于采购时间");
                             }
                         }
+                        // 部门
+                        if(device.getDepartmentName() != null && !device.getDepartmentName().equals("")){
+                            params.clear();
+                            params.put("name", device.getDepartmentName());
+                            List<Department> departments = this.departmentService.selectObjByMap(params);
+                            if(departments.size() <= 0){
+                                msg = "第" + (i + 2) + "行,部门不存在";
+                                break;
+                            }else{
+                                Department department = departments.get(0);
+                                device.setDepartmentId(department.getId());
+                            }
+                        }
                         rsmsDevices.add(device);
                     }
                     if(msg.isEmpty()){
@@ -674,7 +721,7 @@ public class RsmsDeviceManagerController {
 //            return ResponseUtil.badArgument("请选择要文件导出位置");
 //        }
         if(StringUtils.isBlank(device.getExcelName())){
-            device.setExcelName("设备台账"+ DateTools.getCurrentDate(new Date()) +".xls");
+            device.setExcelName("设备台账"+ DateTools.getCurrentDate(new Date()));//  +".xls"
         }
         Map params = new HashMap();
 //        List<RsmsDevice> devices = new ArrayList<>();
@@ -713,6 +760,10 @@ public class RsmsDeviceManagerController {
                 if(rsmsDevice.getProjectId() != null && !rsmsDevice.getProjectId().equals("")){
                     Project instance = this.projectService.selectObjById(rsmsDevice.getProjectId());
                     rsmsDevice.setProjectName(instance.getName());
+                }
+                if(rsmsDevice.getDepartmentId() != null && !rsmsDevice.getDepartmentId().equals("")){
+                    Department department = this.departmentService.selectObjById(rsmsDevice.getDepartmentId());
+                    rsmsDevice.setDepartmentName(department.getName());
                 }
             }
             List<List<Object>> sheetDataList = ExcelUtils.getSheetData(devices);
