@@ -85,22 +85,11 @@ public class TopologyManagerController {
     @Autowired
     private ITerminalService terminalService;
     @Autowired
-    private ISubnetService subnetService;
-    @Autowired
-    private IVlanService vlanService;
-    @Autowired
-    private MacUtil macUtil;
-    @Autowired
-    private ITerminalTypeService terminalTypeService;
-    @Autowired
     private ItemService itemService;
     @Autowired
     private ZabbixService zabbixService;
     @Autowired
-    private ZabbixItemService zabbixItemService;
-
-    @Autowired
-    private HistoryMapper historyMapper;
+    private RsmsDeviceUtils rsmsDeviceUtils;
 
     @RequestMapping("/list")
     public Object list(@RequestBody(required = false) TopologyDTO dto){
@@ -1440,19 +1429,19 @@ public class TopologyManagerController {
     public Object getObjByUuid(@RequestParam(value = "id", required = false) String id) {
         if(Strings.isNotBlank(id)){
             Map params = new HashMap();
-            Terminal terminals = this.terminalService.selectObjById(Long.parseLong(id));
-            if(terminals == null){
+            Terminal terminal = this.terminalService.selectObjById(Long.parseLong(id));
+            if(terminal == null){
                 return ResponseUtil.badArgument();
             }
             // 流量
             Map flux = new HashMap();
-            NetworkElement ne = this.networkElementService.selectObjByUuid(terminals.getUuid());
+            NetworkElement ne = this.networkElementService.selectObjByUuid(terminal.getUuid());
             if(ne != null){
                 // 根据端口获取流量
                 // ifreceived
                 params.clear();
                 params.put("ip", ne.getIp());
-                params.put("filterValue", terminals.getInterfaceName());
+                params.put("filterValue", terminal.getInterfaceName());
                 params.put("tag", "ifreceived");
                 params.put("available", 1);
                 params.put("filterTag", "ifname");// 根据名字查询tag
@@ -1469,7 +1458,7 @@ public class TopologyManagerController {
                 // sent
                 params.clear();
                 params.put("ip", ne.getIp());
-                params.put("filterValue", terminals.getInterfaceName());
+                params.put("filterValue", terminal.getInterfaceName());
                 params.put("tag", "ifsent");
                 params.put("available", 1);
                 params.put("filterTag", "ifname");// 根据名字查询tag
@@ -1484,6 +1473,9 @@ public class TopologyManagerController {
                     flux.put("sent", "0");
                 }
             }
+            // 查询设备信息
+            Map deviceInfo = this.rsmsDeviceUtils.getDeviceInfo(terminal.getIp());
+            flux.put("deviceInfo", deviceInfo);
             return ResponseUtil.ok(flux);
         }
         return ResponseUtil.ok();

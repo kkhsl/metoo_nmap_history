@@ -92,7 +92,7 @@
                                                     ON
                                                             interface.hostid = items.hostid
                                     WHERE interface.ip = #{ip}	AND available = 1)
-                                    AND `value` in('BOARDCPU', 'BOARDMEM', 'BOARDTEMP')
+                                    AND `value` in(#{cpu}, #{mem}, #{temp})
                                     GROUP BY itemid
                                     ORDER BY itemid
                                     DESC
@@ -113,7 +113,7 @@
                                                     ON
                                                             interface.hostid = items.hostid
                                     WHERE interface.ip = #{ip}	AND available = 1)
-                                    AND `value` in('BOARDCPU', 'BOARDMEM', 'BOARDTEMP')
+                                    AND `value` in(#{cpu}, #{mem}, #{temp})
                                     GROUP BY itemid
                                     ORDER BY itemid
                                     DESC
@@ -152,6 +152,24 @@
                 WHERE interface.ip = #{ip}	AND available = 1
             )
         AND `value` in('BOARDCPU', 'BOARDMEM', 'BOARDTEMP')
+        GROUP BY itemid
+        ORDER BY itemid
+        DESC
+    </select>
+
+    <select id="queryBoardByMap" parameterType="java.util.Map" resultMap="Base_Result_Map">
+         SELECT *
+        FROM item_tag
+        WHERE itemid
+        IN (
+                SELECT itemid
+                FROM interface
+                JOIN items
+                ON
+                  interface.hostid = items.hostid
+                WHERE interface.ip = #{ip}	AND available = 1
+            )
+        AND `value` in(#{cpu}, #{mem}, #{temp})
         GROUP BY itemid
         ORDER BY itemid
         DESC

@@ -1,11 +1,16 @@
 package com.metoo.nspm.core.service.nspm.impl;
 
+import com.metoo.nspm.core.manager.admin.tools.RsmsDeviceUtils;
 import com.metoo.nspm.core.mapper.nspm.AddressMapper;
 import com.metoo.nspm.core.service.nspm.IAddressService;
+import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.Address;
+import com.metoo.nspm.entity.nspm.Terminal;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.Date;
 import java.util.List;
@@ -17,6 +22,8 @@ public class AddressServiceImpl implements IAddressService {
 
     @Autowired
     private AddressMapper addressMapper;
+    @Autowired
+    private RsmsDeviceUtils rsmsDeviceUtils;
 
     @Override
     public List<Address> selectObjByMap(Map map) {
@@ -45,14 +52,48 @@ public class AddressServiceImpl implements IAddressService {
         }
         if(instance.getId() == null){
             try {
-                return this.addressMapper.save(instance);
+                int i = this.addressMapper.save(instance);
+                String ip = IpUtil.decConvertIp(Long.parseLong(instance.getIp()));
+                if(Strings.isBlank(ip)){
+                    Address address = this.addressMapper.selectObjById(instance.getId());
+                    ip = IpUtil.decConvertIp(Long.parseLong(address.getIp()));
+                }
+                try {
+                    this.rsmsDeviceUtils.syncUpdateDevice(ip,
+                            instance.getMac(), instance.getLocation(), instance.getDuty(), instance.getDepartmentId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return 0;
+                }
+                return i;
             } catch (Exception e) {
                 e.printStackTrace();
                 return 0;
             }
         }else{
             try {
-                return this.addressMapper.update(instance);
+                int i = this.addressMapper.update(instance);
+                try {
+                    String ip = IpUtil.decConvertIp(Long.parseLong(instance.getIp()));
+                    if(Strings.isBlank(ip)){
+                        Address address = this.addressMapper.selectObjById(instance.getId());
+                        ip = IpUtil.decConvertIp(Long.parseLong(address.getIp()));
+                    }
+                    try {
+                        this.rsmsDeviceUtils.syncUpdateDevice(ip,
+                                instance.getMac(), instance.getLocation(), instance.getDuty(), instance.getDepartmentId());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return 0;
+                    }
+                    return i;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return 0;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return 0;

@@ -10,6 +10,17 @@
         <result column="value" property="value"></result>
     </resultMap>
 
+    <resultMap id="Interface_And_Tag" type="com.metoo.nspm.entity.zabbix.Interface">
+        <result column="hostid" property="hostid"></result>
+        <result column="ip" property="ip"></result>
+        <result column="available" property="available"></result>
+        <result column="error" property="error"></result>
+        <collection property="itemTags" javaType="list" ofType="com.metoo.nspm.entity.zabbix.InterfaceTag">
+            <result column="tag" property="tag"></result>
+            <result column="value" property="value"></result>
+        </collection>
+    </resultMap>
+
     <sql id="Base_Column_List">
         hostid, ip, available, error, value
     </sql>
@@ -30,5 +41,22 @@
         WHERE
           ip = #{ip}
     </select>
+
+    <select id="selectInfAndTag" parameterType="java.lang.String" resultMap="Interface_And_Tag">
+        SELECT * FROM interface inf
+        JOIN
+          (
+             SELECT
+                *
+             FROM
+                host_tag tag
+        )host_tag
+        ON
+          inf.hostid = host_tag.hostid
+        WHERE
+         inf.ip = #{ip}
+    </select>
+
+
 
 </mapper>

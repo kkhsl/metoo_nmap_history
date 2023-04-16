@@ -1,5 +1,6 @@
 package com.metoo.nspm.core.service.nspm.impl;
 
+import com.metoo.nspm.core.manager.admin.tools.RsmsDeviceUtils;
 import com.metoo.nspm.core.mapper.nspm.TerminalMapper;
 import com.metoo.nspm.core.service.nspm.IMacHistoryService;
 import com.metoo.nspm.core.service.nspm.IMacService;
@@ -9,10 +10,12 @@ import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.entity.nspm.Mac;
 import com.metoo.nspm.entity.nspm.Terminal;
 import com.metoo.nspm.entity.nspm.TerminalType;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +34,8 @@ public class TerminalServiceImpl implements ITerminalService {
     private IMacHistoryService macHistoryService;
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private RsmsDeviceUtils rsmsDeviceUtils;
 
     @Override
     public Terminal selectObjById(Long id) {
@@ -67,7 +72,23 @@ public class TerminalServiceImpl implements ITerminalService {
     @Override
     public int update(Terminal instance) {
         try {
-            return this.terminalMapper.update(instance);
+            int i = this.terminalMapper.update(instance);
+            if(i >= 1){
+                try {
+                    String ip = instance.getIp();
+                    if(Strings.isBlank(ip)){
+                        Terminal terminal = this.terminalMapper.selectObjById(instance.getId());
+                        ip = terminal.getIp();
+                    }
+                    this.rsmsDeviceUtils.syncUpdateDevice(ip,
+                            instance.getMac(), instance.getLocation(), instance.getDuty(), instance.getDepartmentId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return 0;
+                }
+            }
+            return i;
         } catch (Exception e) {
             e.printStackTrace();
             return 0;

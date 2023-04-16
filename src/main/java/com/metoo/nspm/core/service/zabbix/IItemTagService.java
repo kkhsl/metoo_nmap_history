@@ -18,4 +18,6 @@ public interface IItemTagService {
     List<ItemTagBoardVO> selectBoard(String ip, Long time_from, Long time_till);
 
     List<ItemTag> queryBoard(String ip);
+
+    List<ItemTag> queryBoardByMap(Map params);
 }

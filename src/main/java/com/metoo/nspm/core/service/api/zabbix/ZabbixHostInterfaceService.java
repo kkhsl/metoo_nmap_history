@@ -5,7 +5,6 @@ import com.metoo.nspm.dto.zabbix.HostInterfaceDTO;
 
 public interface ZabbixHostInterfaceService {
 
-
     JSONObject getHostInterface(HostInterfaceDTO dto);
 
     JSONObject getHostInterfaceByIp(String ip);

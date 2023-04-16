@@ -3,6 +3,7 @@ package com.metoo.nspm.core.manager.admin.action;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.core.manager.admin.tools.RsmsDeviceUtils;
 import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.service.topo.ITopoNodeService;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixItemService;
@@ -12,6 +13,7 @@ import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.logging.log4j.util.Strings;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +34,6 @@ public class SubnetManagerController {
     @Autowired
     private IpDetailService ipDetailService;
     @Autowired
-    private ITopoNodeService topoNodeService;
-    @Autowired
     private ZabbixItemService zabbixItemService;
     @Autowired
     private IVlanService vlanService;
@@ -41,6 +41,8 @@ public class SubnetManagerController {
     private IDomainService domainService;
     @Autowired
     private IIPAddressService ipAddressService;
+    @Autowired
+    private RsmsDeviceUtils rsmsDeviceUtils;
 
     public static void main(String[] args) {
         List list = new ArrayList();
@@ -470,6 +472,9 @@ public class SubnetManagerController {
                                     ipDetail.setDuration(day + "天" + hour + "小时");
                                     address.setIpDetail(ipDetail);
                                 }
+                                // 写入Ip地址的设备信息
+                                Map deviceInfo = this.rsmsDeviceUtils.getDeviceInfo(address.getIp());
+                                address.setDeviceInfo(deviceInfo);
                             }
                             addresses.put(ip, address);
                         }
@@ -515,7 +520,6 @@ public class SubnetManagerController {
                 return ResponseUtil.badArgument();
             }
             if(subnet.getMask() < 24 && subnet.getMask() >= 16){
-                int mask = subnet.getMask();
                 String[] str = ip.split("-");
                 if(str[0] != null){
                     boolean flag = IpUtil.verifyIp(str[0]);
@@ -529,8 +533,6 @@ public class SubnetManagerController {
                         params.put("begin_ip", IpUtil.ipConvertDec(str[0]));
                         params.put("end_ip", IpUtil.ipConvertDec(sb.toString()));
                         List<Address> addresses = this.addressService.selectObjByMap(params);
-                        Set<String> ips = addresses.stream().map(Address::getIp).filter(Objects::nonNull).collect(Collectors.toSet());
-                        List list = new ArrayList();
                         Map map = new LinkedHashMap();
                         for (int i = 1; i <= 255 ; i++) {
                             StringBuffer sb2 = new StringBuffer(begin_ip);
@@ -548,24 +550,13 @@ public class SubnetManagerController {
                                     ipDetail.setDuration(day + "天" + hour + "小时");
                                     address.setIpDetail(ipDetail);
                                 }
+                                // 写入Ip地址的设备信息
+                                Map deviceInfo = this.rsmsDeviceUtils.getDeviceInfo(address.getIp());
+                                address.setDeviceInfo(deviceInfo);
                                 map.put(sb2.toString(), address);
                             }else{
                                 map.put(sb2.toString(), null);
                             }
-
-//                            if(ips.contains(sb2.toString())){
-//                                IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(ip));
-//                                if(ipDetail != null){
-//                                    int time = ipDetail.getTime();
-//                                    // 每分钟采一次
-//                                    int hourAll = time / 60;// 一共多少小时
-//                                    int day = hourAll / 24;
-//                                    int hour = hourAll % 24;
-//                                    ipDetail.setDuration(day + "天" + hour + "小时");
-//
-//                                    address.setIpDetail(ipDetail);
-//                                }
-//                            }
                         }
                         return ResponseUtil.ok(map);
                     }
@@ -844,28 +835,34 @@ public class SubnetManagerController {
                 params.put("ips", ips);
                 params.put("usage", 0);
                 List<IpDetail> unuseds = this.ipDetailService.selectObjByMap(params);
+
                 params.clear();
                 params.put("ips", ips);
                 params.put("start", 1);
                 params.put("end", 2);
                 List<IpDetail> seldom = this.ipDetailService.selectObjByMap(params);
+
                 params.clear();
                 params.put("ips", ips);
                 params.put("start", 3);
                 params.put("end", 9);
                 List<IpDetail> unmeant = this.ipDetailService.selectObjByMap(params);
+
                 params.clear();
                 params.put("ips", ips);
                 params.put("endUsage", 10);
                 List<IpDetail> regular = this.ipDetailService.selectObjByMap(params);
+
                 List<Integer> list = this.genericSubnetIps(subnetId);
-//                IntSummaryStatistics summaryStatistics = list.stream().mapToInt((s) -> s).summaryStatistics();
-//                int sum = (int) summaryStatistics.getSum();
+
                 int sum = list.stream().mapToInt((s) -> s).sum();
+
                 int existingSum = unuseds.size() + seldom.size() + unmeant.size() + regular.size();
+
                 int inexistenceSum = sum - existingSum;
 
                 float unusedScale =(float)(unuseds.size() + inexistenceSum) / sum;
+
                 Map map = new HashMap();
                 map.put("unused",  Math.round(unusedScale * 100));
 
@@ -927,9 +924,9 @@ public class SubnetManagerController {
                 for (Subnet obj : subnets){
                     List<Integer> clengs = genericSubnetIps(obj.getId());
                     list.addAll(clengs);
-                    List<Subnet> csunets = this.subnetService.selectSubnetByParentId(subnet.getId());
+                    List<Subnet> csubnets = this.subnetService.selectSubnetByParentId(subnet.getId());
                     // 查询IP addresses in subnets
-                    if(csunets.size() <= 0 && obj.getMask() >= 21){
+                    if(csubnets.size() <= 0 && obj.getMask() >= 16){
                         // 获取地址列表
                         // 获取最大Ip地址和最小Ip地址
                         String mask = IpUtil.bitMaskConvertMask(obj.getMask());
@@ -943,7 +940,7 @@ public class SubnetManagerController {
                 }
             }
             // 查询IP addresses in subnets
-            if(subnets.size() <= 0 && subnet.getMask() >= 21){
+            if(subnets.size() <= 0 && subnet.getMask() >= 16){
                 // 获取地址列表
                 // 获取最大Ip地址和最小Ip地址
                 String mask = IpUtil.bitMaskConvertMask(subnet.getMask());

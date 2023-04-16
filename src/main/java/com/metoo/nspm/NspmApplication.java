@@ -16,6 +16,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * <p>
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Component;
 @EnableScheduling // 开启定时任务（启动类增加该注解，使项目启动后执行定时任务）
 @ServletComponentScan(basePackages ={ "com.metoo.nspm"})//只用注解配置时，需要扫描包
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
+@EnableTransactionManagement
 public class NspmApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
