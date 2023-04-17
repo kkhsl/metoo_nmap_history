@@ -84,7 +84,6 @@ public class GroupServiceImpl implements IGroupService {
                         group.setParentLevel(parent.getLevel());
                         group.setParentId(parent.getId());
                     }
-
                 }
             }else{
                 group.setParentLevel("0");

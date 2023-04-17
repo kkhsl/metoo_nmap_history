@@ -12,6 +12,7 @@ import com.metoo.nspm.core.mapper.zabbix.ItemMapper;
 import com.metoo.nspm.core.service.api.zabbix.*;
 import com.metoo.nspm.core.service.nspm.*;
 import com.metoo.nspm.core.service.zabbix.IItemTagService;
+import com.metoo.nspm.core.service.zabbix.InterfaceService;
 import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.core.utils.BasicDate.BasicDataConvertUtil;
 import com.metoo.nspm.core.utils.NodeUtil;
@@ -97,6 +98,8 @@ public class TopoManagerController {
     private IDeviceTypeService deviceTypeService;
     @Autowired
     private IUserMacroService userMacroService;
+    @Autowired
+    private InterfaceService interfaceService;
 
     @Test
     public void test(){
@@ -1038,13 +1041,13 @@ public class TopoManagerController {
                             if(ips.length == 1){
                                 ip_mask.append(tag.getIp());
                                 if(tag.getMask() != null && !tag.getMask().equals("")){
-                                    ip_mask.append("/").append(tag.getMask());
+                                    ip_mask.append("/").append(IpUtil.getBitMask(tag.getMask()));
                                 }
                                 map.put("ip", ip_mask);
                             }
                             if(ips.length > 1 && masks.length > 1){
                                 for(int i = 0; i < ips.length; i ++){
-                                    ip_mask.append(ips[i]).append("/").append(masks[i]);
+                                    ip_mask.append(ips[i]).append("/").append(IpUtil.getBitMask(masks[i]));
                                     if(i + 1 < ips.length){
                                         ip_mask .append("\n");
                                     }

@@ -1,9 +1,11 @@
 package com.metoo.nspm.core.manager.admin.tools;
 
 import com.metoo.nspm.core.service.nspm.IDepartmentService;
+import com.metoo.nspm.core.service.nspm.IGroupService;
 import com.metoo.nspm.core.service.nspm.IRsmsDeviceService;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.Department;
+import com.metoo.nspm.entity.nspm.Group;
 import com.metoo.nspm.entity.nspm.RsmsDevice;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +21,10 @@ public class RsmsDeviceUtils {
     @Autowired
     private IRsmsDeviceService rsmsDeviceService;
     @Autowired
-    private IDepartmentService departmentService;
+    private IGroupService groupService;
 
     public int syncUpdateDevice(String ip,String mac,  String location, String duty,
                                 Long departmentId){
-
         if(ip != null && IpUtil.verifyIp(ip)){
             Map params = new HashMap();
             params.put("ip", ip);
@@ -55,8 +56,8 @@ public class RsmsDeviceUtils {
                     map.put("location", device.getLocation());
                     map.put("duty", device.getDuty());
                     if(device.getDepartmentId() != null){
-                        Department department = this.departmentService.selectObjById(device.getDepartmentId());
-                        map.put("departmentName", department.getName());
+                        Group department = this.groupService.selectObjById(device.getDepartmentId());
+                        map.put("departmentName", department.getBranchName());
                         map.put("departmentId", department.getId());
                     }
                     return map;

@@ -41,4 +41,91 @@
         </if>
     </select>
 
+    <select id="queryChild" parameterType="long" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM rsms_department
+        <where>
+            <choose>
+                <when test="parentId != null">
+                    parent_id = #{parentId}
+                </when>
+                <when test="parentId == null">
+                    parent_id is null
+                </when>
+                <otherwise>
+
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.metoo.nspm.entity.nspm.Department" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO rsms_department
+        <trim prefix="("  suffixOverrides="," suffix=")">
+            <if test="addTime != null">
+                addTime,
+            </if>
+            <if test="deleteStatus != null">
+                deleteStatus,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="desc != null">
+                `desc`,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="sequence != null">
+                sequence,
+            </if>
+        </trim>
+        <trim prefix="VALUES(" suffixOverrides="," suffix=")">
+            <if test="addTime != null">
+                #{addTime},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus},
+            </if>
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="desc != null">
+                #{desc},
+            </if>
+            <if test="parentId != null">
+                #{parentId},
+            </if>
+            <if test="sequence != null">
+                #{sequence},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.metoo.nspm.entity.nspm.Department">
+        UPDATE rsms_department
+        <set>
+            <if test="addTime != null">
+                addTime = #{addTime},
+            </if>
+            <if test="deleteStatus != null">
+                deleteStatus = #{deleteStatus},
+            </if>
+            <if test="name != null">
+                `name` = #{name},
+            </if>
+            <if test="desc != null">
+                `desc` = #{desc},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId},
+            </if>
+            <if test="sequence != null">
+                `sequence` = #{sequence},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
 </mapper>

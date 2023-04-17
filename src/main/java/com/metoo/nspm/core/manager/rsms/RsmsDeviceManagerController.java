@@ -98,9 +98,15 @@ public class RsmsDeviceManagerController {
         if(page.getResult().size() > 0){
             page.getResult().stream().forEach(e -> {
                 if(e.getDepartmentId() != null){
-                    Department department = this.departmentService.selectObjById(e.getDepartmentId());
+                    Group department = this.groupService.selectObjById(e.getDepartmentId());
                     if(department != null){
-                        e.setDepartmentName(department.getName());
+                        e.setDepartmentName(department.getBranchName());
+                    }
+                }
+                if(e.getGroupId() != null){
+                    Group group = this.groupService.selectObjById(e.getGroupId());
+                    if(group != null){
+                        e.setGroupName(group.getBranchName());
                     }
                 }
             });
@@ -125,11 +131,11 @@ public class RsmsDeviceManagerController {
         params.put("userId", user.getId());
         List<Project> projectList = this.projectService.selectObjByMap(params);
         map.put("project", projectList);
-        params.clear();
-        params.put("orderBy", "sequence");
-        params.put("orderType", "desc");
-        List<Department> departments= this.departmentService.selectObjByMap(params);
-        map.put("department", departments);
+//        params.clear();
+//        params.put("orderBy", "sequence");
+//        params.put("orderType", "desc");
+//        List<Department> departments= this.departmentService.selectObjByMap(params);
+//        map.put("department", departments);
         return ResponseUtil.ok(new PageInfo<Rack>(page, map));
     }
 
@@ -200,11 +206,11 @@ public class RsmsDeviceManagerController {
         params.put("userId", user.getId());
         List<Project> projectList = this.projectService.selectObjByMap(params);
         map.put("project", projectList);
-        params.clear();
-        params.put("orderBy", "sequence");
-        params.put("orderType", "desc");
-        List<Department> departments= this.departmentService.selectObjByMap(params);
-        map.put("department", departments);
+//        params.clear();
+//        params.put("orderBy", "sequence");
+//        params.put("orderType", "desc");
+//        List<Department> departments= this.departmentService.selectObjByMap(params);
+//        map.put("department", departments);
         return ResponseUtil.ok(map);
     }
 
@@ -248,11 +254,11 @@ public class RsmsDeviceManagerController {
             params.put("userId", user.getId());
             List<Project> projectList = this.projectService.selectObjByMap(params);
             map.put("project", projectList);
-            params.clear();
-            params.put("orderBy", "sequence");
-            params.put("orderType", "desc");
-            List<Department> departments= this.departmentService.selectObjByMap(params);
-            map.put("department", departments);
+//            params.clear();
+//            params.put("orderBy", "sequence");
+//            params.put("orderType", "desc");
+//            List<Department> departments= this.departmentService.selectObjByMap(params);
+//            map.put("department", departments);
             return ResponseUtil.ok(map);
         }
         return ResponseUtil.badArgument();
@@ -406,7 +412,6 @@ public class RsmsDeviceManagerController {
                         return ResponseUtil.badArgument("当前位置已有设备");
                     }
                 }
-
                 instance.setRackId(rack.getId());
                 instance.setRackName(rack.getName());
             }else{
@@ -435,11 +440,17 @@ public class RsmsDeviceManagerController {
         }
         // 验证部门
         if(instance.getDepartmentId() != null){
-            Department department = this.departmentService.selectObjById(instance.getDepartmentId());
+            Group department = this.groupService.selectObjById(instance.getDepartmentId());
             if(department == null){
                 return ResponseUtil.badArgument("请输入正确部门信息");
             }
         }
+//        if(instance.getDepartmentId() != null){
+//            Department department = this.departmentService.selectObjById(instance.getDepartmentId());
+//            if(department == null){
+//                return ResponseUtil.badArgument("请输入正确部门信息");
+//            }
+//        }
 
         int flag = this.rsmsDeviceService.save(instance);
         if (flag != 0){
@@ -671,15 +682,12 @@ public class RsmsDeviceManagerController {
                         }
                         // 部门
                         if(device.getDepartmentName() != null && !device.getDepartmentName().equals("")){
-                            params.clear();
-                            params.put("name", device.getDepartmentName());
-                            List<Department> departments = this.departmentService.selectObjByMap(params);
-                            if(departments.size() <= 0){
+                            Group group = this.groupService.selectObjByName(device.getDepartmentName());
+                            if(group == null){
                                 msg = "第" + (i + 2) + "行,部门不存在";
                                 break;
                             }else{
-                                Department department = departments.get(0);
-                                device.setDepartmentId(department.getId());
+                                device.setDepartmentId(group.getId());
                             }
                         }
                         rsmsDevices.add(device);
@@ -762,8 +770,8 @@ public class RsmsDeviceManagerController {
                     rsmsDevice.setProjectName(instance.getName());
                 }
                 if(rsmsDevice.getDepartmentId() != null && !rsmsDevice.getDepartmentId().equals("")){
-                    Department department = this.departmentService.selectObjById(rsmsDevice.getDepartmentId());
-                    rsmsDevice.setDepartmentName(department.getName());
+                    Group department = this.groupService.selectObjById(rsmsDevice.getDepartmentId());
+                    rsmsDevice.setDepartmentName(department.getBranchName());
                 }
             }
             List<List<Object>> sheetDataList = ExcelUtils.getSheetData(devices);
